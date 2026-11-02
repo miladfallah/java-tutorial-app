@@ -63,19 +63,21 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
   const isPassed = currentScore >= passThreshold;
 
   return (
-    <div className="my-10 rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/20 to-slate-900/60 p-5 sm:p-7 shadow-xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
-            <HelpCircle className="w-6 h-6" />
+    <section
+      id="quiz"
+      className="my-8 rounded-xl border border-border bg-card p-5 sm:p-6"
+    >
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border/60">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-secondary text-primary border border-border flex items-center justify-center shrink-0 mt-0.5">
+            <HelpCircle className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                سنجش درک مفهومی و کوییز
-              </span>
+            <div className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+              Concept Check
             </div>
-            <h3 className="text-lg font-bold text-white mt-1">
+            <h3 className="text-base font-semibold text-foreground mt-0.5">
               آزمونک سنجش یادگیری ({toPersianDigits(quizzes.length)} سوال تخصصی)
             </h3>
           </div>
@@ -83,34 +85,32 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
 
         {submitted && (
           <div className="flex items-center gap-2">
-            <div
+            <span
               className={cn(
-                "px-3 py-1.5 rounded-xl border text-xs sm:text-sm font-bold flex items-center gap-1.5",
+                "px-2.5 py-1 rounded-md text-xs font-mono font-medium border",
                 isPassed
-                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                  : "bg-rose-500/20 text-rose-300 border-rose-500/40"
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                  : "bg-rose-500/10 text-rose-400 border-rose-500/20"
               )}
             >
-              <Award className="w-4 h-4" />
-              <span>
-                نمره: {toPersianDigits(currentScore)} از {toPersianDigits(quizzes.length)} (
-                {isPassed ? "قبول شدی!" : "نیاز به مرور"})
-              </span>
-            </div>
+              نمره: {toPersianDigits(currentScore)} / {toPersianDigits(quizzes.length)} (
+              {isPassed ? "قبول" : "نیازمند مرور"})
+            </span>
 
             <button
               onClick={handleRetry}
-              className="p-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+              className="p-1.5 rounded-lg border border-border bg-secondary hover:bg-secondary/80 text-muted-foreground hover:text-foreground transition-colors"
               title="آزمون مجدد"
+              aria-label="آزمون مجدد"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
       </div>
 
-      {/* Quiz questions */}
-      <div className="mt-6 space-y-8">
+      {/* Quizzes List */}
+      <div className="mt-4 space-y-6">
         {quizzes.map((quiz, qIndex) => {
           const selected = selectedAnswers[quiz.id];
           const isAnswered = selected !== undefined;
@@ -119,39 +119,39 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
           return (
             <div
               key={quiz.id}
-              className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 sm:p-5 transition-all"
+              className="rounded-lg border border-border/70 bg-background/50 p-4 space-y-3"
             >
-              <div className="flex items-start gap-3 mb-4">
-                <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded bg-secondary text-foreground flex items-center justify-center text-xs font-mono font-medium shrink-0 mt-0.5 border border-border/60">
                   {toPersianDigits(qIndex + 1)}
                 </span>
-                <h4 className="text-sm font-semibold text-slate-100 leading-relaxed">
+                <h4 className="text-xs sm:text-sm font-medium text-foreground leading-relaxed">
                   {quiz.question}
                 </h4>
               </div>
 
               {/* Options */}
-              <div className="space-y-2.5 mr-9">
+              <div className="space-y-1.5 mr-7">
                 {quiz.options.map((option, optIdx) => {
                   const isThisSelected = selected === optIdx;
                   const isThisCorrect = optIdx === quiz.correctIndex;
 
                   let optionStyle =
-                    "border-slate-800/80 bg-slate-900/40 text-slate-300 hover:bg-slate-800/60 hover:text-white";
+                    "border-border/60 bg-card hover:bg-secondary/50 text-foreground";
 
                   if (submitted) {
                     if (isThisCorrect) {
                       optionStyle =
-                        "border-emerald-500/50 bg-emerald-950/40 text-emerald-200 font-medium";
+                        "border-emerald-500/50 bg-emerald-500/5 text-emerald-300 font-medium";
                     } else if (isThisSelected && !isThisCorrect) {
                       optionStyle =
-                        "border-rose-500/50 bg-rose-950/40 text-rose-200";
+                        "border-rose-500/50 bg-rose-500/5 text-rose-300";
                     } else {
-                      optionStyle = "border-slate-800/40 bg-slate-950/20 text-slate-500 opacity-60";
+                      optionStyle = "border-border/30 bg-card/40 text-muted-foreground opacity-50";
                     }
                   } else if (isThisSelected) {
                     optionStyle =
-                      "border-orange-500/50 bg-orange-950/30 text-orange-200 font-medium";
+                      "border-primary bg-primary-muted text-primary font-medium";
                   }
 
                   return (
@@ -160,24 +160,24 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
                       disabled={submitted}
                       onClick={() => handleSelectOption(quiz.id, optIdx)}
                       className={cn(
-                        "w-full text-right p-3 rounded-xl border text-xs sm:text-sm flex items-center justify-between gap-3 transition-all",
+                        "w-full text-right p-2.5 rounded-lg border text-xs flex items-center justify-between gap-2.5 transition-colors",
                         optionStyle
                       )}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-5 h-5 rounded-md border border-slate-700 bg-slate-800/80 text-slate-400 text-[11px] font-mono flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-2">
+                        <span className="w-4 h-4 rounded text-[10px] font-mono border border-border bg-secondary text-muted-foreground flex items-center justify-center shrink-0">
                           {String.fromCharCode(65 + optIdx)}
                         </span>
-                        <span>{option}</span>
+                        <span className="leading-relaxed">{option}</span>
                       </div>
 
                       {submitted && (
                         <div>
                           {isThisCorrect && (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                           )}
                           {isThisSelected && !isThisCorrect && (
-                            <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                            <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                           )}
                         </div>
                       )}
@@ -190,20 +190,15 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
               {submitted && (
                 <div
                   className={cn(
-                    "mt-4 mr-9 p-3.5 rounded-xl border text-xs leading-relaxed",
+                    "mr-7 p-2.5 rounded-lg border text-xs leading-relaxed",
                     isCorrect
-                      ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-300"
-                      : "border-amber-500/30 bg-amber-950/20 text-amber-300"
+                      ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-300"
+                      : "border-border bg-secondary/30 text-muted-foreground"
                   )}
                 >
-                  <div className="font-semibold flex items-center gap-1.5 mb-1">
-                    {isCorrect ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    ) : (
-                      <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                    )}
-                    <span>تحلیل و پاسخ تشریحی:</span>
-                  </div>
+                  <span className="font-semibold text-foreground block mb-1">
+                    تحلیل و توضیح:
+                  </span>
                   <p>{quiz.explanation}</p>
                 </div>
               )}
@@ -212,26 +207,26 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
         })}
       </div>
 
-      {/* Action button */}
+      {/* Submit Button */}
       {!submitted && (
-        <div className="mt-6 flex items-center justify-between gap-4 pt-4 border-t border-slate-800">
-          <span className="text-xs text-slate-400">
-            {toPersianDigits(answeredCount)} از {toPersianDigits(quizzes.length)} سوال پاسخ داده شده
+        <div className="mt-5 pt-3 border-t border-border flex items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">
+            {toPersianDigits(answeredCount)} از {toPersianDigits(quizzes.length)} سوال پاسخ داده شد
           </span>
           <button
             disabled={!isAllAnswered}
             onClick={handleSubmit}
             className={cn(
-              "px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all",
+              "px-4 py-2 rounded-lg text-xs font-semibold transition-colors",
               isAllAnswered
-                ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20"
-                : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                : "bg-secondary text-muted-foreground cursor-not-allowed border border-border"
             )}
           >
-            ثبت پاسخ‌ها و مشاهده نتیجه
+            مشاهده نتیجه آزمونک
           </button>
         </div>
       )}
-    </div>
+    </section>
   );
 }

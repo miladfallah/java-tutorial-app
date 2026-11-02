@@ -6,133 +6,162 @@ import {
   Boxes, 
   Terminal, 
   Database, 
-  ShieldCheck, 
   Server, 
   Cpu, 
-  GitBranch, 
-  ChevronDown, 
-  ChevronUp, 
-  ExternalLink,
   Layers,
-  ArrowRight
+  ArrowRight,
+  ExternalLink,
+  CheckCircle2,
+  Copy,
+  Check
 } from "lucide-react";
 import { CodeBlock } from "@/components/lesson/CodeBlock";
-import { toPersianDigits } from "@/lib/utils";
+import { toPersianDigits, cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 export default function CapstonePage() {
-  const [activeTab, setActiveTab] = useState<string>("architecture");
+  const [activeTab, setActiveTab] = useState<"architecture" | "phases" | "docker-local">("architecture");
+  const [copiedCmd, setCopiedCmd] = useState(false);
+
+  const copyCommand = () => {
+    navigator.clipboard.writeText("docker compose -f compose.yaml up -d");
+    setCopiedCmd(true);
+    setTimeout(() => setCopiedCmd(false), 2000);
+  };
 
   const phases = [
     {
+      phaseNumber: 1,
       weekRange: "هفته ۱ تا ۴",
-      title: "فاز ۱ — فونداسیون دامنه و همزمانی خالص در جاوا ۲۱",
-      desc: "طراحی اشیای دامنه Order و Product با انکپسولیشن قوی، حل Race Condition در کسر موجودی با Atomic و ExecutorService، و بسته‌بندی با Maven.",
-      techs: ["Java 21", "Maven", "OOP", "Concurrency", "JUnit 5"],
+      title: "فونداسیون دامنه و همزمانی خالص در جاوا ۲۱",
+      titleEn: "Domain Foundation & Pure Concurrency in Java 21",
+      desc: "طراحی اشیای دامنه Order و Product با انکپسولیشن قوی و Value Objectها، حل رقابت همروند در کسر موجودی انبار با AtomicReference و ExecutorService، و بسته‌بندی ماژولار با Maven Multi-module.",
+      techs: ["Java 21", "Maven", "OOP Patterns", "ExecutorService", "JUnit 5"],
       link: "/lessons/order-product-domain-models",
     },
     {
+      phaseNumber: 2,
       weekRange: "هفته ۵ تا ۸",
-      title: "فاز ۲ — وب سرویس میکروسرویس با Spring Boot 3.3",
-      desc: "تبدیل ماژول به وب‌سرویس RESTful، اعتبارسنجی جاکارتا، DTOها، هندلر خطای سراسری RFC 7807، فیلترهای لاگ‌نویسی و اعمال Idempotency Key.",
-      techs: ["Spring Boot 3", "Spring MVC", "Jakarta Validation", "OpenAPI", "Docker"],
+      title: "وب سرویس استاندارد سازمانی با Spring Boot 3.3",
+      titleEn: "Production RESTful Service with Spring Boot 3.3",
+      desc: "تبدیل ماژول به وب‌سرویس RESTful، اعتبارسنجی جاکارتا (Jakarta Validation)، DTOها و Recordها، مدیریت متمرکز استثناها طبق استاندارد RFC 7807، فیلترهای لاگ‌نویسی و پیاده‌سازی Idempotency Key برای سفارشات تکراری.",
+      techs: ["Spring Boot 3", "Spring MVC", "Jakarta Validation", "OpenAPI / Swagger", "Docker"],
       link: "/lessons/building-the-order-rest-api",
     },
     {
+      phaseNumber: 3,
       weekRange: "هفته ۹ تا ۱۲",
-      title: "فاز ۳ — پایداری داده با PostgreSQL، هایبرنیت و تراکنش‌ها",
-      desc: "مدل‌سازی جداول سفارشات در PostgreSQL، حل باگ N+1 با EntityGraph، کنترل همروندی رزرو انبار با Pessimistic Lock و مایگریشن با Flyway.",
-      techs: ["PostgreSQL", "Spring Data JPA", "Hibernate", "Flyway", "HikariCP"],
+      title: "پایداری داده با PostgreSQL، هایبرنیت و مدیریت تراکنش",
+      titleEn: "Data Persistence with PostgreSQL, Hibernate & Transactions",
+      desc: "مدل‌سازی دقیق جداول سفارشات و اقلام در PostgreSQL، پیشگیری از باگ فاجعه‌بار N+1 با EntityGraph، کنترل همروندی رزرو انبار با Pessimistic Lock و مایگریشن پایگاه‌داده با Flyway.",
+      techs: ["PostgreSQL 16", "Spring Data JPA", "Hibernate 6", "Flyway", "HikariCP"],
       link: "/lessons/implementing-order-and-orderitem-entities",
     },
     {
+      phaseNumber: 4,
       weekRange: "هفته ۱۳ تا ۱۶",
-      title: "فاز ۴ — امنیت با JWT، تست‌های یکپارچه و تاب‌آوری",
-      desc: "امن‌سازی اندپوینت‌ها با Spring Security 6 و توکن‌های بدون وضعیت JWT، تست‌های واقعی دیتابیس با Testcontainers و مدارشکن با Resilience4j.",
-      techs: ["Spring Security", "JWT", "Testcontainers", "Resilience4j", "Bucket4j"],
+      title: "امنیت با JWT، تست‌های یکپارچه و الگوهای تاب‌آوری",
+      titleEn: "Stateless Security, Real Integration Tests & Resilience",
+      desc: "امن‌سازی اندپوینت‌ها با Spring Security 6 و توکن‌های JWT بدون وضعیت، تست‌های یکپارچه دیتابیس با داکر کانتینرهای واقعی به کمک Testcontainers و پیاده‌سازی Circuit Breaker و Rate Limiting.",
+      techs: ["Spring Security 6", "JWT Bearer", "Testcontainers", "Resilience4j", "Bucket4j"],
       link: "/lessons/securing-the-order-api",
     },
     {
+      phaseNumber: 5,
       weekRange: "هفته ۱۷ تا ۲۰",
-      title: "فاز ۵ — پیام‌رسانی ناهمگام، کشینگ ردیس و ترد مجازی",
-      desc: "انتشار رویداد OrderCreated به RabbitMQ، پیاده‌سازی Transactional Outbox جهت تضمین ارسال رویداد، کش ردیس و ارتقا به Virtual Threads جاوا ۲۱.",
-      techs: ["RabbitMQ", "Transactional Outbox", "Redis", "Virtual Threads", "k6"],
+      title: "پیام‌رسانی ناهمگام، کشینگ ردیس و ترد مجازی جاوا ۲۱",
+      titleEn: "Asynchronous Messaging, Redis Caching & Virtual Threads",
+      desc: "انتشار رویداد OrderCreated به صف RabbitMQ، پیاده‌سازی تضمینی Transactional Outbox جهت جلوگیری از عدم تطابق داده و پیام، کشینگ دو لایه با Redis و فعال‌سازی سراسری Virtual Threads جاوا ۲۱.",
+      techs: ["RabbitMQ", "Transactional Outbox", "Redis", "Virtual Threads (Project Loom)", "k6 Benchmark"],
       link: "/lessons/publishing-ordercreated-events",
     },
     {
+      phaseNumber: 6,
       weekRange: "هفته ۲۱ تا ۲۶",
-      title: "فاز ۶ — معماری توزیع‌شده، مشاهده‌پذیری و استقرار نهایی",
-      desc: "طراحی الگوی Saga برای جبران شکست پرداخت، رهگیری توزیع‌شده با OpenTelemetry، متریک‌های پرومتئوس و گرافانا و دیپلوی چندمرحله‌ای داکر.",
-      techs: ["Saga Pattern", "OpenTelemetry", "Prometheus", "Grafana", "CI/CD"],
+      title: "معماری توزیع‌شده، مشاهده‌پذیری و استقرار نهایی",
+      titleEn: "Distributed Architecture, Full Observability & Production",
+      desc: "طراحی الگوی Saga جهت مدیریت تراکنش‌های چند سرویسی و جبران خطا، رهگیری درخواست‌ها (Distributed Tracing) با OpenTelemetry، متریک‌های پرومتئوس و گرافانا و پایپ‌لاین چندمرحله‌ای داکر.",
+      techs: ["Saga Orchestration", "OpenTelemetry", "Prometheus", "Grafana", "Multi-stage Docker"],
       link: "/lessons/instrumenting-the-order-api",
     },
   ];
 
   return (
-    <div className="space-y-10 pb-16">
+    <div className="space-y-8 pb-16">
       {/* Header */}
-      <div className="space-y-4 pb-6 border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
-            پروژه محوری پیوسته در طول ۲۶ هفته
-          </span>
+      <div className="space-y-4 pb-6 border-b border-border">
+        <div className="inline-flex items-center gap-2 text-xs font-mono font-medium text-primary">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <span>CAPSTONE_PROJECT</span>
+          <span className="text-muted-foreground/60">•</span>
+          <span className="text-muted-foreground font-sans">پروژه محوری ۲۶ هفته‌ای</span>
         </div>
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
-          سامانه جامع مدیریت سفارشات و انبار (Order & Inventory System)
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
-          شما در طول این آکادمی فقط تئوری یاد نمی‌گیرید؛ بلکه همگام با آموزش‌ها یک سیستم سفارشات و انبارداری سازمانی مقیاس‌پذیر، 
-          مبتنی بر Modular Monolith با قابلیت گذار به Event-Driven Microservices را در محیط توسعه IDE خود ایجاد خواهید کرد.
-        </p>
+
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+            سامانه مدیریت سفارشات و انبار سازمانی (Order & Inventory System)
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+            در این آکادمی پروژه‌های کوچک جزیره‌ای وجود ندارد؛ بلکه در طول ۲۶ هفته یک سیستم واقعی، توزیع‌پذیر و با کارایی بالا بر اساس معماری Modular Monolith با قابلیت گذار به Event-Driven Microservices در مخزن لوکال خود می‌سازید.
+          </p>
+        </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-2 pt-2">
+        <div className="flex items-center gap-1.5 pt-2">
           <button
             onClick={() => setActiveTab("architecture")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+            className={cn(
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border",
               activeTab === "architecture"
-                ? "bg-orange-500 text-white border-orange-500 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
-            }`}
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
+            )}
           >
             معماری و جریان داده‌ها
           </button>
           <button
             onClick={() => setActiveTab("phases")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+            className={cn(
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border",
               activeTab === "phases"
-                ? "bg-orange-500 text-white border-orange-500 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
-            }`}
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
+            )}
           >
-            فازهای توسعه ۲۶ هفته
+            فازهای توسعه ۶ گانه
           </button>
           <button
             onClick={() => setActiveTab("docker-local")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+            className={cn(
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border",
               activeTab === "docker-local"
-                ? "bg-orange-500 text-white border-orange-500 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
-            }`}
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
+            )}
           >
-            داکر و زیرساخت لوکال پروژه
+            داکر و زیرساخت لوکال
           </button>
         </div>
       </div>
 
       {/* Tab 1: Architecture */}
       {activeTab === "architecture" && (
-        <div className="space-y-8">
-          <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Layers className="w-5 h-5 text-orange-400" />
-              معماری کلی سیستم: Modular Monolith رو به Event-Driven
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              ما از پیچیدگی نارس و زودهنگام میکروسرویس‌ها پرهیز می‌کنیم. پروژه با یک مونولیت ماژولار با مرزهای شفاف بیزینسی (Clean Boundaries) شروع می‌شود 
-              و به مرور زمان پایگاه‌های داده PostgreSQL، کشینگ Redis، پیام‌رسانی RabbitMQ و الگوی حیاتی Transactional Outbox به آن اضافه می‌گردد.
-            </p>
+        <div className="space-y-6">
+          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                <Layers className="w-4 h-4 text-primary" />
+                معماری سامانه: Modular Monolith رو به Event-Driven
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                برای جلوگیری از پیچیدگی نارس میکروسرویس‌ها، سیستم با مرزهای شفاف بیزینسی (Clean Boundaries) داخل یک پروژه ماژولار شکل می‌گیرد و سپس به کمک RabbitMQ، الگوی Transactional Outbox و پایگاه‌های داده توزیع‌شده بسط می‌یابد.
+              </p>
+            </div>
 
-            <div className="p-4 rounded-xl border border-slate-800 bg-slate-950 font-mono text-xs text-slate-300 ltr-dir leading-relaxed overflow-x-auto">
+            {/* ASCII Architecture Diagram */}
+            <div className="p-4 rounded-xl border border-border bg-[#0c0e12] font-mono text-xs text-zinc-300 ltr-dir leading-relaxed overflow-x-auto shadow-inner">
               <pre>{`[ Client / React Frontend ]
            │  HTTP REST (OpenAPI 3 / JWT Bearer)
            ▼
@@ -159,34 +188,34 @@ export default function CapstonePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900/30 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
-                <Database className="w-5 h-5" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
+                <Database className="w-4 h-4" />
               </div>
-              <h4 className="text-sm font-bold text-white">پایگاه داده رابطه‌ای</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                PostgreSQL 16 با مایگریشن‌های Flyway، قفل‌های Pessimistic برای جلوگیری از اتمام موجودی و ایندکس‌های کامپوزیت بهینه.
+              <h4 className="text-sm font-bold text-foreground">پایگاه داده رابطه‌ای سازمانی</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                استفاده از PostgreSQL 16 به همراه مایگریشن‌های خودکار Flyway، تراکنش‌های ایزوله و قفل‌های Pessimistic جهت تضمین عدم موجودی منفی در انبار.
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900/30 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center">
-                <Server className="w-5 h-5" />
+            <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
+                <Server className="w-4 h-4" />
               </div>
-              <h4 className="text-sm font-bold text-white">پیام‌رسانی با اطمینان ۱۰۰٪</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                RabbitMQ به همراه الگوی Transactional Outbox جهت حل معضل قطعی شبکه و تضمین ارسال ایونت پس از Commit تراکنش دیتابیس.
+              <h4 className="text-sm font-bold text-foreground">پیام‌رسانی با اطمینان ۱۰۰٪</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                پیاده‌سازی RabbitMQ و الگوی حیاتی Transactional Outbox جهت جلوگیری از معضل 2PC و اطمینان از ارسال رویدادهای مالی پس از Commit قطعی دیتابیس.
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900/30 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-                <Cpu className="w-5 h-5" />
+            <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
+                <Cpu className="w-4 h-4" />
               </div>
-              <h4 className="text-sm font-bold text-white">همروندی مدرن با ترد مجازی</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Java 21 Virtual Threads جهت پاسخگویی به دهها هزار اتصال همزمان بدون نیاز به پیچیدگی‌های برنامه‌نویسی واکنشی (Reactive).
+              <h4 className="text-sm font-bold text-foreground">مقیاس‌پذیری با ترد مجازی</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                پیکربندی Virtual Threads در Java 21 برای مدیریت ده‌ها هزار درخواست همزمان I/O-bound بدون نیاز به پیچیدگی کدنویسی ری‌اکتیو (WebFlux).
               </p>
             </div>
           </div>
@@ -195,35 +224,47 @@ export default function CapstonePage() {
 
       {/* Tab 2: Phases */}
       {activeTab === "phases" && (
-        <div className="space-y-4">
-          {phases.map((ph, idx) => (
+        <div className="space-y-3.5">
+          {phases.map((ph) => (
             <div
-              key={idx}
-              className="p-5 sm:p-6 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-3"
+              key={ph.phaseNumber}
+              className="p-5 rounded-xl border border-border bg-card space-y-3 hover:border-border/80 transition-colors"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">
-                  {ph.weekRange}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-secondary border border-border text-primary">
+                    فاز {toPersianDigits(ph.phaseNumber)}
+                  </span>
+                  <Badge variant="neutral">
+                    {ph.weekRange}
+                  </Badge>
+                </div>
                 <Link
                   href={ph.link}
-                  className="text-xs text-orange-400 hover:text-orange-300 font-semibold flex items-center gap-1"
+                  className="text-xs text-primary hover:underline font-semibold flex items-center gap-1 group"
                 >
-                  <span>شروع این فاز در درس‌های آکادمی</span>
-                  <ArrowRight className="w-3.5 h-3.5 rotate-180" />
+                  <span>ورود به درس شروع این فاز</span>
+                  <ArrowRight className="w-3 h-3 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
                 </Link>
               </div>
 
-              <h3 className="text-base font-bold text-white">{ph.title}</h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {ph.desc}
-              </p>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-foreground flex flex-wrap items-baseline gap-2">
+                  <span>{ph.title}</span>
+                  <span className="text-xs text-muted-foreground font-mono ltr-dir">
+                    [{ph.titleEn}]
+                  </span>
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {ph.desc}
+                </p>
+              </div>
 
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {ph.techs.map((t, tIdx) => (
                   <span
                     key={tIdx}
-                    className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400 ltr-dir"
+                    className="text-[11px] font-mono px-2 py-0.5 rounded bg-secondary/80 border border-border/80 text-muted-foreground ltr-dir"
                   >
                     {t}
                   </span>
@@ -236,20 +277,22 @@ export default function CapstonePage() {
 
       {/* Tab 3: Docker Local Setup */}
       {activeTab === "docker-local" && (
-        <div className="space-y-6">
-          <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-3">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-orange-400" />
-              داکر کامپوز زیرساخت بک‌اند پروژه عملی
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              این فایل \`compose.yaml\` را می‌توانید در مخزن پروژه جاوا خود در لوکال قرار دهید تا با یک دستور، PostgreSQL، Redis و RabbitMQ با تنظیمات پروداکشن بالا بیایند:
-            </p>
+        <div className="space-y-5">
+          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-primary" />
+                داکر کامپوز زیرساخت لوکال پروژه
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                این فایل <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-secondary border border-border text-foreground">compose.yaml</code> را در ریشه پروژه جاوا در کامپیوتر خود قرار دهید تا تمامی سرویس‌های مورد نیاز (پایگاه‌داده، کش و صف پیام) با یک فرمان اجرا شوند:
+              </p>
+            </div>
 
             <CodeBlock
               language="yaml"
-              filename="capstone-infra/compose.yaml"
-              title="Infrastructure Compose"
+              filename="compose.yaml"
+              title="Local Infrastructure Compose"
               code={`services:
   postgres:
     image: postgres:16-alpine
@@ -294,9 +337,22 @@ volumes:
   rabbitmqdata:`}
             />
 
-            <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/70 text-xs text-slate-300 space-y-1">
-              <span className="font-semibold text-orange-400 block">دستور راه‌اندازی زیرساخت لوکال:</span>
-              <pre className="font-mono text-slate-200 ltr-dir">docker compose -f compose.yaml up -d</pre>
+            <div className="p-3.5 rounded-xl border border-border bg-secondary/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="space-y-1">
+                <span className="font-semibold text-foreground block">دستور راه‌اندازی زیرساخت در ترمینال:</span>
+                <code className="font-mono text-primary ltr-dir block text-xs">
+                  docker compose -f compose.yaml up -d
+                </code>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={copyCommand}
+                className="text-xs h-8 shrink-0 self-start sm:self-center gap-1.5"
+              >
+                {copiedCmd ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedCmd ? "کپی شد" : "کپی دستور"}</span>
+              </Button>
             </div>
           </div>
         </div>

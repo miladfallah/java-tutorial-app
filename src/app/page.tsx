@@ -1,26 +1,26 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { 
   CheckCircle2, 
   Clock, 
   Flame, 
   ArrowLeft, 
-  Calendar, 
-  Trophy, 
-  Sparkles, 
-  BookOpen, 
-  TrendingUp,
-  Boxes,
-  Zap,
-  Bookmark,
+  Terminal,
+  Layers,
   ChevronLeft,
-  RotateCcw
+  Circle,
+  Map,
+  RotateCcw,
+  BookMarked,
+  Boxes
 } from "lucide-react";
 import { useAcademyStore } from "@/lib/store";
 import { ALL_LESSON_SUMMARIES, WEEKS_META } from "@/data/curriculum";
-import { toPersianDigits, formatMinutes, cn } from "@/lib/utils";
+import { toPersianDigits, cn } from "@/lib/utils";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { Button } from "@/components/ui/Button";
 
 export default function DashboardPage() {
   const { progress, isLoaded, loadProgress } = useAcademyStore();
@@ -31,260 +31,254 @@ export default function DashboardPage() {
     loadProgress();
   }, [loadProgress]);
 
-  if (!mounted || !isLoaded) {
-    return (
-      <div className="py-20 flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
-        <p className="text-sm text-slate-400">در حال بارگذاری اطلاعات پیشرفت...</p>
-      </div>
-    );
-  }
+  const completedSet = useMemo(
+    () => new Set(isLoaded ? progress.completedLessons : []),
+    [isLoaded, progress.completedLessons]
+  );
 
-  const completedCount = progress.completedLessons.length;
+  const completedCount = completedSet.size;
   const totalLessons = 156;
   const remainingLessons = totalLessons - completedCount;
   const completionPercent = Math.round((completedCount / totalLessons) * 100);
 
-  // Identify last studied lesson or next lesson to study
-  let lastStudiedLesson = ALL_LESSON_SUMMARIES.find(
-    (l) => l.id === progress.lastStudiedLessonId
-  );
-  if (!lastStudiedLesson && ALL_LESSON_SUMMARIES.length > 0) {
-    lastStudiedLesson = ALL_LESSON_SUMMARIES[0];
-  }
-
   // Next recommended lesson is the first incomplete lesson
-  const nextLessonToStudy =
-    ALL_LESSON_SUMMARIES.find(
-      (l) => !progress.completedLessons.includes(l.id)
-    ) || ALL_LESSON_SUMMARIES[0];
+  const nextLessonToStudy = useMemo(() => {
+    return (
+      ALL_LESSON_SUMMARIES.find((l) => !completedSet.has(l.id)) ||
+      ALL_LESSON_SUMMARIES[0]
+    );
+  }, [completedSet]);
 
   const currentWeekNum = nextLessonToStudy ? nextLessonToStudy.week : 1;
   const currentWeekMeta = WEEKS_META.find((w) => w.weekNumber === currentWeekNum);
+  const currentWeekLessons = ALL_LESSON_SUMMARIES.filter((l) => l.week === currentWeekNum);
+  const currentWeekCompletedCount = currentWeekLessons.filter((l) => completedSet.has(l.id)).length;
 
-  // Estimated completion: 30 minutes per lesson * remaining lessons
-  // Assuming 6 lessons/week study schedule
-  const estimatedDaysRemaining = Math.ceil(remainingLessons * (7 / 6));
-  const estimatedWeeksRemaining = Math.ceil(remainingLessons / 6);
-
-  // Calculation of achievements
-  const achievements = [
-    {
-      id: "first-step",
-      title: "شروع قدرتمند",
-      desc: "اولین درس آکادمی جاوا را با موفقیت مطالعه کردید.",
-      unlocked: completedCount >= 1,
-      icon: Zap,
-    },
-    {
-      id: "week-1",
-      title: "تسلط بر هسته جاوا",
-      desc: "هفته اول و مبانی JVM را به پایان رساندید.",
-      unlocked: completedCount >= 6,
-      icon: Trophy,
-    },
-    {
-      id: "quarter",
-      title: "یک چهارم راه",
-      desc: "بیش از ۳۹ درس از دوره را تکمیل کردید.",
-      unlocked: completedCount >= 39,
-      icon: Sparkles,
-    },
-    {
-      id: "halfway",
-      title: "نقطه عطف ۷۸ درس",
-      desc: "نصف دوره ۲۶ هفته‌ای با موفقیت سپری شد.",
-      unlocked: completedCount >= 78,
-      icon: Flame,
-    },
-    {
-      id: "senior-ready",
-      title: "مهندس ارشد Java-first",
-      desc: "تمام ۱۵۶ درس و پروژه محوری کامل شد.",
-      unlocked: completedCount >= 156,
-      icon: Boxes,
-    },
-  ];
+  if (!mounted || !isLoaded) {
+    return (
+      <div className="py-24 flex flex-col items-center justify-center space-y-3">
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <p className="text-xs text-muted-foreground font-mono">Loading academy state...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-10 pb-16">
-      {/* Hero / Welcome Banner */}
-      <div className="relative rounded-3xl border border-orange-500/30 bg-gradient-to-br from-slate-900 via-slate-950 to-orange-950/30 p-6 sm:p-8 overflow-hidden shadow-2xl">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
+    <div className="space-y-8 pb-16">
+      {/* Page Header */}
+      <div className="space-y-1">
+        <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+          Engineering Command Center
+        </div>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+          داشبورد یادگیری مهندسی جاوا
+        </h1>
+        <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed">
+          انتقال ساخت‌یافته از Node.js/NestJS به معماری‌های مقیاس‌بزرگ با Java 21 LTS و Spring Boot 3.3.
+        </p>
+      </div>
+
+      {/* Primary Hero: What is my next step? */}
+      <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2.5 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                پلتفرم آموزشی اختصاصی مهندسان بک‌اند
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-primary-muted text-primary border border-primary/20">
+                Next Scheduled Session
               </span>
-              <span className="text-xs text-slate-400">
-                هفته فعلی: {toPersianDigits(currentWeekNum)} از {toPersianDigits(26)}
+              <span className="text-xs text-muted-foreground">
+                هفته {toPersianDigits(currentWeekNum)} از ۲۶ • روز {toPersianDigits(nextLessonToStudy.day)}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
-              خوش آمدید، مهندس! مسیر ارتقا به <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">Java-first Engineer</span>
-            </h1>
+            <h2 className="text-lg sm:text-xl font-bold text-foreground">
+              {nextLessonToStudy.title}
+            </h2>
 
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              شما در حال گذار از توسعه Node.js/NestJS به معماری‌های مقیاس‌بزرگ سازمانی با Java 21 و Spring Boot هستید. 
-              هدف روزانه: ۳۰ دقیقه مطالعه متمرکز و پیاده‌سازی گام‌به‌گام پروژه سفارشات.
+            <div className="text-xs font-mono text-muted-foreground ltr-dir">
+              {nextLessonToStudy.titleEn}
+            </div>
+
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              {nextLessonToStudy.description}
             </p>
           </div>
 
-          {/* Continue Learning CTA */}
-          {nextLessonToStudy && (
-            <div className="shrink-0">
-              <Link
-                href={`/lessons/${nextLessonToStudy.slug}`}
-                className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm shadow-xl shadow-orange-500/25 hover:scale-[1.02] transition-all group"
-              >
-                <div className="text-right">
-                  <span className="text-[11px] block font-medium opacity-90">
-                    ادامه یادگیری (درس {toPersianDigits(nextLessonToStudy.day)}):
-                  </span>
-                  <span className="text-sm font-bold block truncate max-w-[220px]">
-                    {nextLessonToStudy.titleEn}
-                  </span>
-                </div>
-                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              </Link>
+          {/* Action Button */}
+          <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3">
+            <Link href={`/lessons/${nextLessonToStudy.slug}`}>
+              <Button variant="primary" size="lg" className="font-semibold text-xs sm:text-sm">
+                <span>ادامه مطالعه جلسه {toPersianDigits(nextLessonToStudy.day)}</span>
+                <ArrowLeft className="w-4 h-4 mr-1" />
+              </Button>
+            </Link>
+
+            <div className="text-[11px] text-muted-foreground font-mono">
+              مدت زمان تخمینی: {toPersianDigits(nextLessonToStudy.estimatedMinutes)} دقیقه
             </div>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* Primary Statistics Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Stat 1: Overall Completion */}
-        <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+      {/* Three Crisp Key Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Metric 1: Course Progress */}
+        <div className="p-4 rounded-xl border border-border bg-card space-y-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>پیشرفت کل دوره</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span className="font-mono font-semibold text-foreground">
+              {toPersianDigits(completionPercent)}%
+            </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-white">
-            {toPersianDigits(completionPercent)}٪
+          <div className="text-xl sm:text-2xl font-bold text-foreground font-mono">
+            {toPersianDigits(completedCount)} <span className="text-xs text-muted-foreground font-sans">از {toPersianDigits(totalLessons)} درس</span>
           </div>
-          <div className="text-[11px] text-slate-400">
-            {toPersianDigits(completedCount)} از {toPersianDigits(totalLessons)} درس تکمیل شده
-          </div>
-          {/* Progress bar */}
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div
-              className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500"
-              style={{ width: `${completionPercent}%` }}
-            />
-          </div>
+          <ProgressBar value={completionPercent} size="sm" />
         </div>
 
-        {/* Stat 2: Streak */}
-        <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+        {/* Metric 2: Streak */}
+        <div className="p-4 rounded-xl border border-border bg-card space-y-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>زنجیره مطالعه مداوم</span>
-            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+            <Flame className="w-3.5 h-3.5 text-amber-500" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-amber-400">
-            {toPersianDigits(progress.streakDays)} روز
+          <div className="text-xl sm:text-2xl font-bold text-foreground font-mono">
+            {toPersianDigits(progress.streakDays)} <span className="text-xs text-muted-foreground font-sans">روز پیوسته</span>
           </div>
-          <div className="text-[11px] text-slate-400">
-            {progress.streakDays > 0 ? "تداوم عالی! هر روز ۳۰ دقیقه" : "امروز مطالعه را شروع کنید"}
-          </div>
-        </div>
-
-        {/* Stat 3: Study Time */}
-        <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>مجموع زمان مطالعه</span>
-            <Clock className="w-4 h-4 text-indigo-400" />
-          </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-indigo-400">
-            {toPersianDigits(Math.round((completedCount * 30) / 60))} ساعت
-          </div>
-          <div className="text-[11px] text-slate-400">
-            بر مبنای جلسات ۳۰ دقیقه‌ای استاندارد
+          <div className="text-[11px] text-muted-foreground">
+            {progress.streakDays > 0 ? "تداوم عالی! هر روز ۳۰ دقیقه" : "مطالعه امروز را ثبت کنید"}
           </div>
         </div>
 
-        {/* Stat 4: Remaining */}
-        <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>درس‌های باقیمانده</span>
-            <TrendingUp className="w-4 h-4 text-orange-400" />
+        {/* Metric 3: Total Study Time */}
+        <div className="p-4 rounded-xl border border-border bg-card space-y-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>زمان یادگیری ثبت‌شده</span>
+            <Clock className="w-3.5 h-3.5 text-primary" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-orange-400">
-            {toPersianDigits(remainingLessons)} درس
+          <div className="text-xl sm:text-2xl font-bold text-foreground font-mono">
+            {toPersianDigits(Math.round((completedCount * 30) / 60))} <span className="text-xs text-muted-foreground font-sans">ساعت آموزشی</span>
           </div>
-          <div className="text-[11px] text-slate-400">
-            تخمین اتمام: حدود {toPersianDigits(estimatedWeeksRemaining)} هفته دیگر
+          <div className="text-[11px] text-muted-foreground">
+            {toPersianDigits(remainingLessons)} جلسه باقیمانده تا اتمام
           </div>
         </div>
       </div>
 
-      {/* Current Week Status & Upcoming Topics */}
+      {/* 26-Week Bird's-Eye Matrix */}
+      <div className="p-5 rounded-xl border border-border bg-card space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              ماتریس پیشرفت ۲۶ هفته
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              نمای کلی از کل مسیر دوره؛ هر مربع نشان‌دهنده یک هفته است.
+            </p>
+          </div>
+          <Link
+            href="/roadmap"
+            className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
+          >
+            <span>مشاهده نقشه کامل</span>
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {/* Grid of 26 weeks */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-13 gap-1.5 select-none">
+          {WEEKS_META.map((w) => {
+            const wLessons = ALL_LESSON_SUMMARIES.filter((l) => l.week === w.weekNumber);
+            const wDone = wLessons.filter((l) => completedSet.has(l.id)).length;
+            const isFull = wDone === 6;
+            const isCurrent = w.weekNumber === currentWeekNum;
+
+            return (
+              <Link
+                key={w.weekNumber}
+                href="/roadmap"
+                className={cn(
+                  "p-2 rounded-lg border text-center transition-colors flex flex-col justify-between",
+                  isFull
+                    ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-400"
+                    : isCurrent
+                    ? "bg-primary-muted border-primary text-primary font-bold"
+                    : "bg-secondary/40 border-border/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                )}
+                title={`هفته ${w.weekNumber}: ${w.titleEn} (${wDone}/6)`}
+              >
+                <div className="font-mono text-xs font-bold">
+                  W{w.weekNumber}
+                </div>
+                <div className="text-[10px] font-mono mt-1 opacity-80">
+                  {toPersianDigits(wDone)}/۶
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Current Active Week Breakdown & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column (2 Cols): Current Week Breakdown */}
-        <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-800 bg-slate-900/30 space-y-5">
-          <div className="flex items-center justify-between">
+        <div className="lg:col-span-2 p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-border/60">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">
-                  هفته فعال شما
-                </span>
+              <div className="text-[11px] font-mono text-primary uppercase">
+                Active Week {currentWeekNum}
               </div>
-              <h2 className="text-lg font-bold text-white mt-1">
+              <h3 className="text-base font-semibold text-foreground mt-0.5">
                 هفته {toPersianDigits(currentWeekNum)}: {currentWeekMeta?.titleEn}
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              </h3>
+              <p className="text-xs text-muted-foreground">
                 {currentWeekMeta?.title}
               </p>
             </div>
-
-            <Link
-              href="/roadmap"
-              className="text-xs text-orange-400 hover:text-orange-300 font-medium flex items-center gap-1"
-            >
-              <span>مشاهده نقشه راه</span>
-              <ChevronLeft className="w-4 h-4" />
-            </Link>
+            <div className="text-xs text-muted-foreground font-mono">
+              {toPersianDigits(currentWeekCompletedCount)} از ۶ تکمیل شده
+            </div>
           </div>
 
-          {/* Lessons list of current week */}
-          <div className="space-y-2 pt-2">
-            {ALL_LESSON_SUMMARIES.filter((l) => l.week === currentWeekNum).map((lesson) => {
-              const isDone = progress.completedLessons.includes(lesson.id);
+          {/* List of 6 lessons */}
+          <div className="space-y-1.5">
+            {currentWeekLessons.map((lesson) => {
+              const isDone = completedSet.has(lesson.id);
+              const isNext = lesson.id === nextLessonToStudy.id;
 
               return (
                 <Link
                   key={lesson.id}
                   href={`/lessons/${lesson.slug}`}
                   className={cn(
-                    "flex items-center justify-between p-3.5 rounded-xl border text-xs sm:text-sm transition-all group",
+                    "flex items-center justify-between p-3 rounded-lg border text-xs transition-colors group",
                     isDone
-                      ? "border-slate-800/60 bg-slate-950/40 text-slate-300"
-                      : "border-slate-800 bg-slate-900/60 hover:border-orange-500/40 hover:bg-slate-900 text-white"
+                      ? "border-border/50 bg-secondary/30 text-muted-foreground"
+                      : isNext
+                      ? "border-primary/50 bg-primary-muted text-foreground font-medium"
+                      : "border-border bg-background hover:bg-secondary/60 text-foreground"
                   )}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <div className="shrink-0">
                       {isDone ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                       ) : (
-                        <div className="w-4 h-4 rounded-full border border-slate-600 group-hover:border-orange-400" />
+                        <Circle className="w-4 h-4 text-border group-hover:text-primary transition-colors" />
                       )}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold truncate">
-                          روز {toPersianDigits(lesson.day)}: {lesson.titleEn}
-                        </span>
+                      <div className="font-mono text-xs truncate">
+                        {toPersianDigits(lesson.day)}. {lesson.titleEn}
                       </div>
-                      <p className="text-xs text-slate-400 truncate mt-0.5">
+                      <div className="text-[11px] text-muted-foreground truncate mt-0.5">
                         {lesson.title}
-                      </p>
+                      </div>
                     </div>
                   </div>
 
-                  <span className="text-[11px] text-slate-500 font-mono shrink-0 mr-3">
-                    {toPersianDigits(lesson.estimatedMinutes)} دقیقه
+                  <span className="text-[11px] font-mono text-muted-foreground shrink-0 mr-2">
+                    {toPersianDigits(lesson.estimatedMinutes)}m
                   </span>
                 </Link>
               );
@@ -292,74 +286,55 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Achievements & Quick Links */}
-        <div className="space-y-6">
-          {/* Recent Achievements */}
-          <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/30 space-y-4">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-amber-400" />
-              دستاوردهای یادگیری شما
-            </h3>
-
-            <div className="space-y-3">
-              {achievements.map((ach) => {
-                const Icon = ach.icon;
-                return (
-                  <div
-                    key={ach.id}
-                    className={cn(
-                      "flex items-start gap-3 p-3 rounded-xl border text-xs transition-colors",
-                      ach.unlocked
-                        ? "border-amber-500/30 bg-amber-950/15 text-slate-200"
-                        : "border-slate-800/60 bg-slate-950/30 text-slate-500 opacity-60"
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                        ach.unlocked
-                          ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                          : "bg-slate-800 text-slate-500"
-                      )}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="font-bold flex items-center gap-2">
-                        <span>{ach.title}</span>
-                        {ach.unlocked && (
-                          <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded">
-                            کسب شد ✓
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] mt-0.5 opacity-90">{ach.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
+        {/* Right Column (1 Col): Secondary Hubs */}
+        <div className="space-y-3">
+          <Link
+            href="/capstone"
+            className="p-4 rounded-xl border border-border bg-card hover:bg-secondary/40 transition-colors block group"
+          >
+            <div className="flex items-center gap-2 text-primary font-medium text-xs mb-1">
+              <Boxes className="w-4 h-4" />
+              <span>پروژه محوری سفارشات</span>
             </div>
-          </div>
-
-          {/* Capstone Card Link */}
-          <div className="p-5 rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-950/20 to-slate-900/40 space-y-3">
-            <div className="flex items-center gap-2 text-orange-400">
-              <Boxes className="w-5 h-5" />
-              <h4 className="text-sm font-bold text-white">
-                پروژه عملی: سامانه سفارشات و انبار
-              </h4>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              این پروژه پیوسته همگام با ۲۶ هفته جلو می‌رود و تمام مفاهیم Spring Boot، JPA، Kafka، Docker و تست را پوشش می‌دهد.
+            <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+              Order & Inventory Management
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              معماری Modular Monolith، داکر، PostgreSQL، RabbitMQ و Outbox Pattern.
             </p>
-            <Link
-              href="/capstone"
-              className="inline-flex items-center gap-1.5 text-xs text-orange-400 hover:text-orange-300 font-semibold"
-            >
-              <span>مشاهده جزئیات معماری و کدها</span>
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+          </Link>
+
+          <Link
+            href="/revision"
+            className="p-4 rounded-xl border border-border bg-card hover:bg-secondary/40 transition-colors block group"
+          >
+            <div className="flex items-center gap-2 text-indigo-400 font-medium text-xs mb-1">
+              <RotateCcw className="w-4 h-4" />
+              <span>مرور و فلش‌کارت‌ها</span>
+            </div>
+            <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+              تثبیت مفاهیم و آمادگی مصاحبه
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              فلش‌کارت‌های تخصصی، مرور درس‌های نشان‌شده و کوییزهای نیازمند تلاش مجدد.
+            </p>
+          </Link>
+
+          <Link
+            href="/glossary"
+            className="p-4 rounded-xl border border-border bg-card hover:bg-secondary/40 transition-colors block group"
+          >
+            <div className="flex items-center gap-2 text-emerald-400 font-medium text-xs mb-1">
+              <BookMarked className="w-4 h-4" />
+              <span>واژه‌نامه مفاهیم</span>
+            </div>
+            <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+              تطبیق اصطلاحات جاوا و نودجی‌اس
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              تعاریف استاندارد مفاهیم Spring Boot و معادل‌های آنها در NestJS.
+            </p>
+          </Link>
         </div>
       </div>
     </div>

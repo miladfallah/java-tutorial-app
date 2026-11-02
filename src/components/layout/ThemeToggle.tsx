@@ -13,9 +13,7 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return (
-      <div className="w-9 h-9 rounded-lg border border-slate-700/50 bg-slate-800/40" />
-    );
+    return <div className="w-8 h-8 rounded-md bg-secondary" />;
   }
 
   const isDark = theme === "dark";
@@ -23,14 +21,14 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="p-2 rounded-xl border border-slate-700/60 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-600 text-slate-300 hover:text-white transition-all shadow-sm"
+      className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary border border-transparent hover:border-border transition-colors"
       title={isDark ? "تغییر به تم روشن" : "تغییر به تم تاریک"}
       aria-label="تغییر تم"
     >
       {isDark ? (
-        <Sun className="w-5 h-5 text-amber-400" />
+        <Sun className="w-4 h-4 text-amber-400" />
       ) : (
-        <Moon className="w-5 h-5 text-indigo-400" />
+        <Moon className="w-4 h-4 text-slate-700" />
       )}
     </button>
   );

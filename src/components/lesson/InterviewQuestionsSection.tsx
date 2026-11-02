@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { HelpCircle, ChevronDown, ChevronUp, Briefcase } from "lucide-react";
+import { ChevronDown, ChevronUp, Briefcase } from "lucide-react";
 import { InterviewQuestion } from "@/data/types";
 import { toPersianDigits } from "@/lib/utils";
 
@@ -19,41 +19,44 @@ export function InterviewQuestionsSection({
   };
 
   return (
-    <div className="my-10 rounded-2xl border border-slate-800 bg-slate-900/30 p-5 sm:p-7">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400">
-          <Briefcase className="w-5 h-5" />
+    <section
+      id="interview-questions"
+      className="my-8 rounded-xl border border-border bg-card p-5 sm:p-6"
+    >
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-8 h-8 rounded-lg bg-secondary text-primary border border-border flex items-center justify-center shrink-0 mt-0.5">
+          <Briefcase className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-white">
-            سوالات مصاحبه شغلی سطح ارشد (Senior Technical Interview)
+          <div className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+            Senior Engineering Interview
+          </div>
+          <h3 className="text-base font-semibold text-foreground mt-0.5">
+            سوالات مصاحبه شغلی سطح ارشد
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            نحوه طرح موضوع توسط معماران و مدیران فنی در مصاحبه‌های استخدامی بین‌المللی
-          </p>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {questions.map((q, idx) => {
           const isOpen = openIndex === idx;
 
           return (
             <div
               key={idx}
-              className="rounded-xl border border-slate-800/80 bg-slate-950/60 overflow-hidden"
+              className="rounded-lg border border-border/70 bg-background/50 overflow-hidden"
             >
               <button
                 onClick={() => toggle(idx)}
-                className="w-full p-4 flex items-center justify-between text-right text-xs sm:text-sm font-semibold text-slate-200 hover:text-white hover:bg-slate-900/40 transition-colors"
+                className="w-full p-3.5 flex items-center justify-between text-right text-xs sm:text-sm font-medium text-foreground hover:bg-secondary/40 transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  <span className="w-5 h-5 rounded-md bg-orange-500/20 text-orange-400 text-xs flex items-center justify-center font-bold shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-4 h-4 rounded text-[10px] font-mono border border-border bg-secondary text-muted-foreground flex items-center justify-center shrink-0">
                     {toPersianDigits(idx + 1)}
                   </span>
                   <span>{q.question}</span>
                 </div>
-                <div className="text-slate-400 mr-2 shrink-0">
+                <div className="text-muted-foreground mr-2 shrink-0">
                   {isOpen ? (
                     <ChevronUp className="w-4 h-4" />
                   ) : (
@@ -63,23 +66,25 @@ export function InterviewQuestionsSection({
               </button>
 
               {isOpen && (
-                <div className="p-4 sm:p-5 border-t border-slate-800/80 bg-slate-900/20 text-xs sm:text-sm text-slate-300 leading-relaxed space-y-3">
-                  <div className="border-r-2 border-orange-500/80 pr-3">
-                    <span className="text-xs font-semibold text-orange-400 block mb-1">
-                      پاسخ طلایی و نحوه پاسخگویی در مصاحبه:
+                <div className="p-4 border-t border-border/60 bg-card/60 text-xs sm:text-sm text-foreground/90 leading-relaxed space-y-3">
+                  <div className="border-r-2 border-primary/60 pr-3">
+                    <span className="text-xs font-semibold text-foreground block mb-1">
+                      پاسخ تشریحی در مصاحبه:
                     </span>
-                    <p className="whitespace-pre-line">{q.answer}</p>
+                    <p className="whitespace-pre-line text-muted-foreground">
+                      {q.answer}
+                    </p>
                   </div>
 
                   {q.keyTakeaways && q.keyTakeaways.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-slate-800/60">
-                      <span className="text-[11px] font-semibold text-slate-400 block mb-1.5">
-                        نکات کلیدی برای جلب توجه مصاحبه‌کننده:
+                    <div className="pt-2 border-t border-border/40">
+                      <span className="text-[11px] font-semibold text-foreground block mb-1">
+                        نکات کلیدی برای مصاحبه‌کننده:
                       </span>
-                      <ul className="space-y-1 text-xs text-slate-300">
+                      <ul className="space-y-1 text-xs text-muted-foreground">
                         {q.keyTakeaways.map((point, pIdx) => (
                           <li key={pIdx} className="flex items-center gap-2">
-                            <span className="text-orange-400 font-bold">•</span>
+                            <span className="text-primary font-bold">•</span>
                             <span>{point}</span>
                           </li>
                         ))}
@@ -92,6 +97,6 @@ export function InterviewQuestionsSection({
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   RotateCcw, 
@@ -16,16 +16,20 @@ import {
   CheckCircle2, 
   AlertCircle,
   Sparkles,
-  Shuffle
+  Shuffle,
+  Clock,
+  ArrowRight
 } from "lucide-react";
 import { useAcademyStore } from "@/lib/store";
 import { ALL_LESSON_SUMMARIES } from "@/data/curriculum";
 import { FLASHCARDS } from "@/data/flashcards";
 import { exportProgressJSON, validateImportedProgress } from "@/lib/storage";
 import { toPersianDigits, cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 export default function RevisionPage() {
-  const { progress, importProgress, resetProgress } = useAcademyStore();
+  const { progress, importProgress } = useAcademyStore();
   const [activeTab, setActiveTab] = useState<"flashcards" | "bookmarks" | "review" | "quizzes" | "backup">("flashcards");
 
   // Flashcards state
@@ -66,6 +70,31 @@ export default function RevisionPage() {
     setCurrentCardIndex(randomIndex);
   };
 
+  // Keyboard navigation for flashcards
+  useEffect(() => {
+    if (activeTab !== "flashcards") return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        setIsFlipped((f) => !f);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleNextCard();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handlePrevCard();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeTab]);
+
   // Export JSON file
   const handleExport = () => {
     const dataStr =
@@ -96,10 +125,10 @@ export default function RevisionPage() {
           await importProgress(parsed);
           setImportStatus("اطلاعات پیشرفت با موفقیت بازیابی شد! ✓");
         } else {
-          setImportStatus("فایل نامعتبر است. فرمت پشتیبان مطابقت ندارد.");
+          setImportStatus("فایل نامعتبر است. ساختار JSON مطابقت ندارد.");
         }
-      } catch (err) {
-        setImportStatus("خطا در خواندن فایل JSON.");
+      } catch {
+        setImportStatus("خطا در پردازش فایل JSON.");
       }
     };
     reader.readAsText(file);
@@ -108,134 +137,164 @@ export default function RevisionPage() {
   return (
     <div className="space-y-8 pb-16">
       {/* Header */}
-      <div className="space-y-3 pb-6 border-b border-slate-800">
-        <div className="flex items-center gap-2 text-xs font-bold text-indigo-400 uppercase tracking-wider">
-          <RotateCcw className="w-4 h-4" />
-          <span>مرکز تثبیت یادگیری و بازیابی داده‌ها</span>
+      <div className="space-y-4 pb-6 border-b border-border">
+        <div className="inline-flex items-center gap-2 text-xs font-mono font-medium text-primary">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <span>REVISION_HUB</span>
+          <span className="text-muted-foreground/60">•</span>
+          <span className="text-muted-foreground font-sans">تثبیت مفاهیم، مرور و پشتیبان</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-          مرور، فلش‌کارت‌های مفهومی و مدیریت پشتیبان
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
-          جمعه‌ها و زمان‌های فراغت خود را به مرور فلش‌کارت‌ها، درس‌های نشان‌شده و کوییزهای ناموفق اختصاص دهید تا مفاهیم عمیقاً در ذهن تثبیت شوند.
-        </p>
+
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+            مرور، فلش‌کارت‌های مفهومی و مدیریت پشتیبان
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+            روزهای جمعه یا ساعات مرور را به بررسی فلش‌کارت‌های معماری، رفع اشکال کوییزهای آزموده شده و جلسات نشان‌شده اختصاص دهید تا مفاهیم عمیقاً در حافظه کاری شما تثبیت شوند.
+          </p>
+        </div>
 
         {/* Tab switch */}
-        <div className="flex flex-wrap items-center gap-2 pt-2">
+        <div className="flex flex-wrap items-center gap-1.5 pt-2">
           <button
             onClick={() => setActiveTab("flashcards")}
             className={cn(
-              "px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5",
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
               activeTab === "flashcards"
-                ? "bg-indigo-600 text-white border-indigo-500 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            فلش‌کارت‌های تخصصی ({toPersianDigits(FLASHCARDS.length)})
+            <span>فلش‌کارت‌ها</span>
+            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(FLASHCARDS.length)})</span>
           </button>
+
           <button
             onClick={() => setActiveTab("bookmarks")}
             className={cn(
-              "px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5",
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
               activeTab === "bookmarks"
-                ? "bg-amber-600 text-white border-amber-500 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Bookmark className="w-3.5 h-3.5" />
-            نشان‌شده‌ها ({toPersianDigits(bookmarkedLessons.length)})
+            <span>نشان‌شده‌ها</span>
+            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(bookmarkedLessons.length)})</span>
           </button>
+
           <button
             onClick={() => setActiveTab("review")}
             className={cn(
-              "px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5",
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
               activeTab === "review"
-                ? "bg-rose-600 text-white border-rose-500 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Flag className="w-3.5 h-3.5" />
-            نیازمند مرور ({toPersianDigits(reviewNeededLessons.length)})
+            <span>نیازمند مرور</span>
+            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(reviewNeededLessons.length)})</span>
           </button>
+
           <button
             onClick={() => setActiveTab("quizzes")}
             className={cn(
-              "px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5",
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
               activeTab === "quizzes"
-                ? "bg-purple-600 text-white border-purple-500 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <HelpCircle className="w-3.5 h-3.5" />
-            کوییزهای نیازمند تلاش مجدد ({toPersianDigits(failedQuizzesLessons.length)})
+            <span>کوییزهای ناموفق</span>
+            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(failedQuizzesLessons.length)})</span>
           </button>
+
           <button
             onClick={() => setActiveTab("backup")}
             className={cn(
-              "px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5",
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
               activeTab === "backup"
-                ? "bg-slate-700 text-white border-slate-600 shadow-sm"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Download className="w-3.5 h-3.5" />
-            پشتیبان‌گیری و بازیابی
+            <span>پشتیبان‌گیری و بازیابی</span>
           </button>
         </div>
       </div>
 
       {/* Tab: Flashcards */}
       {activeTab === "flashcards" && (
-        <div className="space-y-6 max-w-2xl mx-auto">
+        <div className="space-y-4 max-w-2xl mx-auto">
           {/* Controls Bar */}
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span className="font-mono">
               کارت {toPersianDigits(currentCardIndex + 1)} از {toPersianDigits(FLASHCARDS.length)}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-indigo-300 font-mono text-[11px]">
+            <Badge variant="neutral" className="font-mono text-[11px]">
               {currentCard.category}
-            </span>
-            <button
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleShuffle}
-              className="flex items-center gap-1 hover:text-white transition-colors"
+              className="text-xs h-7 px-2 text-muted-foreground hover:text-foreground gap-1"
             >
               <Shuffle className="w-3.5 h-3.5" />
-              <span>تصادفی</span>
-            </button>
+              <span>کارت تصادفی</span>
+            </Button>
           </div>
 
           {/* Flashcard Box */}
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="cursor-pointer min-h-[300px] p-8 rounded-3xl border border-indigo-500/30 bg-gradient-to-b from-indigo-950/20 to-slate-900/60 shadow-xl flex flex-col justify-between transition-all hover:border-indigo-500/50"
+            className="cursor-pointer min-h-[320px] p-6 sm:p-8 rounded-xl border border-border bg-card shadow-xs hover:border-primary/40 flex flex-col justify-between transition-all select-none"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setIsFlipped(!isFlipped);
+              }
+            }}
           >
             <div>
-              <div className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider mb-3">
-                {isFlipped ? "پاسخ تخصصی و تحلیل مهندسی:" : "پرسش مفهومی:"}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[11px] font-mono font-bold text-primary uppercase tracking-wider">
+                  {isFlipped ? "ANSWER & ARCHITECTURE ANALYSIS" : "QUESTION"}
+                </span>
+                <span className="text-[11px] text-muted-foreground/60 font-mono">
+                  {isFlipped ? "رویه پاسخ" : "رویه سوال"}
+                </span>
               </div>
 
               {!isFlipped ? (
-                <h3 className="text-lg sm:text-xl font-bold text-white leading-relaxed">
-                  {currentCard.question}
-                </h3>
+                <div className="py-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-foreground leading-relaxed">
+                    {currentCard.question}
+                  </h3>
+                </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-sm sm:text-base font-semibold text-emerald-300 leading-relaxed">
+                  <p className="text-sm sm:text-base font-bold text-foreground leading-relaxed">
                     {currentCard.answer}
                   </p>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed border-r-2 border-indigo-500 pr-3">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed border-r-2 border-primary pr-3">
                     {currentCard.explanation}
                   </p>
                   <div className="pt-2">
-                    <span className="text-[11px] font-bold text-slate-400 block mb-1">
-                      نکات طلایی:
+                    <span className="text-[11px] font-bold text-foreground block mb-1.5">
+                      نکات کلیدی مهندسی:
                     </span>
-                    <ul className="space-y-1 text-xs text-slate-300">
+                    <ul className="space-y-1.5 text-xs text-muted-foreground">
                       {currentCard.keyPoints.map((kp, idx) => (
-                        <li key={idx} className="flex items-center gap-1.5">
-                          <span className="text-indigo-400 font-bold">•</span>
-                          <span>{kp}</span>
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <span className="text-primary font-bold mt-0.5">•</span>
+                          <span className="leading-relaxed">{kp}</span>
                         </li>
                       ))}
                     </ul>
@@ -244,35 +303,44 @@ export default function RevisionPage() {
               )}
             </div>
 
-            <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-              <span className="flex items-center gap-1">
+            <div className="pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
                 {isFlipped ? (
-                  <EyeOff className="w-3.5 h-3.5 text-slate-400" />
+                  <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />
                 ) : (
-                  <Eye className="w-3.5 h-3.5 text-indigo-400" />
+                  <Eye className="w-3.5 h-3.5 text-primary" />
                 )}
-                {isFlipped ? "برای بازگشت به سوال کلیک کنید" : "برای مشاهده پاسخ کلیک کنید"}
+                <span>{isFlipped ? "برای بازگشت به سوال کلیک کنید" : "برای مشاهده پاسخ کلیک کنید"}</span>
               </span>
-              <span className="text-[11px] text-slate-500">Space یا Click</span>
+              <kbd className="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded bg-secondary border border-border text-muted-foreground">
+                Space / Click
+              </kbd>
             </div>
           </div>
 
           {/* Nav arrows */}
-          <div className="flex items-center justify-between">
-            <button
+          <div className="flex items-center justify-between pt-1">
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handlePrevCard}
-              className="px-4 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 flex items-center gap-2 transition-colors"
+              className="text-xs h-8 gap-1.5"
             >
               <ChevronRight className="w-4 h-4" />
               <span>کارت قبلی</span>
-            </button>
-            <button
+            </Button>
+            <span className="text-[11px] text-muted-foreground font-mono hidden sm:inline-block">
+              کلیدهای جهت‌نما ← / → برای جابجایی
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleNextCard}
-              className="px-4 py-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 flex items-center gap-2 transition-colors"
+              className="text-xs h-8 gap-1.5"
             >
               <span>کارت بعدی</span>
               <ChevronLeft className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -281,25 +349,36 @@ export default function RevisionPage() {
       {activeTab === "bookmarks" && (
         <div className="space-y-3">
           {bookmarkedLessons.length === 0 ? (
-            <div className="p-8 rounded-2xl border border-slate-800 text-center text-slate-400 text-xs">
-              شما هنوز هیچ درسی را نشان نکرده‌اید. در صفحه درس‌ها می‌توانید با آیکون بوکمارک جلسات مهم را علامت بزنید.
+            <div className="p-10 rounded-xl border border-dashed border-border text-center space-y-2">
+              <Bookmark className="w-8 h-8 mx-auto text-muted-foreground/40" />
+              <p className="text-sm font-semibold text-foreground">
+                هنوز درسی را نشان نکرده‌اید
+              </p>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                در صفحه هر درس، با کلیک روی آیکون نشان می‌توانید مباحث مهم را برای مراجعه بعدی در این قسمت ذخیره کنید.
+              </p>
             </div>
           ) : (
             bookmarkedLessons.map((l) => (
               <Link
                 key={l.id}
                 href={`/lessons/${l.slug}`}
-                className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:bg-slate-800/60 transition-all flex items-center justify-between gap-4 block"
+                className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-colors flex items-center justify-between gap-4 group"
               >
-                <div>
-                  <div className="flex items-center gap-2 text-[11px] text-amber-400 font-bold">
-                    <span>هفته {toPersianDigits(l.week)} • روز {toPersianDigits(l.day)}</span>
-                    <span className="text-slate-500">•</span>
-                    <span className="text-slate-400 font-mono ltr-dir">{l.titleEn}</span>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-mono">
+                    <span className="text-primary font-bold">هفته {toPersianDigits(l.week)} • روز {toPersianDigits(l.day)}</span>
+                    <span>•</span>
+                    <span className="ltr-dir">{l.titleEn}</span>
                   </div>
-                  <h4 className="text-sm font-bold text-white mt-1">{l.title}</h4>
+                  <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                    {l.title}
+                  </h4>
                 </div>
-                <ChevronLeft className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground group-hover:text-primary">
+                  <span className="hidden sm:inline">مشاهده درس</span>
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                </div>
               </Link>
             ))
           )}
@@ -310,25 +389,36 @@ export default function RevisionPage() {
       {activeTab === "review" && (
         <div className="space-y-3">
           {reviewNeededLessons.length === 0 ? (
-            <div className="p-8 rounded-2xl border border-slate-800 text-center text-slate-400 text-xs">
-              هیچ درسی برای مرور علامت نخورده است. عالیه!
+            <div className="p-10 rounded-xl border border-dashed border-border text-center space-y-2">
+              <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500/60" />
+              <p className="text-sm font-semibold text-foreground">
+                هیچ درسی برای مرور علامت نخورده است
+              </p>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                جلساتی که مباحث چالش‌برانگیز دارند را می‌توانید در انتهای درس به عنوان «نیازمند مرور مجدد» علامت بزنید.
+              </p>
             </div>
           ) : (
             reviewNeededLessons.map((l) => (
               <Link
                 key={l.id}
                 href={`/lessons/${l.slug}`}
-                className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:bg-slate-800/60 transition-all flex items-center justify-between gap-4 block"
+                className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-colors flex items-center justify-between gap-4 group"
               >
-                <div>
-                  <div className="flex items-center gap-2 text-[11px] text-rose-400 font-bold">
-                    <span>هفته {toPersianDigits(l.week)} • روز {toPersianDigits(l.day)}</span>
-                    <span className="text-slate-500">•</span>
-                    <span className="text-slate-400 font-mono ltr-dir">{l.titleEn}</span>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-mono">
+                    <span className="text-amber-500 font-bold">هفته {toPersianDigits(l.week)} • روز {toPersianDigits(l.day)}</span>
+                    <span>•</span>
+                    <span className="ltr-dir">{l.titleEn}</span>
                   </div>
-                  <h4 className="text-sm font-bold text-white mt-1">{l.title}</h4>
+                  <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                    {l.title}
+                  </h4>
                 </div>
-                <ChevronLeft className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground group-hover:text-primary">
+                  <span className="hidden sm:inline">مرور مجدد</span>
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                </div>
               </Link>
             ))
           )}
@@ -339,9 +429,14 @@ export default function RevisionPage() {
       {activeTab === "quizzes" && (
         <div className="space-y-3">
           {failedQuizzesLessons.length === 0 ? (
-            <div className="p-8 rounded-2xl border border-slate-800 text-center text-emerald-400 text-xs flex items-center justify-center gap-2">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>تمام کوییزهایی که در آن‌ها شرکت کرده‌اید با نمره قبولی پاس شده‌اند!</span>
+            <div className="p-10 rounded-xl border border-dashed border-border text-center space-y-2">
+              <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500" />
+              <p className="text-sm font-semibold text-foreground">
+                وضعیت عالی است! کوییز ناموفقی وجود ندارد
+              </p>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                تمامی آزمون‌هایی که تا الان در آن‌ها شرکت کرده‌اید با نمره قبولی پشت سر گذاشته شده‌اند.
+              </p>
             </div>
           ) : (
             failedQuizzesLessons.map((l) => {
@@ -350,19 +445,24 @@ export default function RevisionPage() {
                 <Link
                   key={l.id}
                   href={`/lessons/${l.slug}`}
-                  className="p-4 rounded-xl border border-rose-500/30 bg-rose-950/10 hover:bg-rose-950/20 transition-all flex items-center justify-between gap-4 block"
+                  className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-colors flex items-center justify-between gap-4 group"
                 >
-                  <div>
-                    <div className="flex items-center gap-2 text-[11px] text-rose-400 font-bold">
-                      <span>نمره کسب شده: {toPersianDigits(res?.score || 0)} از {toPersianDigits(res?.total || 0)}</span>
-                      <span className="text-slate-500">•</span>
-                      <span className="text-slate-400 font-mono ltr-dir">{l.titleEn}</span>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-mono">
+                      <Badge variant="warning" className="text-[10px] py-0">
+                        نمره: {toPersianDigits(res?.score || 0)} از {toPersianDigits(res?.total || 0)}
+                      </Badge>
+                      <span>•</span>
+                      <span className="ltr-dir">{l.titleEn}</span>
                     </div>
-                    <h4 className="text-sm font-bold text-white mt-1">{l.title}</h4>
+                    <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                      {l.title}
+                    </h4>
                   </div>
-                  <span className="text-xs text-rose-400 font-bold shrink-0">
-                    آزمون مجدد ←
-                  </span>
+                  <div className="flex items-center gap-1.5 text-xs text-primary font-semibold">
+                    <span>تلاش مجدد</span>
+                    <ArrowRight className="w-3.5 h-3.5 rotate-180" />
+                  </div>
                 </Link>
               );
             })
@@ -372,43 +472,53 @@ export default function RevisionPage() {
 
       {/* Tab: Backup & Restore */}
       {activeTab === "backup" && (
-        <div className="space-y-6 max-w-xl">
-          <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-4">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Download className="w-4 h-4 text-emerald-400" />
-              خروجی گرفتن از تمام پیشرفت و یادداشت‌ها (JSON Export)
-            </h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              شما می‌توانید با دانلود فایل پشتیبان، تمام وضعیت درس‌های تکمیل شده، یادداشت‌های شخصی و نتایج کوییزها را ذخیره کرده و به کامپیوتر یا مرورگر دیگر منتقل کنید.
-            </p>
-            <button
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
+          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4 flex flex-col justify-between">
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <Download className="w-4 h-4 text-primary" />
+                دانلود فایل پشتیبان (JSON Export)
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                ذخیره کامل وضعیت جلسات مطالعه‌شده، یادداشت‌های شخصی هر درس و سوابق کوییزها در قالب یک فایل متنی JSON استاندارد.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleExport}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-2 transition-all shadow-md"
+              className="w-full text-xs h-9 gap-1.5"
             >
-              <Download className="w-4 h-4" />
-              <span>دانلود فایل پشتیبان (.json)</span>
-            </button>
+              <Download className="w-3.5 h-3.5" />
+              <span>دانلود فایل JSON</span>
+            </Button>
           </div>
 
-          <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 space-y-4">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Upload className="w-4 h-4 text-indigo-400" />
-              بازیابی پیشرفت از فایل پشتیبان (JSON Import)
-            </h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              فایل JSON قبلی خود را انتخاب کنید تا اطلاعات پیشرفت شما بدون نیاز به سرور فوراً در IndexedDB جایگزین شود.
-            </p>
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              className="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer"
-            />
-            {importStatus && (
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-emerald-300">
-                {importStatus}
-              </div>
-            )}
+          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4 flex flex-col justify-between">
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <Upload className="w-4 h-4 text-primary" />
+                بازیابی اطلاعات (JSON Import)
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                فایل JSON تهیه‌شده از دستگاه قبلی را انتخاب نمایید تا دیتابیس محلی IndexedDB مرورگر به‌روزرسانی شود.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <label className="block w-full">
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileUpload}
+                  className="block w-full text-xs text-muted-foreground file:mr-0 file:ml-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-border file:text-xs file:font-semibold file:bg-secondary file:text-foreground hover:file:bg-secondary/80 file:cursor-pointer cursor-pointer"
+                />
+              </label>
+              {importStatus && (
+                <div className="p-2.5 rounded-lg bg-secondary/80 border border-border text-xs text-foreground font-mono">
+                  {importStatus}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

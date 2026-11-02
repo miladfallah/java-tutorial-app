@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { StickyNote, Check, Save } from "lucide-react";
+import { StickyNote, Check } from "lucide-react";
 import { useAcademyStore } from "@/lib/store";
 
 interface NotesEditorProps {
@@ -27,20 +27,20 @@ export function NotesEditor({ lessonId }: NotesEditorProps) {
   };
 
   return (
-    <div className="my-8 rounded-2xl border border-slate-800 bg-slate-900/30 p-5">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-sm font-bold text-slate-200">
-          <StickyNote className="w-4 h-4 text-amber-400" />
-          <span>یادداشت‌های شخصی شما برای این درس:</span>
+    <section id="notes" className="my-8 rounded-xl border border-border bg-card p-5">
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+          <StickyNote className="w-3.5 h-3.5 text-primary" />
+          <span>یادداشت‌های شخصی این جلسه</span>
         </div>
-        <div className="text-[11px] text-slate-400 flex items-center gap-1">
+        <div className="text-[11px] text-muted-foreground flex items-center gap-1">
           {saved ? (
-            <span className="text-emerald-400 flex items-center gap-1">
-              <Check className="w-3.5 h-3.5" />
-              ذخیره شد
+            <span className="text-emerald-400 flex items-center gap-1 font-mono">
+              <Check className="w-3 h-3" />
+              Saved
             </span>
           ) : (
-            <span className="text-slate-500">ذخیره‌سازی خودکار در مرورگر</span>
+            <span className="font-mono text-[10px]">Auto-saved locally</span>
           )}
         </div>
       </div>
@@ -48,10 +48,10 @@ export function NotesEditor({ lessonId }: NotesEditorProps) {
       <textarea
         value={note}
         onChange={handleChange}
-        placeholder="نکات کلیدی، پرسش‌ها یا یادآوری‌های خود درباره این مبحث را اینجا بنویسید..."
-        rows={4}
-        className="w-full rounded-xl border border-slate-800 bg-slate-950/80 p-3.5 text-xs sm:text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 resize-y leading-relaxed"
+        placeholder="نکات، پرسش‌ها یا یادآوری‌های خود درباره این جلسه را یادداشت کنید..."
+        rows={3}
+        className="w-full rounded-lg border border-border bg-background p-3 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 resize-y leading-relaxed font-sans"
       />
-    </div>
+    </section>
   );
 }

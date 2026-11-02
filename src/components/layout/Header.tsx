@@ -2,20 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { 
   Flame, 
   Search, 
-  BookOpen, 
   CheckCircle2, 
-  Boxes, 
   Menu, 
   X,
+  Terminal,
+  Layers,
   RotateCcw,
   BookMarked
 } from "lucide-react";
 import { useAcademyStore } from "@/lib/store";
 import { ThemeToggle } from "./ThemeToggle";
-import { toPersianDigits } from "@/lib/utils";
+import { toPersianDigits, cn } from "@/lib/utils";
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
@@ -23,6 +24,7 @@ interface HeaderProps {
 }
 
 export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
+  const pathname = usePathname();
   const { progress, isLoaded, loadProgress } = useAcademyStore();
   const [mounted, setMounted] = useState(false);
 
@@ -35,104 +37,102 @@ export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
   const streak = isLoaded ? progress.streakDays : 0;
   const progressPercent = Math.round((completedCount / 156) * 100);
 
+  const navLinks = [
+    { href: "/", label: "داشبورد" },
+    { href: "/roadmap", label: "نقشه راه" },
+    { href: "/capstone", label: "پروژه سفارشات" },
+    { href: "/revision", label: "مرور و فلش‌کارت" },
+    { href: "/glossary", label: "واژه‌نامه" },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Right side (RTL Start): Logo & Mobile Toggle */}
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        {/* Right side (RTL start): Brand & Mobile toggle */}
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-900 border border-slate-800"
+            className="lg:hidden p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary border border-border/80"
             aria-label="منوی سرفصل‌ها"
           >
-            {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isSidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
 
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
-              <Boxes className="w-6 h-6 text-white" />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 text-primary flex items-center justify-center font-mono font-bold text-sm">
+              <Terminal className="w-4 h-4" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-100 text-base sm:text-lg group-hover:text-orange-400 transition-colors">
-                  Java-first Academy
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                  Node to Java
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 hidden sm:block">
-                آکادمی مهندسی ارشد جاوا و اسپرینگ‌بوت برای توسعه‌دهندگان نودجی‌اس
-              </p>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-foreground text-sm tracking-tight group-hover:text-primary transition-colors">
+                Java-first Academy
+              </span>
+              <span className="hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded border border-border bg-secondary text-muted-foreground">
+                Node → Java
+              </span>
             </div>
           </Link>
         </div>
 
-        {/* Center / Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-sm font-medium">
-          <Link
-            href="/"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors"
-          >
-            داشبورد
-          </Link>
-          <Link
-            href="/roadmap"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors"
-          >
-            نقشه راه ۲۶ هفته
-          </Link>
-          <Link
-            href="/capstone"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-1.5"
-          >
-            <Boxes className="w-4 h-4 text-orange-400" />
-            پروژه سفارشات
-          </Link>
-          <Link
-            href="/revision"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-1.5"
-          >
-            <RotateCcw className="w-4 h-4 text-indigo-400" />
-            مرور و فلش‌کارت
-          </Link>
-          <Link
-            href="/glossary"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-1.5"
-          >
-            <BookMarked className="w-4 h-4 text-emerald-400" />
-            واژه‌نامه
-          </Link>
+        {/* Center: Clean navigation links */}
+        <nav className="hidden md:flex items-center gap-1 text-xs sm:text-sm font-medium">
+          {navLinks.map((link) => {
+            const isActive =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "px-3 py-1.5 rounded-md transition-colors",
+                  isActive
+                    ? "bg-secondary text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Left side (RTL End): Search, Progress, Streak & Theme */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Left side (RTL end): Search, Streak, Progress & Theme */}
+        <div className="flex items-center gap-2">
+          {/* Quick search button */}
           <Link
             href="/search"
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 hover:text-white flex items-center gap-2 text-sm transition-all"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-border hover:border-border/80 bg-secondary/60 hover:bg-secondary text-muted-foreground hover:text-foreground flex items-center gap-2 text-xs transition-colors"
             title="جستجو در درس‌ها (Ctrl+K)"
           >
-            <Search className="w-4 h-4 text-slate-400" />
-            <span className="hidden sm:inline text-xs text-slate-400">جستجو...</span>
+            <Search className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline text-xs">جستجو</span>
+            <kbd className="hidden lg:inline-flex items-center gap-0.5 text-[10px] font-mono px-1 py-0.2 rounded bg-background border border-border text-muted-foreground">
+              /
+            </kbd>
           </Link>
 
-          {/* Streak indicator */}
-          <div
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400 text-xs font-semibold"
-            title="روزهای متوالی مطالعه"
-          >
-            <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
-            <span>{toPersianDigits(streak)} روز پیوسته</span>
-          </div>
+          {/* Streak badge */}
+          {streak > 0 && (
+            <div
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-amber-500/20 bg-amber-500/10 text-amber-500 text-xs font-medium"
+              title="تعداد روزهای متوالی مطالعه"
+            >
+              <Flame className="w-3.5 h-3.5 fill-amber-500/30" />
+              <span>{toPersianDigits(streak)} روز</span>
+            </div>
+          )}
 
           {/* Progress pill */}
           <Link
             href="/roadmap"
-            className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-colors"
+            className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-secondary/40 text-muted-foreground hover:text-foreground hover:bg-secondary text-xs transition-colors"
+            title="مشاهده پیشرفت در نقشه راه"
           >
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>
-              {toPersianDigits(completedCount)} از {toPersianDigits(156)} ({toPersianDigits(progressPercent)}٪)
+              {toPersianDigits(completedCount)}/{toPersianDigits(156)}
             </span>
           </Link>
 
