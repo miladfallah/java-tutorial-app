@@ -11,9 +11,10 @@ export interface TOCItem {
 
 interface TableOfContentsProps {
   items: TOCItem[];
+  variant: "mobile" | "desktop";
 }
 
-export function TableOfContents({ items }: TableOfContentsProps) {
+export function TableOfContents({ items, variant }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>(items[0]?.id || "");
   const [isOpenMobile, setIsOpenMobile] = useState(false);
 
@@ -52,7 +53,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
   return (
     <>
       {/* Mobile Drawer Trigger */}
-      <div className="xl:hidden my-4">
+      {variant === "mobile" && <div className="xl:hidden my-4">
         <button
           onClick={() => setIsOpenMobile(!isOpenMobile)}
           className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-card text-xs flex items-center justify-between text-muted-foreground hover:text-foreground"
@@ -84,10 +85,10 @@ export function TableOfContents({ items }: TableOfContentsProps) {
             ))}
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Desktop Sticky Table of Contents (on the left in RTL) */}
-      <nav
+      {variant === "desktop" && <nav
         aria-label="فهرست محتوای صفحه"
         className="hidden xl:block sticky top-20 w-56 text-xs shrink-0 select-none space-y-2 border-r border-border/40 pr-4"
       >
@@ -116,7 +117,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
             );
           })}
         </div>
-      </nav>
+      </nav>}
     </>
   );
 }

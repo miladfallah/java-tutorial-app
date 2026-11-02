@@ -145,7 +145,7 @@ export function LessonView({ lesson }: LessonViewProps) {
         </header>
 
         {/* Mobile Table of Contents */}
-        <TableOfContents items={tocItems} />
+        <TableOfContents items={tocItems} variant="mobile" />
 
         {/* Learning Objectives & Prerequisites */}
         <div id="objectives" className="grid grid-cols-1 md:grid-cols-2 gap-3 my-6">
@@ -476,7 +476,7 @@ export function LessonView({ lesson }: LessonViewProps) {
       </article>
 
       {/* Desktop Sticky Table of Contents on the side */}
-      <TableOfContents items={tocItems} />
+      <TableOfContents items={tocItems} variant="desktop" />
     </div>
   );
 }
