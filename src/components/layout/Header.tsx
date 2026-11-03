@@ -12,7 +12,9 @@ import {
   Terminal,
   Settings2,
   BookOpen,
-  Layout
+  Layout,
+  PanelRightClose,
+  PanelRightOpen
 } from "lucide-react";
 import { useAcademyStore } from "@/lib/store";
 import { ThemeToggle } from "./ThemeToggle";
@@ -22,9 +24,11 @@ import { toPersianDigits, cn } from "@/lib/utils";
 interface HeaderProps {
   onToggleSidebar?: () => void;
   isSidebarOpen?: boolean;
+  isDesktopSidebarOpen: boolean;
+  onToggleDesktopSidebar: () => void;
 }
 
-export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
+export function Header({ onToggleSidebar, isSidebarOpen, isDesktopSidebarOpen, onToggleDesktopSidebar }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { progress, isLoaded, loadProgress, isReaderMode, toggleReaderMode } = useAcademyStore();
@@ -78,6 +82,16 @@ export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
           {/* Right side (RTL start): Brand & Mobile toggle */}
           <div className="flex items-center gap-2.5 sm:gap-3">
             <button
+              onClick={onToggleDesktopSidebar}
+              className="hidden lg:flex p-2 min-h-[40px] min-w-[40px] text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary border border-border items-center justify-center cursor-pointer"
+              aria-label={isDesktopSidebarOpen ? "بستن فهرست سمت راست" : "باز کردن فهرست سمت راست"}
+              title={isDesktopSidebarOpen ? "بستن فهرست سمت راست" : "باز کردن فهرست سمت راست"}
+              aria-expanded={isDesktopSidebarOpen}
+              type="button"
+            >
+              {isDesktopSidebarOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+            </button>
+            <button
               onClick={onToggleSidebar}
               className="lg:hidden p-2 min-h-[40px] min-w-[40px] text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary border border-border flex items-center justify-center cursor-pointer"
               aria-label="منوی سرفصل‌ها و ناوبری"
@@ -102,7 +116,7 @@ export function Header({ onToggleSidebar, isSidebarOpen }: HeaderProps) {
           </div>
 
           {/* Center: Tablet and Desktop navigation links */}
-          <nav className="hidden md:flex items-center gap-1 text-xs sm:text-sm font-medium">
+          <nav className="hidden 2xl:flex items-center gap-1 text-xs sm:text-sm font-medium">
             {navLinks.map((link) => {
               const isActive =
                 link.href === "/"

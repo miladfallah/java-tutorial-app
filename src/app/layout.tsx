@@ -53,7 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { isReaderMode } = useAcademyStore();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { isReaderMode, toggleReaderMode } = useAcademyStore();
 
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning className="dark">
@@ -71,12 +72,21 @@ export default function RootLayout({
         <Header
           isSidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+          isDesktopSidebarOpen={!isReaderMode && !sidebarCollapsed}
+          onToggleDesktopSidebar={() => {
+            if (isReaderMode) {
+              toggleReaderMode();
+              setSidebarCollapsed(false);
+            } else {
+              setSidebarCollapsed((prev) => !prev);
+            }
+          }}
         />
 
         <div
           className={cn(
             "flex-1 flex flex-col min-w-0 transition-all duration-200",
-            isReaderMode ? "lg:mr-0" : "lg:mr-72"
+            isReaderMode || sidebarCollapsed ? "lg:mr-0" : "lg:mr-72"
           )}
         >
           {/* Main content container */}
@@ -91,7 +101,9 @@ export default function RootLayout({
 
         {/* RTL Sidebar on the right */}
         {!isReaderMode && (
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <div className={sidebarCollapsed ? "lg:hidden" : undefined}>
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          </div>
         )}
       </body>
     </html>

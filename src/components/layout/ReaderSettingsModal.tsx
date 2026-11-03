@@ -58,7 +58,7 @@ export function ReaderSettingsModal({ isOpen, onClose }: ReaderSettingsModalProp
     >
       <div
         ref={modalRef}
-        className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-6 text-foreground"
+        className="w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-2xl space-y-6 text-foreground"
       >
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-border">

@@ -137,13 +137,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          "fixed top-14 right-0 z-40 h-[calc(100vh-3.5rem)] w-72 bg-card border-l border-border transition-transform duration-200 ease-in-out overflow-hidden flex flex-col select-none",
+          "fixed top-14 right-0 z-40 h-[calc(100dvh-3.5rem)] w-72 max-w-[calc(100vw-1rem)] bg-card border-l border-border transition-transform duration-200 ease-in-out overflow-hidden flex flex-col select-none",
           isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
         )}
         aria-label="ناوبری و سرفصل‌های آکادمی"
       >
         {/* Mobile Navigation Links (Visible on Mobile & Tablet where Header nav is hidden) */}
-        <div className="lg:hidden p-3 border-b border-border bg-secondary/30 space-y-1">
+        <div className="2xl:hidden p-3 border-b border-border bg-secondary/30 space-y-1">
           <div className="text-[11px] font-bold text-muted-foreground uppercase px-2 pb-1">
             بخش‌های اصلی آکادمی
           </div>

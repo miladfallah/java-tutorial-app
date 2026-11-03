@@ -66,6 +66,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Choose the lesson navigation layout from available content width, not screen width. */
+.lesson-layout {
+  container: lesson / inline-size;
+}
+
+.lesson-toc-sidebar {
+  display: none;
+}
+
+@container lesson (min-width: 1100px) {
+  .lesson-toc-inline { display: none; }
+  .lesson-toc-sidebar { display: block; }
+}
+
 @layer base {
   :root {
     /* Calm, high-precision engineering dark theme (Default) */

@@ -56,7 +56,7 @@ export function TableOfContents({ items, variant = "desktop" }: TableOfContentsP
     return (
       <nav
         aria-label="فهرست عناوین درس"
-        className="xl:hidden my-6 rounded-xl border border-border bg-card p-3 shadow-xs select-none"
+        className="my-6 rounded-xl border border-border bg-card p-3 shadow-xs select-none"
       >
         <button
           onClick={() => setIsOpenMobile(!isOpenMobile)}
@@ -105,7 +105,7 @@ export function TableOfContents({ items, variant = "desktop" }: TableOfContentsP
     return (
       <nav
         aria-label="فهرست محتوای صفحه"
-        className="hidden xl:block sticky top-20 w-64 shrink-0 select-none space-y-3 pl-2"
+        className="w-full min-w-0 select-none space-y-3 pl-2"
       >
         <div className="flex items-center gap-2 font-bold text-xs uppercase text-foreground pb-1 border-b border-border">
           <List className="w-3.5 h-3.5 text-primary" />

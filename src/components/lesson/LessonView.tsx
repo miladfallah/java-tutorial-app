@@ -158,7 +158,7 @@ export function LessonView({ lesson }: LessonViewProps) {
   }, [lesson]);
 
   return (
-    <div className={cn("flex items-start gap-8 justify-between", isReaderMode && "justify-center")}>
+    <div className={cn("lesson-layout flex items-start gap-6 2xl:gap-8 justify-between", isReaderMode && "justify-center")}>
       {/* Main Prose Reading Column */}
       <article className="flex-1 min-w-0 reading-column mx-auto pb-20">
         {/* Breadcrumbs */}
@@ -229,7 +229,7 @@ export function LessonView({ lesson }: LessonViewProps) {
         </header>
 
         {/* Mobile Table of Contents */}
-        <div className="xl:hidden my-6">
+        <div className="lesson-toc-inline my-6">
           <TableOfContents items={tocItems} variant="mobile" />
         </div>
 
@@ -563,7 +563,7 @@ export function LessonView({ lesson }: LessonViewProps) {
 
       {/* Desktop Sticky Table of Contents (Hidden in Reader Focus Mode) */}
       {!isReaderMode && (
-        <aside className="hidden xl:block w-64 shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <aside className="lesson-toc-sidebar w-64 shrink-0 sticky top-20 self-start max-h-[calc(100dvh-6rem)] overflow-y-auto">
           <TableOfContents items={tocItems} variant="desktop" />
         </aside>
       )}
