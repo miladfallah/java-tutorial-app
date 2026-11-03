@@ -11,10 +11,10 @@ export interface TOCItem {
 
 interface TableOfContentsProps {
   items: TOCItem[];
-  variant?: "inline" | "sidebar";
+  variant?: "mobile" | "desktop" | "inline" | "sidebar";
 }
 
-export function TableOfContents({ items, variant = "inline" }: TableOfContentsProps) {
+export function TableOfContents({ items, variant = "desktop" }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>(items[0]?.id || "");
   const [isOpenMobile, setIsOpenMobile] = useState(false);
 
@@ -49,7 +49,10 @@ export function TableOfContents({ items, variant = "inline" }: TableOfContentsPr
     }
   };
 
-  if (variant === "inline") {
+  const isMobile = variant === "mobile" || variant === "inline";
+  const isDesktop = variant === "desktop" || variant === "sidebar";
+
+  if (isMobile) {
     return (
       <nav
         aria-label="فهرست عناوین درس"
@@ -98,36 +101,40 @@ export function TableOfContents({ items, variant = "inline" }: TableOfContentsPr
   }
 
   // Desktop Sticky Sidebar TOC
-  return (
-    <nav
-      aria-label="فهرست محتوای صفحه"
-      className="hidden xl:block sticky top-20 w-64 shrink-0 select-none space-y-3 pl-2"
-    >
-      <div className="flex items-center gap-2 font-bold text-xs uppercase text-foreground pb-1 border-b border-border">
-        <List className="w-3.5 h-3.5 text-primary" />
-        <span>فهرست محتوای درس</span>
-      </div>
+  if (isDesktop) {
+    return (
+      <nav
+        aria-label="فهرست محتوای صفحه"
+        className="hidden xl:block sticky top-20 w-64 shrink-0 select-none space-y-3 pl-2"
+      >
+        <div className="flex items-center gap-2 font-bold text-xs uppercase text-foreground pb-1 border-b border-border">
+          <List className="w-3.5 h-3.5 text-primary" />
+          <span>فهرست محتوای درس</span>
+        </div>
 
-      <div className="space-y-0.5 max-h-[calc(100vh-8rem)] overflow-y-auto pr-1">
-        {items.map((item) => {
-          const isActive = activeId === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => scrollToSection(item.id)}
-              className={cn(
-                "w-full text-right px-2.5 py-1.5 rounded-md text-xs leading-relaxed transition-colors cursor-pointer block border-r-2",
-                isActive
-                  ? "text-primary font-bold bg-primary/10 border-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border-transparent"
-              )}
-              type="button"
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
-    </nav>
-  );
+        <div className="space-y-0.5 max-h-[calc(100vh-8rem)] overflow-y-auto pr-1">
+          {items.map((item) => {
+            const isActive = activeId === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={cn(
+                  "w-full text-right px-2.5 py-1.5 rounded-md text-xs leading-relaxed transition-colors cursor-pointer block border-r-2",
+                  isActive
+                    ? "text-primary font-bold bg-primary/10 border-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border-transparent"
+                )}
+                type="button"
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+    );
+  }
+
+  return null;
 }
