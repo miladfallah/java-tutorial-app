@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 .pnpm-store/
+.cache/
 .pnpm-debug.log*
 
 # Production build outputs

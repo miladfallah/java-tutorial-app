@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Java-first Backend Engineer Academy
 # Standalone Next.js production build
 
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -16,14 +16,17 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+# Reuse Corepack/pnpm caches so source-only rebuilds do not download pnpm again.
+COPY --from=deps /root/.cache /root/.cache
+COPY --from=deps /pnpm /pnpm
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV BUILD_STANDALONE=true
-RUN pnpm build
+RUN pnpm validate && pnpm build
 
 # 3. Production image, copy all the files and run next
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

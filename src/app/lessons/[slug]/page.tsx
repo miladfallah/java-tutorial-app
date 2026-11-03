@@ -5,9 +5,9 @@ import { LessonView } from "@/components/lesson/LessonView";
 import type { Metadata } from "next";
 
 interface LessonPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export function generateStaticParams() {
@@ -17,8 +17,9 @@ export function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({ params }: LessonPageProps): Metadata {
-  const lesson = getLessonBySlug(params.slug);
+export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const lesson = getLessonBySlug(slug);
   if (!lesson) {
     return {
       title: "درس یافت نشد | Java-first Academy",
@@ -31,8 +32,9 @@ export function generateMetadata({ params }: LessonPageProps): Metadata {
   };
 }
 
-export default function LessonPage({ params }: LessonPageProps) {
-  const lesson = getLessonBySlug(params.slug);
+export default async function LessonPage({ params }: LessonPageProps) {
+  const { slug } = await params;
+  const lesson = getLessonBySlug(slug);
 
   if (!lesson) {
     notFound();
