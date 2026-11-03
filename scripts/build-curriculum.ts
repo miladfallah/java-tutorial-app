@@ -263,8 +263,16 @@ async function generateAllWeeks() {
   }
 
   // Weeks 2 to 26
+  const forceOverwrite = process.argv.includes("--force");
   for (let week = 2; week <= 26; week++) {
     const weekNumStr = String(week).padStart(2, "0");
+    const filePath = path.join(outputDir, `week-${weekNumStr}.ts`);
+
+    if (fs.existsSync(filePath) && !forceOverwrite) {
+      console.log(`✓ Skipping week-${weekNumStr}.ts (already exists; preserving curated content).`);
+      continue;
+    }
+
     const weekLessonsSummary = ALL_LESSON_SUMMARIES.filter((l) => l.week === week);
 
     const lessonsData: Lesson[] = weekLessonsSummary.map((summary) => {
@@ -283,7 +291,6 @@ async function generateAllWeeks() {
 export const WEEK_${weekNumStr}_LESSONS: Lesson[] = ${JSON.stringify(lessonsData, null, 2)};
 `;
 
-    const filePath = path.join(outputDir, `week-${weekNumStr}.ts`);
     fs.writeFileSync(filePath, fileContent, "utf-8");
     console.log(`Generated week-${weekNumStr}.ts with ${lessonsData.length} complete lessons.`);
   }

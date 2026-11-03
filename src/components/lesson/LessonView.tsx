@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { 
   Clock, 
@@ -12,7 +12,9 @@ import {
   Cpu,
   AlertTriangle,
   Bookmark,
-  Boxes
+  Boxes,
+  RotateCcw,
+  BookOpen
 } from "lucide-react";
 import { Lesson } from "@/data/types";
 import { ALL_LESSON_SUMMARIES } from "@/data/curriculum";
@@ -26,18 +28,94 @@ import { InterviewQuestionsSection } from "./InterviewQuestionsSection";
 import { NotesEditor } from "./NotesEditor";
 import { LessonNavigation } from "./LessonNavigation";
 import { TableOfContents, TOCItem } from "./TableOfContents";
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 
 interface LessonViewProps {
   lesson: Lesson;
 }
 
 export function LessonView({ lesson }: LessonViewProps) {
-  const { progress, markLessonInProgress, setLastStudied } = useAcademyStore();
+  const { 
+    progress, 
+    isLoaded, 
+    markLessonInProgress, 
+    setLastStudied, 
+    addStudyTime,
+    isReaderMode 
+  } = useAcademyStore();
 
+  const [restoredScroll, setRestoredScroll] = useState(false);
+  const lastActiveRef = useRef<number>(Date.now());
+
+  // Mark lesson in progress and record last studied once data is loaded
   useEffect(() => {
-    markLessonInProgress(lesson.id);
-    setLastStudied(lesson.id);
-  }, [lesson.id, markLessonInProgress, setLastStudied]);
+    if (isLoaded) {
+      markLessonInProgress(lesson.id);
+      setLastStudied(lesson.id);
+    }
+  }, [lesson.id, isLoaded, markLessonInProgress, setLastStudied]);
+
+  // Active study time tracker (counts actual active seconds in the lesson)
+  useEffect(() => {
+    const handleActivity = () => {
+      lastActiveRef.current = Date.now();
+    };
+
+    window.addEventListener("mousemove", handleActivity, { passive: true });
+    window.addEventListener("scroll", handleActivity, { passive: true });
+    window.addEventListener("keydown", handleActivity, { passive: true });
+
+    // Every 60 seconds, if the user was active within the last 3 minutes and document is visible
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        const timeSinceActive = Date.now() - lastActiveRef.current;
+        if (timeSinceActive < 3 * 60 * 1000) {
+          addStudyTime(1);
+        }
+      }
+    }, 60000);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("scroll", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+    };
+  }, [addStudyTime]);
+
+  // Scroll position save and restore per lesson
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Save scroll on unload or unmount
+    const savePosition = () => {
+      if (window.scrollY > 150) {
+        localStorage.setItem(`academy_scroll_${lesson.id}`, String(Math.floor(window.scrollY)));
+      }
+    };
+
+    window.addEventListener("beforeunload", savePosition);
+
+    // Restore previous scroll position if no anchor hash in URL
+    if (!window.location.hash && !restoredScroll) {
+      const saved = localStorage.getItem(`academy_scroll_${lesson.id}`);
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (parsed > 200) {
+          // Delay briefly to allow content layout to settle
+          setTimeout(() => {
+            window.scrollTo({ top: parsed, behavior: "smooth" });
+            setRestoredScroll(true);
+          }, 200);
+        }
+      }
+    }
+
+    return () => {
+      savePosition();
+      window.removeEventListener("beforeunload", savePosition);
+    };
+  }, [lesson.id, restoredScroll]);
 
   const currentIndex = ALL_LESSON_SUMMARIES.findIndex((l) => l.id === lesson.id);
   const prevLesson = currentIndex > 0 ? ALL_LESSON_SUMMARIES[currentIndex - 1] : undefined;
@@ -46,7 +124,7 @@ export function LessonView({ lesson }: LessonViewProps) {
       ? ALL_LESSON_SUMMARIES[currentIndex + 1]
       : undefined;
 
-  const isCompleted = progress.completedLessons.includes(lesson.id);
+  const isCompleted = isLoaded && progress.completedLessons.includes(lesson.id);
 
   // Table of Contents items
   const tocItems: TOCItem[] = useMemo(() => {
@@ -65,9 +143,9 @@ export function LessonView({ lesson }: LessonViewProps) {
     if (lesson.codeExamples && lesson.codeExamples.length > 0) {
       items.push({ id: "code-examples", label: "نمونه کدهای اجرایی" });
     }
-    items.push({ id: "nest-comparison", label: "تطبیق مفهومی با NestJS" });
+    items.push({ id: "nest-comparison", label: "تطبیق با NestJS" });
     if (lesson.commonMistakes && lesson.commonMistakes.length > 0) {
-      items.push({ id: "common-mistakes", label: "اشتباهات متداول و Anti-patterns" });
+      items.push({ id: "common-mistakes", label: "اشتباهات متداول" });
     }
     items.push(
       { id: "best-practices", label: "اصول زرین Best Practices" },
@@ -80,9 +158,9 @@ export function LessonView({ lesson }: LessonViewProps) {
   }, [lesson]);
 
   return (
-    <div className="flex items-start gap-8 justify-between">
-      {/* Main Prose Reading Column (Optimal max-w-3xl ~ 768px for deep reading comfort) */}
-      <article className="flex-1 min-w-0 max-w-3xl pb-20">
+    <div className={cn("flex items-start gap-8 justify-between", isReaderMode && "justify-center")}>
+      {/* Main Prose Reading Column */}
+      <article className="flex-1 min-w-0 reading-column mx-auto pb-20">
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-xs text-muted-foreground mb-5 select-none flex-wrap">
           <Link href="/" className="hover:text-foreground transition-colors font-medium">
@@ -119,33 +197,41 @@ export function LessonView({ lesson }: LessonViewProps) {
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground leading-snug">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground leading-tight">
             {lesson.title}
           </h1>
 
-          <div className="text-sm font-mono text-muted-foreground ltr-dir">
+          <div
+            dir="ltr"
+            style={{ direction: "ltr", textAlign: "left" }}
+            className="text-xs sm:text-sm font-mono text-muted-foreground ltr-dir"
+          >
             {lesson.titleEn}
           </div>
 
-          <p className="text-base sm:text-[17px] text-muted-foreground leading-[1.9]">
-            {lesson.description}
-          </p>
+          <div className="text-[16px] sm:text-[17px] text-muted-foreground leading-[1.85]">
+            <MarkdownRenderer content={lesson.description} />
+          </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {lesson.tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="text-xs font-mono px-2 py-0.5 rounded bg-secondary text-muted-foreground border border-border ltr-dir"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
+          {lesson.tags && lesson.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-2">
+              {lesson.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 rounded text-[11px] font-mono bg-secondary/80 text-muted-foreground border border-border"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
         </header>
 
-        {/* Mobile/Tablet In-line Table of Contents */}
-        <TableOfContents items={tocItems} variant="mobile" />
+        {/* Mobile Table of Contents */}
+        <div className="xl:hidden my-6">
+          <TableOfContents items={tocItems} variant="mobile" />
+        </div>
 
         {/* Learning Objectives & Prerequisites */}
         <div id="objectives" className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8 scroll-mt-24">
@@ -188,9 +274,9 @@ export function LessonView({ lesson }: LessonViewProps) {
           <div className="text-sm font-bold text-primary">
             چرا این موضوع برای یک مهندس ارشد بک‌اند حیاتی است؟
           </div>
-          <p className="text-[16px] sm:text-[17px] text-foreground/95 leading-[1.95]">
-            {lesson.whyItMatters}
-          </p>
+          <div className="text-[16px] sm:text-[17px] text-foreground/95 leading-[1.95]">
+            <MarkdownRenderer content={lesson.whyItMatters} />
+          </div>
         </section>
 
         {/* Introduction */}
@@ -198,8 +284,8 @@ export function LessonView({ lesson }: LessonViewProps) {
           <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 border-r-3 border-primary pr-3">
             مقدمه و طرح بحث
           </h2>
-          <div className="text-[17px] sm:text-[18px] text-foreground/90 leading-[1.95] space-y-4 whitespace-pre-line">
-            {lesson.introduction}
+          <div className="text-[17px] sm:text-[18px] text-foreground/90 leading-[1.95]">
+            <MarkdownRenderer content={lesson.introduction} />
           </div>
         </section>
 
@@ -222,8 +308,8 @@ export function LessonView({ lesson }: LessonViewProps) {
                   <span>{sec.title}</span>
                 </h3>
 
-                <div className="text-[16px] sm:text-[17px] text-foreground/90 leading-[1.95] whitespace-pre-line">
-                  {sec.content}
+                <div className="text-[16px] sm:text-[17px] text-foreground/90 leading-[1.95]">
+                  <MarkdownRenderer content={sec.content} />
                 </div>
 
                 {sec.keyPoints && sec.keyPoints.length > 0 && (
@@ -256,8 +342,8 @@ export function LessonView({ lesson }: LessonViewProps) {
               <Cpu className="w-5 h-5 text-primary shrink-0" />
               <span>کالبدشکافی عمیق زیرساخت و معماری داخلی (Internals)</span>
             </div>
-            <div className="text-[16px] sm:text-[17px] text-foreground/90 leading-[1.95] whitespace-pre-line border-r-3 border-primary/50 pr-3.5">
-              {lesson.internalsAndMechanisms}
+            <div className="text-[16px] sm:text-[17px] text-foreground/90 leading-[1.95] border-r-3 border-primary/50 pr-3.5">
+              <MarkdownRenderer content={lesson.internalsAndMechanisms} />
             </div>
           </section>
         )}
@@ -275,11 +361,15 @@ export function LessonView({ lesson }: LessonViewProps) {
             <div className="p-4 rounded-xl border border-border bg-background space-y-3 text-[15px] sm:text-base leading-[1.9]">
               <div>
                 <span className="text-primary font-bold block mb-1">صورت مسئله در سیستم تجاری:</span>
-                <p className="text-muted-foreground">{lesson.realWorldScenario.scenario}</p>
+                <div className="text-muted-foreground">
+                  <MarkdownRenderer content={lesson.realWorldScenario.scenario} />
+                </div>
               </div>
               <div className="pt-3 border-t border-border">
                 <span className="text-emerald-500 font-bold block mb-1">راهکار پیاده‌سازی سازمانی:</span>
-                <p className="text-foreground/90">{lesson.realWorldScenario.solution}</p>
+                <div className="text-foreground/90">
+                  <MarkdownRenderer content={lesson.realWorldScenario.solution} />
+                </div>
               </div>
             </div>
           </section>
@@ -304,9 +394,9 @@ export function LessonView({ lesson }: LessonViewProps) {
                     </span>
                   )}
                 </div>
-                <p className="text-[15px] text-muted-foreground leading-[1.85]">
-                  {example.explanation}
-                </p>
+                <div className="text-[15px] text-muted-foreground leading-[1.85]">
+                  <MarkdownRenderer content={example.explanation} />
+                </div>
                 <CodeBlock
                   code={example.code}
                   language={example.language}
@@ -318,57 +408,73 @@ export function LessonView({ lesson }: LessonViewProps) {
           </section>
         )}
 
-        {/* NestJS vs Java Comparison */}
-        <NestComparisonCard comparison={lesson.comparisonWithNestJS} />
+        {/* Comparison with NestJS */}
+        {lesson.comparisonWithNestJS && (
+          <section id="nest-comparison" className="my-10 space-y-4 scroll-mt-24">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 border-r-3 border-primary pr-3">
+              تطبیق مفهومی با Node.js و NestJS
+            </h2>
+            <NestComparisonCard comparison={lesson.comparisonWithNestJS} />
+          </section>
+        )}
 
         {/* Common Mistakes */}
         {lesson.commonMistakes && lesson.commonMistakes.length > 0 && (
           <section id="common-mistakes" className="my-10 space-y-4 scroll-mt-24">
-            <div className="flex items-center gap-2 text-rose-500 font-bold text-xl sm:text-2xl border-r-3 border-rose-500 pr-3">
-              <AlertTriangle className="w-5 h-5 shrink-0" />
-              <h2 className="text-foreground">اشتباهات متداول و الگوهای ضدطراحی (Anti-patterns)</h2>
-            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 border-r-3 border-primary pr-3">
+              اشتباهات متداول و Anti-patterns
+            </h2>
 
             <div className="space-y-4">
-              {lesson.commonMistakes.map((m, idx) => (
+              {lesson.commonMistakes.map((mistake, idx) => (
                 <div
                   key={idx}
                   className="p-5 rounded-xl border border-rose-500/20 bg-rose-500/5 space-y-3"
                 >
-                  <div className="font-bold text-base text-foreground">
-                    {idx + 1}. {m.mistake}
-                  </div>
-                  <div>
-                    <span className="font-semibold text-rose-400 block mb-1 text-sm">
-                      چرا این رویکرد خطرناک و آسیب‌زننده است؟
-                    </span>
-                    <p className="text-[15px] leading-[1.85] text-muted-foreground">{m.whyBad}</p>
-                  </div>
-                  <div className="pt-2 border-t border-rose-500/20">
-                    <span className="font-semibold text-emerald-400 block mb-1 text-sm">
-                      راهکار اصولی:
-                    </span>
-                    <p className="text-[15px] leading-[1.85] text-foreground/90">{m.solution}</p>
+                  <div className="flex items-start gap-2 text-rose-400 font-bold text-base">
+                    <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+                    <span>{mistake.mistake}</span>
                   </div>
 
-                  {(m.codeBad || m.codeGood) && (
-                    <div className="space-y-3 pt-2">
-                      {m.codeBad && (
-                        <div>
-                          <span className="text-xs font-mono text-rose-400 font-semibold block mb-1 ltr-dir">
-                            // ✕ Bad Practice
-                          </span>
-                          <CodeBlock code={m.codeBad} language="java" />
-                        </div>
-                      )}
-                      {m.codeGood && (
-                        <div>
-                          <span className="text-xs font-mono text-emerald-400 font-semibold block mb-1 ltr-dir">
-                            // ✓ Recommended Practice
-                          </span>
-                          <CodeBlock code={m.codeGood} language="java" />
-                        </div>
-                      )}
+                  <div className="text-[15px] text-foreground/90 space-y-2 leading-[1.85]">
+                    <div>
+                      <span className="text-xs font-bold text-muted-foreground block mb-0.5">
+                        چرا این رویکرد در جاوا اشتباه است؟
+                      </span>
+                      <p>{mistake.whyBad}</p>
+                    </div>
+
+                    <div className="pt-2 border-t border-rose-500/15">
+                      <span className="text-xs font-bold text-emerald-500 block mb-0.5">
+                        راهکار استاندارد:
+                      </span>
+                      <p className="text-foreground">{mistake.solution}</p>
+                    </div>
+                  </div>
+
+                  {mistake.codeBad && (
+                    <div className="pt-2">
+                      <span className="text-xs font-mono text-rose-400 block mb-1">
+                        ✗ رویکرد نادرست (Anti-pattern):
+                      </span>
+                      <CodeBlock
+                        code={mistake.codeBad}
+                        language="java"
+                        showLineNumbers={false}
+                      />
+                    </div>
+                  )}
+
+                  {mistake.codeGood && (
+                    <div className="pt-2">
+                      <span className="text-xs font-mono text-emerald-400 block mb-1">
+                        ✓ رویکرد استاندارد (Best Practice):
+                      </span>
+                      <CodeBlock
+                        code={mistake.codeGood}
+                        language="java"
+                        showLineNumbers={false}
+                      />
                     </div>
                   )}
                 </div>
@@ -378,96 +484,76 @@ export function LessonView({ lesson }: LessonViewProps) {
         )}
 
         {/* Best Practices */}
-        <section
-          id="best-practices"
-          className="my-10 p-5 sm:p-6 rounded-xl border border-border bg-card space-y-3 scroll-mt-24"
-        >
-          <div className="flex items-center gap-2 text-foreground font-bold text-base sm:text-lg">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-            <span>اصول زرین و Best Practices محیط پروداکشن</span>
-          </div>
-          <ul className="space-y-2 text-[15px] sm:text-base leading-[1.9] text-foreground/90">
-            {lesson.bestPractices.map((bp, i) => (
-              <li key={i} className="flex items-start gap-2.5">
-                <span className="text-emerald-500 font-bold shrink-0 mt-0.5">✓</span>
-                <span>{bp}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        {lesson.bestPractices && lesson.bestPractices.length > 0 && (
+          <section id="best-practices" className="my-10 space-y-4 scroll-mt-24">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 border-r-3 border-primary pr-3">
+              اصول زرین Best Practices مهندسی
+            </h2>
 
-        {/* Practical Workshop Exercise */}
-        <ExerciseSection lessonId={lesson.id} exercise={lesson.exercise} />
-
-        {/* Conceptual Quiz */}
-        <QuizSection lessonId={lesson.id} quizzes={lesson.quizzes} />
-
-        {/* Senior Interview Questions */}
-        <InterviewQuestionsSection questions={lesson.interviewQuestions} />
-
-        {/* Capstone Connection */}
-        {lesson.capstoneConnection && (
-          <section className="my-8 p-5 rounded-xl border border-border bg-secondary/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="text-xs font-mono font-semibold text-primary block">
-                {lesson.capstoneConnection.phase}
-              </span>
-              <h4 className="text-sm sm:text-base font-bold text-foreground">
-                {lesson.capstoneConnection.task}
-              </h4>
-              <div className="flex flex-wrap gap-1.5 text-xs font-mono text-muted-foreground ltr-dir pt-1">
-                {lesson.capstoneConnection.filesToModify.map((f, i) => (
-                  <span key={i} className="px-2 py-0.5 rounded bg-background border border-border">
-                    {f}
-                  </span>
+            <div className="p-5 rounded-xl border border-border bg-card">
+              <ul className="space-y-3">
+                {lesson.bestPractices.map((bp, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5 text-[15px] leading-[1.85] text-foreground/90">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-1" />
+                    <span>{bp}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-            <Link
-              href="/capstone"
-              className="px-4 py-2 min-h-[44px] rounded-lg bg-secondary hover:bg-secondary/80 border border-border text-foreground text-xs font-bold shrink-0 flex items-center justify-center transition-colors"
-            >
-              پروژه سفارشات
-            </Link>
           </section>
         )}
 
-        {/* Summary & References */}
-        <section id="summary" className="my-10 space-y-5 scroll-mt-24">
-          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-3">
-            <h3 className="text-base sm:text-lg font-bold text-foreground">
-              جمع‌بندی درس:
-            </h3>
-            <p className="text-[16px] sm:text-[17px] text-muted-foreground leading-[1.95]">
-              {lesson.summary}
-            </p>
-          </div>
+        {/* Personal Notes */}
+        <NotesEditor lessonId={lesson.id} />
 
-          <div>
-            <h4 className="text-xs font-bold text-muted-foreground uppercase mb-3">
-              مراجع رسمی و مستندات:
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {lesson.references.map((ref, idx) => (
-                <a
-                  key={idx}
-                  href={ref.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3 py-1.5 rounded-lg border border-border bg-secondary/40 hover:bg-secondary text-muted-foreground hover:text-foreground text-xs flex items-center gap-1.5 font-mono transition-colors ltr-dir min-h-[36px]"
-                >
-                  <span>{ref.title}</span>
-                  <ExternalLink className="w-3.5 h-3.5 opacity-60" />
-                </a>
-              ))}
+        {/* Hands-on Exercise */}
+        <ExerciseSection lessonId={lesson.id} exercise={lesson.exercise} />
+
+        {/* Concept Assessment Quiz */}
+        <QuizSection lessonId={lesson.id} quizzes={lesson.quizzes} />
+
+        {/* Senior Interview Questions */}
+        {lesson.interviewQuestions && lesson.interviewQuestions.length > 0 && (
+          <InterviewQuestionsSection questions={lesson.interviewQuestions} />
+        )}
+
+        {/* Lesson Summary and Official References */}
+        <section id="summary" className="my-10 space-y-4 scroll-mt-24">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 border-r-3 border-primary pr-3">
+            جمع‌بندی و مراجع رسمی
+          </h2>
+
+          <div className="p-5 rounded-xl border border-border bg-card space-y-4">
+            <div className="text-[16px] text-foreground/90 leading-[1.95]">
+              <MarkdownRenderer content={lesson.summary} />
             </div>
+
+            {lesson.references && lesson.references.length > 0 && (
+              <div className="pt-4 border-t border-border">
+                <span className="text-xs font-bold text-muted-foreground block mb-2">
+                  مستندات مرجع و منابع رسمی:
+                </span>
+                <ul className="space-y-2">
+                  {lesson.references.map((ref, idx) => (
+                    <li key={idx}>
+                      <a
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs sm:text-sm text-primary hover:underline flex items-center gap-1.5 font-medium"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                        <span>{ref.title}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* Personal Notes Editor */}
-        <NotesEditor lessonId={lesson.id} />
-
-        {/* Navigation (Prev, Next, Complete) */}
+        {/* Bottom Navigation */}
         <LessonNavigation
           lessonId={lesson.id}
           prevLesson={prevLesson}
@@ -475,8 +561,12 @@ export function LessonView({ lesson }: LessonViewProps) {
         />
       </article>
 
-      {/* Desktop Sticky Table of Contents on the side (Visible only on xl+ screens) */}
-      <TableOfContents items={tocItems} variant="desktop" />
+      {/* Desktop Sticky Table of Contents (Hidden in Reader Focus Mode) */}
+      {!isReaderMode && (
+        <aside className="hidden xl:block w-64 shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
+          <TableOfContents items={tocItems} variant="desktop" />
+        </aside>
+      )}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Moon, Sun } from "lucide-react";
 import { useAcademyStore } from "@/lib/store";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useAcademyStore();
+  const { settings, setTheme } = useAcademyStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -13,15 +13,20 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className="w-8 h-8 rounded-md bg-secondary" />;
+    return <div className="w-8 h-8 rounded-lg bg-secondary/50 animate-pulse" />;
   }
 
-  const isDark = theme === "dark";
+  const isDark =
+    settings.theme === "dark" ||
+    (settings.theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   return (
     <button
+      type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary border border-transparent hover:border-border transition-colors"
+      className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary border border-transparent hover:border-border transition-colors cursor-pointer"
       title={isDark ? "تغییر به تم روشن" : "تغییر به تم تاریک"}
       aria-label="تغییر تم"
     >

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   HelpCircle, 
   CheckCircle2, 
@@ -26,6 +26,18 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
     existingResult?.answers || {}
   );
   const [submitted, setSubmitted] = useState<boolean>(!!existingResult);
+
+  // Synchronize state when lesson changes or when progress finishes loading
+  useEffect(() => {
+    const res = progress.quizResults[lessonId];
+    if (res) {
+      setSelectedAnswers(res.answers || {});
+      setSubmitted(true);
+    } else {
+      setSelectedAnswers({});
+      setSubmitted(false);
+    }
+  }, [lessonId, progress.quizResults]);
 
   const handleSelectOption = (quizId: string, optionIndex: number) => {
     if (submitted) return;
@@ -74,8 +86,8 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
             <HelpCircle className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-mono text-muted-foreground">
-              CONCEPT_ASSESSMENT
+            <div className="text-xs font-semibold text-primary">
+              سنجش مفهومی و تست آمادگی
             </div>
             <h3 className="text-base sm:text-lg font-bold text-foreground mt-0.5">
               آزمونک سنجش یادگیری ({toPersianDigits(quizzes.length)} سوال تخصصی)

@@ -69,6 +69,8 @@
 @layer base {
   :root {
     /* Calm, high-precision engineering dark theme (Default) */
+    color-scheme: dark;
+
     --background: 220 16% 5%;
     --foreground: 220 14% 96%;
 
@@ -114,7 +116,9 @@
     --token-punctuation: #8b949e;
   }
 
-  .light {
+  .light, html.light {
+    color-scheme: light;
+
     --background: 220 20% 99%;
     --foreground: 222 47% 11%;
 
@@ -158,12 +162,95 @@
     --token-punctuation: #57606a;
   }
 
+  .dark, html.dark {
+    color-scheme: dark;
+
+    --background: 220 16% 5%;
+    --foreground: 220 14% 96%;
+
+    --card: 220 14% 8%;
+    --card-foreground: 220 14% 96%;
+    --card-border: 220 12% 16%;
+
+    --primary: 28 92% 54%;
+    --primary-foreground: 0 0% 100%;
+    --primary-muted: 28 92% 54% / 0.12;
+
+    --secondary: 220 12% 12%;
+    --secondary-foreground: 220 14% 90%;
+
+    --muted: 220 12% 12%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 28 92% 54%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 158 64% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 158 64% 45% / 0.12;
+
+    --border: 220 12% 15%;
+    --input: 220 12% 15%;
+    --ring: 28 92% 54%;
+
+    /* Code Block Theme Tokens - Dark */
+    --code-bg: #0d1117;
+    --code-header-bg: #161b22;
+    --code-border: #30363d;
+    --code-text: #e6edf3;
+    --code-line-number: #484f58;
+    --token-keyword: #ff7b72;
+    --token-type: #79c0ff;
+    --token-string: #7ee787;
+    --token-comment: #8b949e;
+    --token-annotation: #ffa657;
+    --token-number: #79c0ff;
+    --token-punctuation: #8b949e;
+  }
+
   * {
     @apply border-border;
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  /* User-configurable typography settings */
+  html[data-font-size="normal"] .reading-body {
+    font-size: 1.0625rem; /* 17px */
+  }
+  html[data-font-size="large"] .reading-body {
+    font-size: 1.15625rem; /* 18.5px */
+  }
+  html[data-font-size="xlarge"] .reading-body {
+    font-size: 1.25rem; /* 20px */
+  }
+
+  html[data-line-height="normal"] .reading-body {
+    line-height: 1.85;
+  }
+  html[data-line-height="relaxed"] .reading-body {
+    line-height: 1.95;
+  }
+  html[data-line-height="loose"] .reading-body {
+    line-height: 2.1;
+  }
+
+  html[data-column-width="normal"] .reading-column {
+    max-width: 48rem; /* 768px */
+  }
+  html[data-column-width="wide"] .reading-column {
+    max-width: 56rem; /* 896px */
+  }
+
+  /* Reduced motion preference */
+  html[data-reduce-motion="reduce"],
+  html[data-reduce-motion="reduce"] * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 
   body {
