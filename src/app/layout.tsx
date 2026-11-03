@@ -54,7 +54,8 @@ export default function RootLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { isReaderMode, toggleReaderMode } = useAcademyStore();
+  const isReaderMode = useAcademyStore(state => state.isReaderMode);
+  const toggleReaderMode = useAcademyStore(state => state.toggleReaderMode);
 
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning className="dark">

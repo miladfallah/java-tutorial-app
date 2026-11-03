@@ -1,149 +1,53 @@
-import { ALL_LESSONS } from "../src/data/lessons";
-import { WEEKS_META } from "../src/data/curriculum";
+import assert from 'node:assert/strict';
+import { ALL_LESSONS } from '../src/data/lessons';
+import { ALL_LESSON_SUMMARIES, WEEKS_META } from '../src/data/curriculum';
+import { sanitizeProgress, validateImportedProgress, DEFAULT_PROGRESS } from '../src/lib/storage';
 
-console.log("==================================================");
-console.log("🔍 آغاز اعتبارسنجی جامع محتوای آکادمی جاوا");
-console.log("==================================================");
-
-let hasStructuralErrors = false;
-
-// 1. Total count check
-if (ALL_LESSONS.length !== 156) {
-  console.error(`❌ تعداد کل درس‌ها مغایرت دارد! مورد انتظار: ۱۵۶، یافت شده: ${ALL_LESSONS.length}`);
-  hasStructuralErrors = true;
-} else {
-  console.log(`✓ تعداد کل درس‌ها: دقیقاً ۱۵۶ درس.`);
-}
-
-// 2. Weeks count check
-if (WEEKS_META.length !== 26) {
-  console.error(`❌ تعداد سرفصل‌های هفته مغایرت دارد! مورد انتظار: ۲۶، یافت شده: ${WEEKS_META.length}`);
-  hasStructuralErrors = true;
-} else {
-  console.log(`✓ تعداد هفته‌ها: دقیقاً ۲۶ هفته.`);
-}
-
-// 3. 6 lessons per week check
-const lessonsPerWeek = new Map<number, number>();
-ALL_LESSONS.forEach((l) => {
-  lessonsPerWeek.set(l.week, (lessonsPerWeek.get(l.week) || 0) + 1);
-});
-
-for (let w = 1; w <= 26; w++) {
-  const count = lessonsPerWeek.get(w) || 0;
-  if (count !== 6) {
-    console.error(`❌ هفته ${w} دارای ${count} درس است در حالی که باید دقیقاً ۶ درس داشته باشد!`);
-    hasStructuralErrors = true;
+assert.equal(ALL_LESSONS.length, ALL_LESSON_SUMMARIES.length, 'lesson and roadmap inventories differ');
+assert.equal(new Set(ALL_LESSONS.map(l => l.id)).size, ALL_LESSONS.length, 'duplicate IDs');
+assert.equal(new Set(ALL_LESSONS.map(l => l.slug)).size, ALL_LESSONS.length, 'duplicate routes');
+const positions = [0, 0, 0];
+const fragments = new Set<string>();
+for (const lesson of ALL_LESSONS) {
+  const summary = ALL_LESSON_SUMMARIES.find(item => item.id === lesson.id);
+  assert.equal(summary?.slug, lesson.slug, `broken roadmap route: ${lesson.id}`);
+  assert.equal(summary?.estimatedMinutes, lesson.estimatedMinutes, `inconsistent duration: ${lesson.id}`);
+  assert.ok(lesson.conceptualSections.length && lesson.codeExamples.length && lesson.quizzes.length);
+  const serialized = JSON.stringify(lesson);
+  assert.ok(!serialized.includes('StandardImplementation'), `placeholder code: ${lesson.id}`);
+  assert.ok(!serialized.includes('۴۵ میلی‌ثانیه'), `unverified benchmark: ${lesson.id}`);
+  for (const quiz of lesson.quizzes) {
+    assert.ok(quiz.options.length >= 3 && new Set(quiz.options).size === quiz.options.length);
+    assert.ok(Number.isInteger(quiz.correctIndex) && quiz.correctIndex >= 0 && quiz.correctIndex < quiz.options.length);
+    assert.ok(quiz.explanation.length > 20);
+  }
+  if (lesson.contentVersion === 2) {
+    assert.ok(lesson.estimatedMinutes <= 30);
+    assert.ok(lesson.conceptualSections[0].content.length > 100);
+    assert.ok(lesson.exercise.instructions.length > 50);
+    assert.ok(lesson.quizzes[0].id.startsWith('focused-v2-'));
+    const code = lesson.codeExamples[0].code;
+    assert.ok(!fragments.has(code), `duplicate worked fragment: ${lesson.id}`);
+    fragments.add(code);
+    positions[lesson.quizzes[0].correctIndex]++;
   }
 }
-console.log(`✓ توزیع درس‌ها: تمام ۲۶ هفته دارای ۶ درس هستند.`);
+for (const week of WEEKS_META) assert.equal(week.lessonsCount, ALL_LESSONS.filter(l => l.week === week.weekNumber).length);
+assert.deepEqual(positions, [50, 50, 50], 'uniform answer-position bias returned');
 
-// 4. Unique IDs and Slugs
-const ids = new Set<string>();
-const slugs = new Set<string>();
+assert.equal(validateImportedProgress([]).valid, false);
+assert.equal(validateImportedProgress({}).valid, false);
+assert.equal(validateImportedProgress({ completedLessons: [], lessonStatus: {}, lessonNotes: { 'lesson-001': 42 } }).valid, false);
+const note = 'یادداشت قبلی من';
+const roundTrip = validateImportedProgress(JSON.parse(JSON.stringify({ ...DEFAULT_PROGRESS, lessonNotes: { 'lesson-007': note }, completedLessons: ['lesson-007'] })));
+assert.equal(roundTrip.valid, true);
+assert.equal(roundTrip.progress?.lessonNotes['lesson-007'], note);
+assert.deepEqual(roundTrip.progress?.completedLessons, ['lesson-007']);
+const repaired = sanitizeProgress({ studyTimeMinutes: Infinity, completedLessons: ['lesson-007', 'lesson-007', 'unknown'], exerciseCompleted: { 'lesson-007': 'yes' as unknown as boolean } });
+assert.equal(repaired.studyTimeMinutes, 0);
+assert.deepEqual(repaired.completedLessons, ['lesson-007']);
+assert.deepEqual(repaired.exerciseCompleted, {});
 
-// Quality audit metrics
-let standardImplCount = 0;
-let uniformQuizIndexCount = 0;
-let genericAtomicCount = 0;
-let unverifiedClaimCount = 0;
-let totalQuizzes = 0;
-
-ALL_LESSONS.forEach((lesson) => {
-  if (ids.has(lesson.id)) {
-    console.error(`❌ شناسه تکراری: ${lesson.id}`);
-    hasStructuralErrors = true;
-  }
-  ids.add(lesson.id);
-
-  if (slugs.has(lesson.slug)) {
-    console.error(`❌ اسلاگ تکراری: ${lesson.slug}`);
-    hasStructuralErrors = true;
-  }
-  slugs.add(lesson.slug);
-
-  // Field presence checks
-  if (!lesson.title || lesson.title.trim().length < 5) {
-    console.error(`❌ عنوان نامعتبر برای ${lesson.id}`);
-    hasStructuralErrors = true;
-  }
-
-  if (!lesson.titleEn || lesson.titleEn.trim().length < 3) {
-    console.error(`❌ عنوان انگلیسی نامعتبر برای ${lesson.id}`);
-    hasStructuralErrors = true;
-  }
-
-  if (!lesson.introduction || lesson.introduction.trim().length < 50) {
-    console.error(`❌ بخش مقدمه برای درس ${lesson.id} ناکافی است`);
-    hasStructuralErrors = true;
-  }
-
-  if (!lesson.conceptualSections || lesson.conceptualSections.length < 1) {
-    console.error(`❌ بخش‌های مفهومی برای درس ${lesson.id} وجود ندارد`);
-    hasStructuralErrors = true;
-  }
-
-  if (!lesson.codeExamples || lesson.codeExamples.length < 1) {
-    console.error(`❌ نمونه کد برای درس ${lesson.id} وجود ندارد`);
-    hasStructuralErrors = true;
-  }
-
-  // Quality metrics detection
-  const codeContent = JSON.stringify(lesson.codeExamples || []);
-  if (codeContent.includes("StandardImplementation")) {
-    standardImplCount++;
-  }
-
-  if (JSON.stringify(lesson.realWorldScenario || {}).includes("۴۵ میلی‌ثانیه")) {
-    unverifiedClaimCount++;
-  }
-
-  if (JSON.stringify(lesson.commonMistakes || []).includes("AtomicInteger")) {
-    genericAtomicCount++;
-  }
-
-  if (lesson.quizzes) {
-    totalQuizzes += lesson.quizzes.length;
-    let lessonAllIndexOne = true;
-    lesson.quizzes.forEach((q, qIdx) => {
-      if (q.correctIndex !== 1) {
-        lessonAllIndexOne = false;
-      }
-      if (!q.options || q.options.length < 3) {
-        console.error(`❌ سوال ${qIdx + 1} در درس ${lesson.id} گزینه‌های ناکافی دارد`);
-        hasStructuralErrors = true;
-      }
-      if (q.correctIndex < 0 || q.correctIndex >= q.options.length) {
-        console.error(`❌ شاخص پاسخ صحیح در سوال ${qIdx + 1} درس ${lesson.id} نامعتبر است: ${q.correctIndex}`);
-        hasStructuralErrors = true;
-      }
-    });
-    if (lessonAllIndexOne && lesson.quizzes.length > 0) {
-      uniformQuizIndexCount++;
-    }
-  }
-});
-
-console.log("==================================================");
-console.log("📊 گزارش تفکیک اعتبارسنجی ساختاری و ممیزی علمی محتوا");
-console.log("==================================================");
-
-if (hasStructuralErrors) {
-  console.error("❌ خطای ساختاری در داده‌های درس‌ها وجود دارد. لطفاً موارد بالا را برطرف کنید.");
-  process.exit(1);
-} else {
-  console.log("✓ اعتبارسنجی ساختاری (Structural Validation): ۱۰۰٪ موفقیت‌آمیز");
-  console.log(`  - مجموع درس‌های قابل دسترسی: ۱۵۶ درس`);
-  console.log(`  - مجموع سوالات کوییز: ${totalQuizzes} سوال`);
-  console.log(`  - مجموع تمرین‌های کارگاهی: ${ALL_LESSONS.length} تمرین`);
-}
-
-console.log("--------------------------------------------------");
-console.log("🔬 ممیزی کیفیت علمی و تشخیص الگوهای قالبی:");
-console.log(`  - درس‌های حاوی کلاس قالبی StandardImplementation: ${standardImplCount} درس`);
-console.log(`  - درس‌های با الگوی یکنواخت پاسخ صحیح کوییز (correctIndex=1): ${uniformQuizIndexCount} درس`);
-console.log(`  - درس‌های با الگوی خطای عمومی AtomicInteger: ${genericAtomicCount} درس`);
-console.log(`  - درس‌های با ادعای تکراری بنچمارک ۴۵ میلی‌ثانیه: ${unverifiedClaimCount} درس`);
-console.log("--------------------------------------------------");
-console.log("💡 وضعیت بازنویسی: درس‌های واقعی بازنویسی‌شده از قالب‌های تکراری تفکیک شده‌اند.");
-console.log("==================================================");
+console.log(`PASS: ${ALL_LESSONS.length} routes, 150 focused revisions, no placeholder code or invented benchmark claims.`);
+console.log('PASS: import validation, progress round-trip and malformed-data recovery.');
+console.log('These checks validate structure and regression rules, not scientific completeness or compilation of every fragment.');

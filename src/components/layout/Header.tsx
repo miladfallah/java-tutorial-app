@@ -16,7 +16,7 @@ import {
   PanelRightClose,
   PanelRightOpen
 } from "lucide-react";
-import { useAcademyStore } from "@/lib/store";
+import { useAcademyStore, applySettingsToDOM } from "@/lib/store";
 import { ThemeToggle } from "./ThemeToggle";
 import { ReaderSettingsModal } from "./ReaderSettingsModal";
 import { toPersianDigits, cn } from "@/lib/utils";
@@ -31,9 +31,17 @@ interface HeaderProps {
 export function Header({ onToggleSidebar, isSidebarOpen, isDesktopSidebarOpen, onToggleDesktopSidebar }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { progress, isLoaded, loadProgress, isReaderMode, toggleReaderMode } = useAcademyStore();
+  const { progress, isLoaded, loadProgress, isReaderMode, toggleReaderMode, settings } = useAcademyStore();
   const [mounted, setMounted] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    if (settings.theme !== "system") return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const update = () => applySettingsToDOM(useAcademyStore.getState().settings);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [settings.theme]);
 
   useEffect(() => {
     setMounted(true);
@@ -50,7 +58,7 @@ export function Header({ onToggleSidebar, isSidebarOpen, isDesktopSidebarOpen, o
         target.isContentEditable
       );
 
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      if (!isEditing && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         router.push("/search");
       } else if (!isEditing && e.key === "/") {
@@ -116,6 +124,16 @@ export function Header({ onToggleSidebar, isSidebarOpen, isDesktopSidebarOpen, o
           </div>
 
           {/* Center: Tablet and Desktop navigation links */}
+          <details className="hidden lg:block 2xl:hidden relative shrink-0"
+            onKeyDown={event => { if (event.key === "Escape") { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}>
+            <summary className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm hover:bg-secondary">بخش‌های سایت</summary>
+            <nav aria-label="بخش‌های سایت" className="absolute top-full mt-2 right-0 w-56 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-xl border border-border bg-card shadow-xl p-2 space-y-1">
+              {navLinks.map(link => <Link key={link.href} href={link.href} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary"
+                onClick={event => { const menu = event.currentTarget.closest('details'); if (menu) menu.open = false; }}>{link.label}</Link>)}
+              <Link href="/getting-started" className="block rounded-lg px-3 py-2 text-sm text-primary hover:bg-secondary"
+                onClick={event => { const menu = event.currentTarget.closest('details'); if (menu) menu.open = false; }}>راهنمای شروع</Link>
+            </nav>
+          </details>
           <nav className="hidden 2xl:flex items-center gap-1 text-xs sm:text-sm font-medium">
             {navLinks.map((link) => {
               const isActive =

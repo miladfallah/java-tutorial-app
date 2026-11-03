@@ -24,6 +24,7 @@ import { ALL_LESSON_SUMMARIES } from "@/data/curriculum";
 import { FLASHCARDS } from "@/data/flashcards";
 import { exportProgressJSON, validateImportedProgress } from "@/lib/storage";
 import { toPersianDigits, cn } from "@/lib/utils";
+import { isCurrentQuizResult } from "@/lib/quiz-version";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
@@ -48,7 +49,7 @@ export default function RevisionPage() {
 
   const failedQuizzesLessons = ALL_LESSON_SUMMARIES.filter((l) => {
     const result = progress.quizResults[l.id];
-    return result && !result.passed;
+    return result && (!result.passed || !isCurrentQuizResult(l.id, result));
   });
 
   const currentCard = FLASHCARDS[currentCardIndex];

@@ -16,6 +16,8 @@ import { LessonExercise } from "@/data/types";
 import { useAcademyStore } from "@/lib/store";
 import { CodeBlock } from "./CodeBlock";
 import { toPersianDigits, cn } from "@/lib/utils";
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
+import { formatTechnicalText } from "@/lib/format-technical-text";
 
 interface ExerciseSectionProps {
   lessonId: string;
@@ -42,7 +44,7 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
           </div>
           <div>
             <div className="text-xs font-mono text-muted-foreground">
-              WORKSHOP_EXERCISE
+              تمرین عملی · ثبت انجام به انتخاب شما
             </div>
             <h3 className="text-base sm:text-lg font-bold text-foreground mt-0.5">
               {exercise.title}
@@ -56,7 +58,7 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
           className={cn(
             "inline-flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-lg text-xs sm:text-sm font-medium border transition-colors self-start sm:self-auto cursor-pointer",
             isCompleted
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/15"
+              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/15"
               : "bg-secondary text-foreground border-border hover:bg-secondary/80"
           )}
           type="button"
@@ -64,7 +66,7 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
           <CheckCircle2
             className={cn(
               "w-4 h-4 shrink-0",
-              isCompleted ? "text-emerald-400" : "text-muted-foreground"
+              isCompleted ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground"
             )}
           />
           <span>{isCompleted ? "تمرین تکمیل شد ✓" : "علامت‌گذاری به عنوان انجام شده"}</span>
@@ -73,8 +75,8 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
 
       {/* Instructions: readable body text */}
       <div className="mt-5 space-y-5">
-        <div className="text-[15px] sm:text-base text-foreground/90 leading-[1.95] whitespace-pre-line">
-          {exercise.instructions}
+        <div className="reading-body text-foreground/90 whitespace-pre-line">
+          <MarkdownRenderer content={formatTechnicalText(exercise.instructions)} />
         </div>
 
         {/* Expected output with CodeBlock */}

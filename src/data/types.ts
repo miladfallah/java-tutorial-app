@@ -71,6 +71,7 @@ export interface CapstoneConnection {
 }
 
 export interface Lesson {
+  contentVersion?: number;
   id: string;
   slug: string;
   week: number;

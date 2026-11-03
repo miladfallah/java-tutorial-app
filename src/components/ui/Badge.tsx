@@ -21,7 +21,7 @@ export function Badge({
     primary:
       "bg-primary-muted text-primary border border-primary/20",
     success:
-      "bg-success-muted text-emerald-400 border border-success/20",
+      "bg-success-muted text-emerald-700 dark:text-emerald-400 border border-success/20",
     warning:
       "bg-amber-500/10 text-amber-400 border border-amber-500/20",
     outline:

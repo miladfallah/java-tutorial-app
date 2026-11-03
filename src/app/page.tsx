@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { isCurrentQuizResult } from "@/lib/quiz-version";
 
 export default function DashboardPage() {
   const { progress, isLoaded, loadProgress } = useAcademyStore();
@@ -82,8 +83,9 @@ export default function DashboardPage() {
 
   // Quiz pass statistics
   const quizStats = useMemo(() => {
-    const totalAttempted = Object.keys(progress.quizResults).length;
-    const passed = Object.values(progress.quizResults).filter((r) => r.passed).length;
+    const current = Object.entries(progress.quizResults).filter(([id, result]) => isCurrentQuizResult(id, result));
+    const totalAttempted = current.length;
+    const passed = current.filter(([, result]) => result.passed).length;
     const rate = totalAttempted > 0 ? Math.round((passed / totalAttempted) * 100) : null;
     return { passed, totalAttempted, rate };
   }, [progress.quizResults]);
@@ -103,9 +105,14 @@ export default function DashboardPage() {
           داشبورد یادگیری مهندسی جاوا
         </h1>
         <p className="text-base text-muted-foreground max-w-3xl leading-[1.85]">
-          انتقال ساخت‌یافته و عمیق به معماری‌های مقیاس‌بزرگ سازمانی بر پایه Java 25 LTS و Spring Boot 3.4.
+          از تجربهٔ Node.js به Java 25 و Spring؛ هر جلسه یک مفهوم روشن و یک تمرین قابل بررسی.
         </p>
       </div>
+
+      <Link href="/getting-started" className="block rounded-xl border border-border bg-card p-4 hover:border-primary/50 transition-colors">
+        <span className="font-semibold text-primary">تازه شروع می‌کنی؟ راهنمای محیط و برنامهٔ ۲۵ دقیقه‌ای ←</span>
+        <span className="block mt-1 text-sm text-muted-foreground">تفاوت مطالعه و تمرین، پیش‌نیازها و انتخاب نقطهٔ شروع</span>
+      </Link>
 
       {/* Primary Hero: What is my next step? */}
       {isAllCompleted ? (

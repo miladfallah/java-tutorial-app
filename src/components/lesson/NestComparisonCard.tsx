@@ -39,7 +39,7 @@ export function NestComparisonCard({ comparison }: NestComparisonCardProps) {
           {comparison.nestCode && (
             <div>
               <div className="text-xs font-mono font-medium text-muted-foreground px-1 pb-1 ltr-dir">
-                // 1. NestJS / TypeScript Implementation
+                {"۱. نمونهٔ NestJS / TypeScript"}
               </div>
               <CodeBlock
                 code={comparison.nestCode}
@@ -52,7 +52,7 @@ export function NestComparisonCard({ comparison }: NestComparisonCardProps) {
           {comparison.javaCode && (
             <div>
               <div className="text-xs font-mono font-medium text-muted-foreground px-1 pb-1 ltr-dir">
-                // 2. Modern Java 21 / Spring Boot 3.3 Implementation
+                {"۲. نمونهٔ Java / Spring Boot"}
               </div>
               <CodeBlock
                 code={comparison.javaCode}

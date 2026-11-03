@@ -50,7 +50,7 @@ export function LessonNavigation({
           className={cn(
             "inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-lg text-xs sm:text-sm font-bold transition-all border cursor-pointer",
             isCompleted
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/15"
+              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/15"
               : "bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-sm"
           )}
           type="button"
@@ -58,7 +58,7 @@ export function LessonNavigation({
           <CheckCircle2
             className={cn(
               "w-4 h-4",
-              isCompleted ? "text-emerald-400" : "text-primary-foreground"
+              isCompleted ? "text-emerald-700 dark:text-emerald-400" : "text-primary-foreground"
             )}
           />
           <span>{isCompleted ? "جلسه تکمیل شده است ✓" : "علامت‌گذاری به عنوان خوانده شده"}</span>
@@ -88,7 +88,7 @@ export function LessonNavigation({
             className={cn(
               "inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-lg border text-xs sm:text-sm font-medium transition-colors cursor-pointer",
               isReviewNeeded
-                ? "bg-rose-500/10 text-rose-400 border-rose-500/30 font-bold"
+                ? "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30 font-bold"
                 : "bg-secondary text-muted-foreground hover:text-foreground border-border hover:bg-secondary/80"
             )}
             title={isReviewNeeded ? "حذف علامت مرور" : "نیاز به مرور مجدد"}

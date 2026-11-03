@@ -46,10 +46,10 @@ export default function CapstonePage() {
     {
       phaseNumber: 2,
       weekRange: "هفته ۵ تا ۸",
-      title: "وب سرویس استاندارد سازمانی با Spring Boot 3.4",
-      titleEn: "Production RESTful Service with Spring Boot 3.4",
+      title: "وب سرویس استاندارد سازمانی با Spring Boot 3.5",
+      titleEn: "Production RESTful Service with Spring Boot 3.5",
       desc: "تبدیل ماژول به وب‌سرویس RESTful، اعتبارسنجی Jakarta Validation، مدیریت خطای استاندارد RFC 9457 (Problem Details)، و پیاده‌سازی Idempotency Key جهت ایمنی شبکه.",
-      techs: ["Spring Boot 3.4", "Spring MVC", "RFC 9457 Problem Details", "Jakarta Validation", "Idempotency"],
+      techs: ["Spring Boot 3.5", "Spring MVC", "RFC 9457 Problem Details", "Jakarta Validation", "Idempotency"],
       link: "/lessons/building-the-order-rest-api",
     },
     {
@@ -92,6 +92,9 @@ export default function CapstonePage() {
 
   return (
     <div className="space-y-8 pb-16">
+      <div className="rounded-xl border border-border bg-secondary/40 p-4 text-sm leading-loose">
+        <strong>پروژهٔ آزمایشگاهی محلی:</strong> سورس و تست‌های پایه قابل اجرا هستند. تست‌های فعلی از H2 استفاده می‌کنند و اثبات رفتار PostgreSQL نیستند. احراز هویت نهایی، کنترل مالکیت، replay همزمان کلید idempotency و relay پیام outbox هنوز تمرین‌های توسعه‌اند؛ این نمونه را سرویس آمادهٔ انتشار عمومی فرض نکن.
+      </div>
       {/* Header */}
       <div className="space-y-4 pb-6 border-b border-border">
         <div className="inline-flex items-center gap-2 text-xs font-semibold text-primary">

@@ -11,7 +11,7 @@ export const WEEK_17_LESSONS: Lesson[] = [
     "description": "کالبدشکافی ساختار پیام‌رسان RabbitMQ و تفاوت بنیادی مبادلات Direct, Fanout و Topic در مقایسه با وب‌هوک و ردیس.",
     "category": "Event-Driven",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "RabbitMQ",
       "Exchanges",
@@ -20,167 +20,93 @@ export const WEEK_17_LESSONS: Lesson[] = [
       "AMQP"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Event-Driven",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 16",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Exchanges, Queues, Routing در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای مفاهیم صف‌ها، مبادلات (Exchanges) و مسیریابی در RabbitMQ",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "Consumer معمولاً از کجا پیام می‌خواند",
+      "دو queue با binding متفاوت بساز؛ یک event باید فقط به صف‌های منطبق برسد."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Exchanges, Queues, Routing تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث مفاهیم صف‌ها، مبادلات (Exchanges) و مسیریابی در RabbitMQ (Exchanges, Queues, Routing) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "exchange بدون binding مناسب می‌تواند پیام unroutable بسازد؛ برگشت آن را بررسی کن.",
+    "introduction": "کالبدشکافی ساختار پیام‌رسان RabbitMQ و تفاوت بنیادی مبادلات Direct, Fanout و Topic در مقایسه با وب‌هوک و ردیس.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Exchanges, Queues, Routing",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Exchanges, Queues, Routing استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Exchanges, Queues, Routing نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "Exchange پیام را براساس نوع و binding به queue هدایت می‌کند؛ consumer از queue می‌خواند. direct تطبیق دقیق routing key و topic الگوی قطعه‌بندی‌شده دارد. durable بودن تعریف با پایداری هر پیام یکی نیست."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Exchanges, Queues, Routing از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Exchanges, Queues, Routing، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "دو queue با binding متفاوت بساز؛ یک event باید فقط به صف‌های منطبق برسد.",
+      "solution": "exchange بدون binding مناسب می‌تواند پیام unroutable بسازد؛ برگشت آن را بررسی کن."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Exchanges, Queues, Routing",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exchangesqueuesrouting/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Exchanges, Queues, Routing\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "text",
+        "code": "Producer -> topic exchange orders\nBinding: order.created -> inventory-events queue\nConsumer <- inventory-events",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Exchanges, Queues, Routing",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Exchanges, Queues, Routing",
+      "explanation": "قرارداد تحویل broker مستقل از زبان client است. در Spring AMQP به تنظیمات ack/confirm container دقت کن؛ API publish به تنهایی اثبات پردازش نیست."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Exchanges, Queues, Routing بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "exchange بدون binding مناسب می‌تواند پیام unroutable بسازد؛ برگشت آن را بررسی کن.",
+        "whyBad": "Exchange پیام را براساس نوع و binding به queue هدایت می‌کند؛ consumer از queue می‌خواند. direct تطبیق دقیق routing key و topic الگوی قطعه‌بندی‌شده دارد. durable بودن تعریف با پایداری هر پیام یکی نیست.",
+        "solution": "Queue"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Exchanges, Queues, Routing را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "exchange بدون binding مناسب می‌تواند پیام unroutable بسازد؛ برگشت آن را بررسی کن.",
+      "دو queue با binding متفاوت بساز؛ یک event باید فقط به صف‌های منطبق برسد."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست مفاهیم صف‌ها، مبادلات (Exchanges) و مسیریابی در RabbitMQ",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Exchanges, Queues, Routing برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "دو queue با binding متفاوت بساز؛ یک event باید فقط به صف‌های منطبق برسد.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "دو queue با binding متفاوت بساز؛ یک event باید فقط به صف‌های منطبق برسد.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "exchange بدون binding مناسب می‌تواند پیام unroutable بسازد؛ برگشت آن را بررسی کن."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/exchangesqueuesrouting/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "Producer -> topic exchange orders\nBinding: order.created -> inventory-events queue\nConsumer <- inventory-events",
+        "language": "text",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. Queue. exchange بدون binding مناسب می‌تواند پیام unroutable بسازد؛ برگشت آن را بررسی کن."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-097-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Exchanges, Queues, Routing در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-097",
+        "question": "Consumer معمولاً از کجا پیام می‌خواند؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "مستقیماً از routing key بدون queue",
+          "Queue",
+          "از جدول metadata exchange"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-097-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-097-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "Queue. Exchange پیام را براساس نوع و binding به queue هدایت می‌کند؛ consumer از queue می‌خواند. direct تطبیق دقیق routing key و topic الگوی قطعه‌بندی‌شده دارد. durable بودن تعریف با پایداری هر پیام یکی نیست."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Exchanges, Queues, Routing را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: Consumer معمولاً از کجا پیام می‌خواند؟",
+        "answer": "Queue. exchange بدون binding مناسب می‌تواند پیام unroutable بسازد؛ برگشت آن را بررسی کن."
       }
     ],
-    "summary": "در این جلسه مبحث مفاهیم صف‌ها، مبادلات (Exchanges) و مسیریابی در RabbitMQ را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "Exchange پیام را براساس نوع و binding به queue هدایت می‌کند؛ consumer از queue می‌خواند. direct تطبیق دقیق routing key و topic الگوی قطعه‌بندی‌شده دارد. durable بودن تعریف با پایداری هر پیام یکی نیست.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://www.rabbitmq.com/docs/confirms"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 17",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Exchanges, Queues, Routing",
-      "filesToModify": [
-        "src/main/java/com/academy/order/exchangesqueuesrouting/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-098",
@@ -192,7 +118,7 @@ export const WEEK_17_LESSONS: Lesson[] = [
     "description": "کار با RabbitTemplate، انوتیشن @RabbitListener و سریالایز کردن خودکار اشیای رویداد به JSON.",
     "category": "Event-Driven",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Spring AMQP",
       "RabbitTemplate",
@@ -200,167 +126,93 @@ export const WEEK_17_LESSONS: Lesson[] = [
       "Serialization"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Event-Driven",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 16",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Publishers and Consumers در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای پیاده‌سازی ناشران (Publishers) و مصرف‌کنندگان (Consumers) در Spring AMQP",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "Publisher confirm موفق چه چیزی را اثبات نمی‌کند",
+      "binding را حذف کن و رفتار publish را مشاهده کن؛ خطا نباید بی‌صدا ناپدید شود."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Publishers and Consumers تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث پیاده‌سازی ناشران (Publishers) و مصرف‌کنندگان (Consumers) در Spring AMQP (Publishers and Consumers) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "ارسال async بدون مشاهده confirm به معنی تحویل تضمینی نیست.",
+    "introduction": "کار با RabbitTemplate، انوتیشن @RabbitListener و سریالایز کردن خودکار اشیای رویداد به JSON.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Publishers and Consumers",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Publishers and Consumers استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Publishers and Consumers نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "تأیید publisher یعنی broker پیام را پذیرفته؛ به معنی پردازش consumer نیست. consumer باید پس از موفقیت اثر محلی ack کند. برای پیام unroutable، mandatory و return handling را متناسب پیکربندی کن."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Publishers and Consumers از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Publishers and Consumers، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "binding را حذف کن و رفتار publish را مشاهده کن؛ خطا نباید بی‌صدا ناپدید شود.",
+      "solution": "ارسال async بدون مشاهده confirm به معنی تحویل تضمینی نیست."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Publishers and Consumers",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/publishersandconsumers/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Publishers and Consumers\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "template.convertAndSend(\"orders\", \"order.created\", event);\n// Configure publisher confirms and returned-message handling separately.\n// Ack consumer only after its durable transaction commits.",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Publishers and Consumers",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Publishers and Consumers",
+      "explanation": "قرارداد تحویل broker مستقل از زبان client است. در Spring AMQP به تنظیمات ack/confirm container دقت کن؛ API publish به تنهایی اثبات پردازش نیست."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Publishers and Consumers بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "ارسال async بدون مشاهده confirm به معنی تحویل تضمینی نیست.",
+        "whyBad": "تأیید publisher یعنی broker پیام را پذیرفته؛ به معنی پردازش consumer نیست. consumer باید پس از موفقیت اثر محلی ack کند. برای پیام unroutable، mandatory و return handling را متناسب پیکربندی کن.",
+        "solution": "اجرای موفق منطق consumer"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Publishers and Consumers را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "ارسال async بدون مشاهده confirm به معنی تحویل تضمینی نیست.",
+      "binding را حذف کن و رفتار publish را مشاهده کن؛ خطا نباید بی‌صدا ناپدید شود."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست پیاده‌سازی ناشران (Publishers) و مصرف‌کنندگان (Consumers) در Spring AMQP",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Publishers and Consumers برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "binding را حذف کن و رفتار publish را مشاهده کن؛ خطا نباید بی‌صدا ناپدید شود.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "binding را حذف کن و رفتار publish را مشاهده کن؛ خطا نباید بی‌صدا ناپدید شود.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "ارسال async بدون مشاهده confirm به معنی تحویل تضمینی نیست."
       ],
       "solution": {
+        "code": "template.convertAndSend(\"orders\", \"order.created\", event);\n// Configure publisher confirms and returned-message handling separately.\n// Ack consumer only after its durable transaction commits.",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/publishersandconsumers/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. اجرای موفق منطق consumer. ارسال async بدون مشاهده confirm به معنی تحویل تضمینی نیست."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-098-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Publishers and Consumers در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-098",
+        "question": "Publisher confirm موفق چه چیزی را اثبات نمی‌کند؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "پذیرش publish طبق semantics broker",
+          "رسیدن تأیید به publisher",
+          "اجرای موفق منطق consumer"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-098-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-098-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "اجرای موفق منطق consumer. تأیید publisher یعنی broker پیام را پذیرفته؛ به معنی پردازش consumer نیست. consumer باید پس از موفقیت اثر محلی ack کند. برای پیام unroutable، mandatory و return handling را متناسب پیکربندی کن."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Publishers and Consumers را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: Publisher confirm موفق چه چیزی را اثبات نمی‌کند؟",
+        "answer": "اجرای موفق منطق consumer. ارسال async بدون مشاهده confirm به معنی تحویل تضمینی نیست."
       }
     ],
-    "summary": "در این جلسه مبحث پیاده‌سازی ناشران (Publishers) و مصرف‌کنندگان (Consumers) در Spring AMQP را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "تأیید publisher یعنی broker پیام را پذیرفته؛ به معنی پردازش consumer نیست. consumer باید پس از موفقیت اثر محلی ack کند. برای پیام unroutable، mandatory و return handling را متناسب پیکربندی کن.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://www.rabbitmq.com/docs/confirms"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 17",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Publishers and Consumers",
-      "filesToModify": [
-        "src/main/java/com/academy/order/publishersandconsumers/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-099",
@@ -372,7 +224,7 @@ export const WEEK_17_LESSONS: Lesson[] = [
     "description": "تنظیم AcknowledgeMode.MANUAL، مدیریت BasicAck و BasicNack و خطرات از دست رفتن پیام‌ها در حین قطع سرور.",
     "category": "Event-Driven",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Message Acks",
       "Reliability",
@@ -380,167 +232,93 @@ export const WEEK_17_LESSONS: Lesson[] = [
       "Message Delivery"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Event-Driven",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 16",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار At-least-once Delivery and Acknowledgments در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای تضمین تحویل حداقل یک‌بار (At-least-once) و تاییدیه‌های دستی (Acks)",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "چرا پیام بعد از commit ممکن است تکرار شود",
+      "consumer را پس از commit و قبل از ack متوقف کن؛ redelivery نباید دوباره موجودی را تغییر دهد."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر At-least-once Delivery and Acknowledgments تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث تضمین تحویل حداقل یک‌بار (At-least-once) و تاییدیه‌های دستی (Acks) (At-least-once Delivery and Acknowledgments) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "ack قبل از commit ریسک گم‌شدن اثر را در crash بالا می‌برد.",
+    "introduction": "تنظیم AcknowledgeMode.MANUAL، مدیریت BasicAck و BasicNack و خطرات از دست رفتن پیام‌ها در حین قطع سرور.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی At-least-once Delivery and Acknowledgments",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از At-least-once Delivery and Acknowledgments استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از At-least-once Delivery and Acknowledgments نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "At-least-once یعنی duplicate ممکن است. اگر consumer پس از commit و پیش از ack قطع شود، پیام دوباره تحویل می‌شود. اثر تجاری باید با eventId و constraint یکتا idempotent شود."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، At-least-once Delivery and Acknowledgments از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش At-least-once Delivery and Acknowledgments، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "consumer را پس از commit و قبل از ack متوقف کن؛ redelivery نباید دوباره موجودی را تغییر دهد.",
+      "solution": "ack قبل از commit ریسک گم‌شدن اثر را در crash بالا می‌برد."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن At-least-once Delivery and Acknowledgments",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/atleastoncedeliveryandacknowledgments/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"At-least-once Delivery and Acknowledgments\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "text",
+        "code": "1. Receive event\n2. Begin DB transaction\n3. Claim eventId and apply business change\n4. Commit\n5. Ack",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای At-least-once Delivery and Acknowledgments",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "At-least-once Delivery and Acknowledgments",
+      "explanation": "قرارداد تحویل broker مستقل از زبان client است. در Spring AMQP به تنظیمات ack/confirm container دقت کن؛ API publish به تنهایی اثبات پردازش نیست."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی At-least-once Delivery and Acknowledgments بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "ack قبل از commit ریسک گم‌شدن اثر را در crash بالا می‌برد.",
+        "whyBad": "At-least-once یعنی duplicate ممکن است. اگر consumer پس از commit و پیش از ack قطع شود، پیام دوباره تحویل می‌شود. اثر تجاری باید با eventId و constraint یکتا idempotent شود.",
+        "solution": "ack هنوز به broker نرسیده است"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با At-least-once Delivery and Acknowledgments را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "ack قبل از commit ریسک گم‌شدن اثر را در crash بالا می‌برد.",
+      "consumer را پس از commit و قبل از ack متوقف کن؛ redelivery نباید دوباره موجودی را تغییر دهد."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست تضمین تحویل حداقل یک‌بار (At-least-once) و تاییدیه‌های دستی (Acks)",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق At-least-once Delivery and Acknowledgments برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "consumer را پس از commit و قبل از ack متوقف کن؛ redelivery نباید دوباره موجودی را تغییر دهد.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "consumer را پس از commit و قبل از ack متوقف کن؛ redelivery نباید دوباره موجودی را تغییر دهد.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "ack قبل از commit ریسک گم‌شدن اثر را در crash بالا می‌برد."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/atleastoncedeliveryandacknowledgments/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "1. Receive event\n2. Begin DB transaction\n3. Claim eventId and apply business change\n4. Commit\n5. Ack",
+        "language": "text",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. ack هنوز به broker نرسیده است. ack قبل از commit ریسک گم‌شدن اثر را در crash بالا می‌برد."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-099-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد At-least-once Delivery and Acknowledgments در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-099",
+        "question": "چرا پیام بعد از commit ممکن است تکرار شود؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "ack هنوز به broker نرسیده است",
+          "commit به معنی حذف همه queueهاست",
+          "RabbitMQ فقط exactly-once دارد"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-099-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-099-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "ack هنوز به broker نرسیده است. At-least-once یعنی duplicate ممکن است. اگر consumer پس از commit و پیش از ack قطع شود، پیام دوباره تحویل می‌شود. اثر تجاری باید با eventId و constraint یکتا idempotent شود."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از At-least-once Delivery and Acknowledgments را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: چرا پیام بعد از commit ممکن است تکرار شود؟",
+        "answer": "ack هنوز به broker نرسیده است. ack قبل از commit ریسک گم‌شدن اثر را در crash بالا می‌برد."
       }
     ],
-    "summary": "در این جلسه مبحث تضمین تحویل حداقل یک‌بار (At-least-once) و تاییدیه‌های دستی (Acks) را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "At-least-once یعنی duplicate ممکن است. اگر consumer پس از commit و پیش از ack قطع شود، پیام دوباره تحویل می‌شود. اثر تجاری باید با eventId و constraint یکتا idempotent شود.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://www.rabbitmq.com/docs/confirms"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 17",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های At-least-once Delivery and Acknowledgments",
-      "filesToModify": [
-        "src/main/java/com/academy/order/atleastoncedeliveryandacknowledgments/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-100",
@@ -552,7 +330,7 @@ export const WEEK_17_LESSONS: Lesson[] = [
     "description": "ارسال ناهمگام ایونت ساخت سفارش به ربیت‌ام‌کیو و دریافت آن توسط سرویس شبیه‌سازی انبار و صدور فاکتور.",
     "category": "Event-Driven",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Capstone",
       "OrderCreated Event",
@@ -560,167 +338,93 @@ export const WEEK_17_LESSONS: Lesson[] = [
       "RabbitMQ Flow"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Event-Driven",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 16",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Publishing OrderCreated Events در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای انتشار رویداد OrderCreated و ارسال اعلان خرید (پروژه محوری)",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "چرا OrderCreated را از entity JPA کامل نسازیم",
+      "payload را serialize و deserialize کن؛ producer نباید entity کامل و اطلاعات حساس مشتری را منتشر کند."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Publishing OrderCreated Events تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث انتشار رویداد OrderCreated و ارسال اعلان خرید (پروژه محوری) (Publishing OrderCreated Events) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "نام event باید واقعیت رخ‌داده را بگوید، نه فرمانی که هنوز ممکن است شکست بخورد.",
+    "introduction": "ارسال ناهمگام ایونت ساخت سفارش به ربیت‌ام‌کیو و دریافت آن توسط سرویس شبیه‌سازی انبار و صدور فاکتور.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Publishing OrderCreated Events",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Publishing OrderCreated Events استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Publishing OrderCreated Events نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "Event تجاری باید شناسه، نوع، زمان و نسخه schema داشته باشد. انتشار مستقیم بعد از commit پنجره گم‌شدن پیام دارد و انتشار قبل از commit می‌تواند رویداد سفارش rollback‌شده بسازد؛ outbox این مرز را هماهنگ می‌کند."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Publishing OrderCreated Events از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Publishing OrderCreated Events، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "payload را serialize و deserialize کن؛ producer نباید entity کامل و اطلاعات حساس مشتری را منتشر کند.",
+      "solution": "نام event باید واقعیت رخ‌داده را بگوید، نه فرمانی که هنوز ممکن است شکست بخورد."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Publishing OrderCreated Events",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/publishingordercreatedevents/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Publishing OrderCreated Events\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "json",
+        "code": "{\"eventId\":\"unique-id\",\"type\":\"OrderCreated\",\"version\":1,\"occurredAt\":\"2026-01-01T00:00:00Z\",\"data\":{\"orderId\":\"order-id\"}}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Publishing OrderCreated Events",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Publishing OrderCreated Events",
+      "explanation": "قرارداد تحویل broker مستقل از زبان client است. در Spring AMQP به تنظیمات ack/confirm container دقت کن؛ API publish به تنهایی اثبات پردازش نیست."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Publishing OrderCreated Events بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "نام event باید واقعیت رخ‌داده را بگوید، نه فرمانی که هنوز ممکن است شکست بخورد.",
+        "whyBad": "Event تجاری باید شناسه، نوع، زمان و نسخه schema داشته باشد. انتشار مستقیم بعد از commit پنجره گم‌شدن پیام دارد و انتشار قبل از commit می‌تواند رویداد سفارش rollback‌شده بسازد؛ outbox این مرز را هماهنگ می‌کند.",
+        "solution": "قرارداد event باید مستقل و حداقلی باشد"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Publishing OrderCreated Events را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "نام event باید واقعیت رخ‌داده را بگوید، نه فرمانی که هنوز ممکن است شکست بخورد.",
+      "payload را serialize و deserialize کن؛ producer نباید entity کامل و اطلاعات حساس مشتری را منتشر کند."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست انتشار رویداد OrderCreated و ارسال اعلان خرید (پروژه محوری)",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Publishing OrderCreated Events برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "payload را serialize و deserialize کن؛ producer نباید entity کامل و اطلاعات حساس مشتری را منتشر کند.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "payload را serialize و deserialize کن؛ producer نباید entity کامل و اطلاعات حساس مشتری را منتشر کند.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "نام event باید واقعیت رخ‌داده را بگوید، نه فرمانی که هنوز ممکن است شکست بخورد."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/publishingordercreatedevents/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "{\"eventId\":\"unique-id\",\"type\":\"OrderCreated\",\"version\":1,\"occurredAt\":\"2026-01-01T00:00:00Z\",\"data\":{\"orderId\":\"order-id\"}}",
+        "language": "json",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. قرارداد event باید مستقل و حداقلی باشد. نام event باید واقعیت رخ‌داده را بگوید، نه فرمانی که هنوز ممکن است شکست بخورد."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-100-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Publishing OrderCreated Events در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-100",
+        "question": "چرا OrderCreated را از entity JPA کامل نسازیم؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "JSON هیچ entity را serialize نمی‌کند",
+          "قرارداد event باید مستقل و حداقلی باشد",
+          "event نباید هیچ شناسه‌ای داشته باشد"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-100-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-100-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "قرارداد event باید مستقل و حداقلی باشد. Event تجاری باید شناسه، نوع، زمان و نسخه schema داشته باشد. انتشار مستقیم بعد از commit پنجره گم‌شدن پیام دارد و انتشار قبل از commit می‌تواند رویداد سفارش rollback‌شده بسازد؛ outbox این مرز را هماهنگ می‌کند."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Publishing OrderCreated Events را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: چرا OrderCreated را از entity JPA کامل نسازیم؟",
+        "answer": "قرارداد event باید مستقل و حداقلی باشد. نام event باید واقعیت رخ‌داده را بگوید، نه فرمانی که هنوز ممکن است شکست بخورد."
       }
     ],
-    "summary": "در این جلسه مبحث انتشار رویداد OrderCreated و ارسال اعلان خرید (پروژه محوری) را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "Event تجاری باید شناسه، نوع، زمان و نسخه schema داشته باشد. انتشار مستقیم بعد از commit پنجره گم‌شدن پیام دارد و انتشار قبل از commit می‌تواند رویداد سفارش rollback‌شده بسازد؛ outbox این مرز را هماهنگ می‌کند.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://www.rabbitmq.com/docs/confirms"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 17",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Publishing OrderCreated Events",
-      "filesToModify": [
-        "src/main/java/com/academy/order/publishingordercreatedevents/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-101",
@@ -732,7 +436,7 @@ export const WEEK_17_LESSONS: Lesson[] = [
     "description": "پیکربندی Dead Letter Exchange (DLX)، تعیین سقف تلاش مجدد و بایگانی پیام‌های غیرقابل پردازش جهت تحلیل دستی.",
     "category": "Event-Driven",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Dead Letter Queue",
       "DLX",
@@ -740,167 +444,93 @@ export const WEEK_17_LESSONS: Lesson[] = [
       "Poison Pills"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Event-Driven",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 16",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Retry and Dead Letter Queues در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای مدیریت پیام‌های مسموم با صف‌های بازبینی (Dead Letter Queues)",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "پیام با schema نامعتبر معمولاً چه می‌خواهد",
+      "یک payload خراب و یک timeout موقت بساز؛ اولی به DLQ و دومی پس از بازیابی موفق شود."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Retry and Dead Letter Queues تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث مدیریت پیام‌های مسموم با صف‌های بازبینی (Dead Letter Queues) (Retry and Dead Letter Queues) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "redelivery فوری بدون تأخیر می‌تواند حلقه داغ مصرف CPU بسازد.",
+    "introduction": "پیکربندی Dead Letter Exchange (DLX)، تعیین سقف تلاش مجدد و بایگانی پیام‌های غیرقابل پردازش جهت تحلیل دستی.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Retry and Dead Letter Queues",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Retry and Dead Letter Queues استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Retry and Dead Letter Queues نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "Retry بی‌نهایت یک poison message می‌تواند صف را قفل یا overload کند. تعداد تلاش، backoff و DLQ مشخص کن؛ پیام‌های validation دائمی معمولاً retry یکسان نمی‌خواهند. replay باید با کنترل و idempotency باشد."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Retry and Dead Letter Queues از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Retry and Dead Letter Queues، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "یک payload خراب و یک timeout موقت بساز؛ اولی به DLQ و دومی پس از بازیابی موفق شود.",
+      "solution": "redelivery فوری بدون تأخیر می‌تواند حلقه داغ مصرف CPU بسازد."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Retry and Dead Letter Queues",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/retryanddeadletterqueues/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Retry and Dead Letter Queues\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "text",
+        "code": "main queue -> failure classification\ntransient -> delayed retry with bounded attempts\npermanent / exhausted -> dead-letter queue + alert",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Retry and Dead Letter Queues",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Retry and Dead Letter Queues",
+      "explanation": "قرارداد تحویل broker مستقل از زبان client است. در Spring AMQP به تنظیمات ack/confirm container دقت کن؛ API publish به تنهایی اثبات پردازش نیست."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Retry and Dead Letter Queues بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "redelivery فوری بدون تأخیر می‌تواند حلقه داغ مصرف CPU بسازد.",
+        "whyBad": "Retry بی‌نهایت یک poison message می‌تواند صف را قفل یا overload کند. تعداد تلاش، backoff و DLQ مشخص کن؛ پیام‌های validation دائمی معمولاً retry یکسان نمی‌خواهند. replay باید با کنترل و idempotency باشد.",
+        "solution": "قرنطینه و بررسی، نه retry بی‌پایان"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Retry and Dead Letter Queues را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "redelivery فوری بدون تأخیر می‌تواند حلقه داغ مصرف CPU بسازد.",
+      "یک payload خراب و یک timeout موقت بساز؛ اولی به DLQ و دومی پس از بازیابی موفق شود."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست مدیریت پیام‌های مسموم با صف‌های بازبینی (Dead Letter Queues)",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Retry and Dead Letter Queues برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "یک payload خراب و یک timeout موقت بساز؛ اولی به DLQ و دومی پس از بازیابی موفق شود.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "یک payload خراب و یک timeout موقت بساز؛ اولی به DLQ و دومی پس از بازیابی موفق شود.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "redelivery فوری بدون تأخیر می‌تواند حلقه داغ مصرف CPU بسازد."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/retryanddeadletterqueues/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "main queue -> failure classification\ntransient -> delayed retry with bounded attempts\npermanent / exhausted -> dead-letter queue + alert",
+        "language": "text",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. قرنطینه و بررسی، نه retry بی‌پایان. redelivery فوری بدون تأخیر می‌تواند حلقه داغ مصرف CPU بسازد."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-101-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Retry and Dead Letter Queues در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-101",
+        "question": "پیام با schema نامعتبر معمولاً چه می‌خواهد؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "retry هر میلی‌ثانیه تا همیشه",
+          "ack و فراموشی بدون مشاهده‌پذیری",
+          "قرنطینه و بررسی، نه retry بی‌پایان"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-101-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-101-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "قرنطینه و بررسی، نه retry بی‌پایان. Retry بی‌نهایت یک poison message می‌تواند صف را قفل یا overload کند. تعداد تلاش، backoff و DLQ مشخص کن؛ پیام‌های validation دائمی معمولاً retry یکسان نمی‌خواهند. replay باید با کنترل و idempotency باشد."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Retry and Dead Letter Queues را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: پیام با schema نامعتبر معمولاً چه می‌خواهد؟",
+        "answer": "قرنطینه و بررسی، نه retry بی‌پایان. redelivery فوری بدون تأخیر می‌تواند حلقه داغ مصرف CPU بسازد."
       }
     ],
-    "summary": "در این جلسه مبحث مدیریت پیام‌های مسموم با صف‌های بازبینی (Dead Letter Queues) را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "Retry بی‌نهایت یک poison message می‌تواند صف را قفل یا overload کند. تعداد تلاش، backoff و DLQ مشخص کن؛ پیام‌های validation دائمی معمولاً retry یکسان نمی‌خواهند. replay باید با کنترل و idempotency باشد.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://www.rabbitmq.com/docs/confirms"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 17",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Retry and Dead Letter Queues",
-      "filesToModify": [
-        "src/main/java/com/academy/order/retryanddeadletterqueues/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-102",
@@ -912,173 +542,99 @@ export const WEEK_17_LESSONS: Lesson[] = [
     "description": "اجرای کانتینر rabbitmq:3-management با داکر کامپوز، تنظیم کاربر و رمزهای اختصاصی و ورود به داشبورد مدیریتی وب.",
     "category": "Event-Driven",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "RabbitMQ Docker",
       "Management UI",
       "DevOps"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Event-Driven",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 16",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار RabbitMQ with Docker در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای راه‌اندازی، تنظیمات امنیتی و مانیتورینگ RabbitMQ با Docker",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "durable queue به تنهایی تضمین پایداری همه پیام‌هاست",
+      "broker را restart کن و باقی‌ماندن queue durable و پیام persistent را جدا بررسی کن."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر RabbitMQ with Docker تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث راه‌اندازی، تنظیمات امنیتی و مانیتورینگ RabbitMQ با Docker (RabbitMQ with Docker) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "depends_on بدون health و سیاست reconnect به تنهایی آماده‌بودن broker را تضمین نمی‌کند.",
+    "introduction": "اجرای کانتینر rabbitmq:3-management با داکر کامپوز، تنظیم کاربر و رمزهای اختصاصی و ورود به داشبورد مدیریتی وب.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی RabbitMQ with Docker",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از RabbitMQ with Docker استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از RabbitMQ with Docker نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "RabbitMQ محلی با volume و healthcheck تکرارپذیرتر است. credential نمونه فقط برای توسعه است و پورت management نباید بی‌دلیل عمومی باشد. readiness اپ را با رفتار واقعی اتصال و retry راه‌اندازی بسنج."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، RabbitMQ with Docker از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش RabbitMQ with Docker، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "broker را restart کن و باقی‌ماندن queue durable و پیام persistent را جدا بررسی کن.",
+      "solution": "depends_on بدون health و سیاست reconnect به تنهایی آماده‌بودن broker را تضمین نمی‌کند."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن RabbitMQ with Docker",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/rabbitmqwithdocker/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"RabbitMQ with Docker\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "yaml",
+        "code": "services:\n  rabbitmq:\n    image: rabbitmq:4-management\n    ports:\n      - \"127.0.0.1:15672:15672\"\n    volumes:\n      - rabbit_data:/var/lib/rabbitmq\nvolumes:\n  rabbit_data:",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای RabbitMQ with Docker",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "RabbitMQ with Docker",
+      "explanation": "قرارداد تحویل broker مستقل از زبان client است. در Spring AMQP به تنظیمات ack/confirm container دقت کن؛ API publish به تنهایی اثبات پردازش نیست."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی RabbitMQ with Docker بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "depends_on بدون health و سیاست reconnect به تنهایی آماده‌بودن broker را تضمین نمی‌کند.",
+        "whyBad": "RabbitMQ محلی با volume و healthcheck تکرارپذیرتر است. credential نمونه فقط برای توسعه است و پورت management نباید بی‌دلیل عمومی باشد. readiness اپ را با رفتار واقعی اتصال و retry راه‌اندازی بسنج.",
+        "solution": "خیر؛ persistence پیام و confirm هم مهم‌اند"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با RabbitMQ with Docker را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "depends_on بدون health و سیاست reconnect به تنهایی آماده‌بودن broker را تضمین نمی‌کند.",
+      "broker را restart کن و باقی‌ماندن queue durable و پیام persistent را جدا بررسی کن."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست راه‌اندازی، تنظیمات امنیتی و مانیتورینگ RabbitMQ با Docker",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق RabbitMQ with Docker برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "broker را restart کن و باقی‌ماندن queue durable و پیام persistent را جدا بررسی کن.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "broker را restart کن و باقی‌ماندن queue durable و پیام persistent را جدا بررسی کن.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "depends_on بدون health و سیاست reconnect به تنهایی آماده‌بودن broker را تضمین نمی‌کند."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/rabbitmqwithdocker/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "services:\n  rabbitmq:\n    image: rabbitmq:4-management\n    ports:\n      - \"127.0.0.1:15672:15672\"\n    volumes:\n      - rabbit_data:/var/lib/rabbitmq\nvolumes:\n  rabbit_data:",
+        "language": "yaml",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ persistence پیام و confirm هم مهم‌اند. depends_on بدون health و سیاست reconnect به تنهایی آماده‌بودن broker را تضمین نمی‌کند."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-102-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد RabbitMQ with Docker در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-102",
+        "question": "durable queue به تنهایی تضمین پایداری همه پیام‌هاست؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "خیر؛ persistence پیام و confirm هم مهم‌اند",
+          "بله؛ حتی پیام transient بدون confirm",
+          "فقط نام queue باید durable باشد"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-102-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-102-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "خیر؛ persistence پیام و confirm هم مهم‌اند. RabbitMQ محلی با volume و healthcheck تکرارپذیرتر است. credential نمونه فقط برای توسعه است و پورت management نباید بی‌دلیل عمومی باشد. readiness اپ را با رفتار واقعی اتصال و retry راه‌اندازی بسنج."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از RabbitMQ with Docker را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: durable queue به تنهایی تضمین پایداری همه پیام‌هاست؟",
+        "answer": "خیر؛ persistence پیام و confirm هم مهم‌اند. depends_on بدون health و سیاست reconnect به تنهایی آماده‌بودن broker را تضمین نمی‌کند."
       }
     ],
-    "summary": "در این جلسه مبحث راه‌اندازی، تنظیمات امنیتی و مانیتورینگ RabbitMQ با Docker را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "RabbitMQ محلی با volume و healthcheck تکرارپذیرتر است. credential نمونه فقط برای توسعه است و پورت management نباید بی‌دلیل عمومی باشد. readiness اپ را با رفتار واقعی اتصال و retry راه‌اندازی بسنج.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://www.rabbitmq.com/docs/confirms"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 17",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های RabbitMQ with Docker",
-      "filesToModify": [
-        "src/main/java/com/academy/order/rabbitmqwithdocker/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   }
 ];

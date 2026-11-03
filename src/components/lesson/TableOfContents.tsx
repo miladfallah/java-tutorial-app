@@ -44,7 +44,9 @@ export function TableOfContents({ items, variant = "desktop" }: TableOfContentsP
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+      const reduceMotion = document.documentElement.dataset.reduceMotion;
+      const reduced = reduceMotion === "reduce" || (reduceMotion === "system" && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+      el.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
       setIsOpenMobile(false);
     }
   };

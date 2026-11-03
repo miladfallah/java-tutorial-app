@@ -71,6 +71,12 @@ function renderInlineMarkdown(text: string): React.ReactNode[] {
     } else if (token.startsWith("[") && match[2] && match[3]) {
       const linkText = match[2];
       const linkUrl = match[3];
+      // Keep untrusted lesson/import content from producing executable links.
+      if (!/^(https?:\/\/|\/(?!\/)|#)/i.test(linkUrl)) {
+        nodes.push(<span key={keyIdx++}>{linkText}</span>);
+        lastIndex = inlineRegex.lastIndex;
+        continue;
+      }
       const isExternal = linkUrl.startsWith("http://") || linkUrl.startsWith("https://");
 
       if (isExternal) {

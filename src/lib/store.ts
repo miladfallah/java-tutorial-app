@@ -115,7 +115,7 @@ export const useAcademyStore = create<AcademyState>((set, get) => ({
 
     loadPromise = (async () => {
       // 1. Load reader settings from localStorage
-      let settings = DEFAULT_SETTINGS;
+      let settings = { ...DEFAULT_SETTINGS };
       if (typeof window !== "undefined") {
         try {
           const stored = localStorage.getItem("academy_reader_settings");
@@ -132,6 +132,9 @@ export const useAcademyStore = create<AcademyState>((set, get) => ({
           console.warn("Could not parse reader settings from localStorage", e);
         }
         applySettingsToDOM(settings);
+        // Publish settings before async IndexedDB work. A user's next theme/font
+        // choice must not be overwritten when progress finishes loading.
+        set({ settings });
 
         // System theme preference listener
         if (settings.theme === "system") {
@@ -148,7 +151,7 @@ export const useAcademyStore = create<AcademyState>((set, get) => ({
 
       // 2. Load progress from storage
       const data = await getStoredProgress();
-      set({ progress: data, isLoaded: true, settings });
+      set({ progress: data, isLoaded: true });
       loadPromise = null;
     })();
 

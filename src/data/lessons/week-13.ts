@@ -11,174 +11,100 @@ export const WEEK_13_LESSONS: Lesson[] = [
     "description": "تفاوت بنیادی احراز هویت با تشخیص دسترسی، مدل‌های امنیتی مدرن و تطبیق آنها با تجربیات پاسپورت در NestJS.",
     "category": "Security",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Authentication",
       "Authorization",
       "Security Fundamentals"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Security",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 12",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Authentication and Authorization در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای مفاهیم بنیادی احراز هویت (Authentication) و مجوزدهی (Authorization)",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "آیا authenticated بودن برای خواندن هر order کافی است",
+      "دو کاربر با دو سفارش بساز؛ خواندن سفارش کاربر دیگر نباید داده افشا کند."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Authentication and Authorization تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث مفاهیم بنیادی احراز هویت (Authentication) و مجوزدهی (Authorization) (Authentication and Authorization) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "customerId معتبر را از principal بگیر، نه از body یا query قابل جعل.",
+    "introduction": "تفاوت بنیادی احراز هویت با تشخیص دسترسی، مدل‌های امنیتی مدرن و تطبیق آنها با تجربیات پاسپورت در NestJS.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Authentication and Authorization",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Authentication and Authorization استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Authentication and Authorization نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "Authentication هویت را مشخص می‌کند؛ authorization مجازبودن عمل روی منبع را. کاربر لاگین‌شده نباید سفارش مشتری دیگر را فقط با حدس id بخواند. ownership را در query یا service enforce کن."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Authentication and Authorization از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Authentication and Authorization، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "دو کاربر با دو سفارش بساز؛ خواندن سفارش کاربر دیگر نباید داده افشا کند.",
+      "solution": "customerId معتبر را از principal بگیر، نه از body یا query قابل جعل."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Authentication and Authorization",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/authenticationandauthorization/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Authentication and Authorization\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "@PreAuthorize(\"isAuthenticated()\")\npublic OrderResponse get(UUID id, String customerId) {\n    return repository.findByIdAndCustomerId(id, customerId)\n        .map(OrderResponse::fromEntity).orElseThrow(NotFoundException::new);\n}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Authentication and Authorization",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Authentication and Authorization",
+      "explanation": "Guard و Passport در Nest آشنا هستند؛ در Spring زنجیره filter و method security را جدا بشناس. احراز هویت معتبر در هیچ‌کدام جای کنترل مالکیت را نمی‌گیرد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Authentication and Authorization بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "customerId معتبر را از principal بگیر، نه از body یا query قابل جعل.",
+        "whyBad": "Authentication هویت را مشخص می‌کند؛ authorization مجازبودن عمل روی منبع را. کاربر لاگین‌شده نباید سفارش مشتری دیگر را فقط با حدس id بخواند. ownership را در query یا service enforce کن.",
+        "solution": "خیر؛ ownership یا policy دسترسی هم لازم است"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Authentication and Authorization را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "customerId معتبر را از principal بگیر، نه از body یا query قابل جعل.",
+      "دو کاربر با دو سفارش بساز؛ خواندن سفارش کاربر دیگر نباید داده افشا کند."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست مفاهیم بنیادی احراز هویت (Authentication) و مجوزدهی (Authorization)",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Authentication and Authorization برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "دو کاربر با دو سفارش بساز؛ خواندن سفارش کاربر دیگر نباید داده افشا کند.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "دو کاربر با دو سفارش بساز؛ خواندن سفارش کاربر دیگر نباید داده افشا کند.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "customerId معتبر را از principal بگیر، نه از body یا query قابل جعل."
       ],
       "solution": {
+        "code": "@PreAuthorize(\"isAuthenticated()\")\npublic OrderResponse get(UUID id, String customerId) {\n    return repository.findByIdAndCustomerId(id, customerId)\n        .map(OrderResponse::fromEntity).orElseThrow(NotFoundException::new);\n}",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/authenticationandauthorization/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ ownership یا policy دسترسی هم لازم است. customerId معتبر را از principal بگیر، نه از body یا query قابل جعل."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-073-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Authentication and Authorization در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-073",
+        "question": "آیا authenticated بودن برای خواندن هر order کافی است؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "بله؛ UUID غیرقابل حدس است",
+          "خیر؛ ownership یا policy دسترسی هم لازم است",
+          "بله؛ اگر role نام USER داشته باشد"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-073-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-073-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "خیر؛ ownership یا policy دسترسی هم لازم است. Authentication هویت را مشخص می‌کند؛ authorization مجازبودن عمل روی منبع را. کاربر لاگین‌شده نباید سفارش مشتری دیگر را فقط با حدس id بخواند. ownership را در query یا service enforce کن."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Authentication and Authorization را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: آیا authenticated بودن برای خواندن هر order کافی است؟",
+        "answer": "خیر؛ ownership یا policy دسترسی هم لازم است. customerId معتبر را از principal بگیر، نه از body یا query قابل جعل."
       }
     ],
-    "summary": "در این جلسه مبحث مفاهیم بنیادی احراز هویت (Authentication) و مجوزدهی (Authorization) را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "Authentication هویت را مشخص می‌کند؛ authorization مجازبودن عمل روی منبع را. کاربر لاگین‌شده نباید سفارش مشتری دیگر را فقط با حدس id بخواند. ownership را در query یا service enforce کن.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 13",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Authentication and Authorization",
-      "filesToModify": [
-        "src/main/java/com/academy/order/authenticationandauthorization/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-074",
@@ -190,174 +116,100 @@ export const WEEK_13_LESSONS: Lesson[] = [
     "description": "نحوه پردازش درخواست‌ها در زنجیره فیلترهای اسپرینگ، انطباق با نسخه‌های جدید Spring Security 6 بدون WebSecurityConfigurerAdapter.",
     "category": "Security",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "SecurityFilterChain",
       "Spring Security 6",
       "Servlet Filters"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Security",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 12",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Spring Security Filter Chain در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای کالبدشکافی زنجیره فیلترهای امنیتی (SecurityFilterChain) در اسپرینگ",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "SecurityFilterChain معمولاً چه زمانی اجرا می‌شود",
+      "برای anonymous، کاربر معتبر و مسیر health تست 401/200 بنویس؛ تمام actuatorها عمومی نباشند."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Spring Security Filter Chain تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث کالبدشکافی زنجیره فیلترهای امنیتی (SecurityFilterChain) در اسپرینگ (Spring Security Filter Chain) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "CSRF را فقط با تحلیل نوع credential و client غیرفعال کن؛ stateless بودن به تنهایی کافی نیست.",
+    "introduction": "نحوه پردازش درخواست‌ها در زنجیره فیلترهای اسپرینگ، انطباق با نسخه‌های جدید Spring Security 6 بدون WebSecurityConfigurerAdapter.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Spring Security Filter Chain",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Spring Security Filter Chain استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Spring Security Filter Chain نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "SecurityFilterChain پیش از MVC درخواست را احراز و مجوزدهی می‌کند. چند chain با matcher و order انتخاب می‌شوند؛ نخستین chain منطبق مهم است. permitAll برای /api/** محافظت واقعی API را حذف می‌کند."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Spring Security Filter Chain از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Spring Security Filter Chain، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "برای anonymous، کاربر معتبر و مسیر health تست 401/200 بنویس؛ تمام actuatorها عمومی نباشند.",
+      "solution": "CSRF را فقط با تحلیل نوع credential و client غیرفعال کن؛ stateless بودن به تنهایی کافی نیست."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Spring Security Filter Chain",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/springsecurityfilterchain/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Spring Security Filter Chain\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "@Bean\nSecurityFilterChain security(HttpSecurity http) throws Exception {\n    return http.authorizeHttpRequests(a -> a\n        .requestMatchers(\"/actuator/health/**\").permitAll()\n        .anyRequest().authenticated()).httpBasic(Customizer.withDefaults()).build();\n}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Spring Security Filter Chain",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Spring Security Filter Chain",
+      "explanation": "Guard و Passport در Nest آشنا هستند؛ در Spring زنجیره filter و method security را جدا بشناس. احراز هویت معتبر در هیچ‌کدام جای کنترل مالکیت را نمی‌گیرد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Spring Security Filter Chain بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "CSRF را فقط با تحلیل نوع credential و client غیرفعال کن؛ stateless بودن به تنهایی کافی نیست.",
+        "whyBad": "SecurityFilterChain پیش از MVC درخواست را احراز و مجوزدهی می‌کند. چند chain با matcher و order انتخاب می‌شوند؛ نخستین chain منطبق مهم است. permitAll برای /api/** محافظت واقعی API را حذف می‌کند.",
+        "solution": "پیش از رسیدن درخواست به controller"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Spring Security Filter Chain را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "CSRF را فقط با تحلیل نوع credential و client غیرفعال کن؛ stateless بودن به تنهایی کافی نیست.",
+      "برای anonymous، کاربر معتبر و مسیر health تست 401/200 بنویس؛ تمام actuatorها عمومی نباشند."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست کالبدشکافی زنجیره فیلترهای امنیتی (SecurityFilterChain) در اسپرینگ",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Spring Security Filter Chain برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "برای anonymous، کاربر معتبر و مسیر health تست 401/200 بنویس؛ تمام actuatorها عمومی نباشند.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "برای anonymous، کاربر معتبر و مسیر health تست 401/200 بنویس؛ تمام actuatorها عمومی نباشند.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "CSRF را فقط با تحلیل نوع credential و client غیرفعال کن؛ stateless بودن به تنهایی کافی نیست."
       ],
       "solution": {
+        "code": "@Bean\nSecurityFilterChain security(HttpSecurity http) throws Exception {\n    return http.authorizeHttpRequests(a -> a\n        .requestMatchers(\"/actuator/health/**\").permitAll()\n        .anyRequest().authenticated()).httpBasic(Customizer.withDefaults()).build();\n}",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/springsecurityfilterchain/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. پیش از رسیدن درخواست به controller. CSRF را فقط با تحلیل نوع credential و client غیرفعال کن؛ stateless بودن به تنهایی کافی نیست."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-074-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Spring Security Filter Chain در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-074",
+        "question": "SecurityFilterChain معمولاً چه زمانی اجرا می‌شود؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "فقط پس از serialization پاسخ",
+          "فقط اگر controller آن را دستی صدا کند",
+          "پیش از رسیدن درخواست به controller"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-074-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-074-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "پیش از رسیدن درخواست به controller. SecurityFilterChain پیش از MVC درخواست را احراز و مجوزدهی می‌کند. چند chain با matcher و order انتخاب می‌شوند؛ نخستین chain منطبق مهم است. permitAll برای /api/** محافظت واقعی API را حذف می‌کند."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Spring Security Filter Chain را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: SecurityFilterChain معمولاً چه زمانی اجرا می‌شود؟",
+        "answer": "پیش از رسیدن درخواست به controller. CSRF را فقط با تحلیل نوع credential و client غیرفعال کن؛ stateless بودن به تنهایی کافی نیست."
       }
     ],
-    "summary": "در این جلسه مبحث کالبدشکافی زنجیره فیلترهای امنیتی (SecurityFilterChain) در اسپرینگ را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "SecurityFilterChain پیش از MVC درخواست را احراز و مجوزدهی می‌کند. چند chain با matcher و order انتخاب می‌شوند؛ نخستین chain منطبق مهم است. permitAll برای /api/** محافظت واقعی API را حذف می‌کند.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 13",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Spring Security Filter Chain",
-      "filesToModify": [
-        "src/main/java/com/academy/order/springsecurityfilterchain/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-075",
@@ -369,7 +221,7 @@ export const WEEK_13_LESSONS: Lesson[] = [
     "description": "رمزگذاری و اعتبارسنجی توکن‌های امضاشده JWT، مدیریت کلیدهای عمومی/خصوصی RSA و معرفی الگوهای Resource Server.",
     "category": "Security",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "JWT",
       "OAuth2",
@@ -377,167 +229,93 @@ export const WEEK_13_LESSONS: Lesson[] = [
       "Token Validation"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Security",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 12",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار JWT and OAuth2/OIDC در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای پیاده‌سازی توکن‌های بدون وضعیت JWT و استاندارد OAuth2/OIDC",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "خواندن payload JWT بدون verification چه تضمینی دارد",
+      "token منقضی، issuer اشتباه و audience اشتباه را تست کن؛ هیچ‌کدام نباید به endpoint برسند."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر JWT and OAuth2/OIDC تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث پیاده‌سازی توکن‌های بدون وضعیت JWT و استاندارد OAuth2/OIDC (JWT and OAuth2/OIDC) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "starter مناسب resource server و تنظیم chain لازم است؛ token واقعی را در log نگذار.",
+    "introduction": "رمزگذاری و اعتبارسنجی توکن‌های امضاشده JWT، مدیریت کلیدهای عمومی/خصوصی RSA و معرفی الگوهای Resource Server.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی JWT and OAuth2/OIDC",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از JWT and OAuth2/OIDC استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از JWT and OAuth2/OIDC نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "OAuth2 مجوز دسترسی و OIDC هویت را استاندارد می‌کنند؛ JWT فقط یک قالب token است. decode کردن Base64 احراز هویت نیست. signature، issuer، زمان اعتبار و audience مورد انتظار را بررسی کن؛ refresh token کار resource server نیست."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، JWT and OAuth2/OIDC از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش JWT and OAuth2/OIDC، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "token منقضی، issuer اشتباه و audience اشتباه را تست کن؛ هیچ‌کدام نباید به endpoint برسند.",
+      "solution": "starter مناسب resource server و تنظیم chain لازم است؛ token واقعی را در log نگذار."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن JWT and OAuth2/OIDC",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/jwtandoauth2oidc/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"JWT and OAuth2/OIDC\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "yaml",
+        "code": "spring:\n  security:\n    oauth2:\n      resourceserver:\n        jwt:\n          issuer-uri: https://idp.example.com/issuer\n          audiences: orders-api",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای JWT and OAuth2/OIDC",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "JWT and OAuth2/OIDC",
+      "explanation": "Guard و Passport در Nest آشنا هستند؛ در Spring زنجیره filter و method security را جدا بشناس. احراز هویت معتبر در هیچ‌کدام جای کنترل مالکیت را نمی‌گیرد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی JWT and OAuth2/OIDC بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "starter مناسب resource server و تنظیم chain لازم است؛ token واقعی را در log نگذار.",
+        "whyBad": "OAuth2 مجوز دسترسی و OIDC هویت را استاندارد می‌کنند؛ JWT فقط یک قالب token است. decode کردن Base64 احراز هویت نیست. signature، issuer، زمان اعتبار و audience مورد انتظار را بررسی کن؛ refresh token کار resource server نیست.",
+        "solution": "هیچ تضمین اصالت یا مجوزی نمی‌دهد"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با JWT and OAuth2/OIDC را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "starter مناسب resource server و تنظیم chain لازم است؛ token واقعی را در log نگذار.",
+      "token منقضی، issuer اشتباه و audience اشتباه را تست کن؛ هیچ‌کدام نباید به endpoint برسند."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست پیاده‌سازی توکن‌های بدون وضعیت JWT و استاندارد OAuth2/OIDC",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق JWT and OAuth2/OIDC برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "token منقضی، issuer اشتباه و audience اشتباه را تست کن؛ هیچ‌کدام نباید به endpoint برسند.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "token منقضی، issuer اشتباه و audience اشتباه را تست کن؛ هیچ‌کدام نباید به endpoint برسند.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "starter مناسب resource server و تنظیم chain لازم است؛ token واقعی را در log نگذار."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/jwtandoauth2oidc/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "spring:\n  security:\n    oauth2:\n      resourceserver:\n        jwt:\n          issuer-uri: https://idp.example.com/issuer\n          audiences: orders-api",
+        "language": "yaml",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. هیچ تضمین اصالت یا مجوزی نمی‌دهد. starter مناسب resource server و تنظیم chain لازم است؛ token واقعی را در log نگذار."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-075-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد JWT and OAuth2/OIDC در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-075",
+        "question": "خواندن payload JWT بدون verification چه تضمینی دارد؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "هیچ تضمین اصالت یا مجوزی نمی‌دهد",
+          "اثبات هویت چون JSON معتبر است",
+          "کافی است اگر token طولانی باشد"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-075-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-075-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "هیچ تضمین اصالت یا مجوزی نمی‌دهد. OAuth2 مجوز دسترسی و OIDC هویت را استاندارد می‌کنند؛ JWT فقط یک قالب token است. decode کردن Base64 احراز هویت نیست. signature، issuer، زمان اعتبار و audience مورد انتظار را بررسی کن؛ refresh token کار resource server نیست."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از JWT and OAuth2/OIDC را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: خواندن payload JWT بدون verification چه تضمینی دارد؟",
+        "answer": "هیچ تضمین اصالت یا مجوزی نمی‌دهد. starter مناسب resource server و تنظیم chain لازم است؛ token واقعی را در log نگذار."
       }
     ],
-    "summary": "در این جلسه مبحث پیاده‌سازی توکن‌های بدون وضعیت JWT و استاندارد OAuth2/OIDC را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "OAuth2 مجوز دسترسی و OIDC هویت را استاندارد می‌کنند؛ JWT فقط یک قالب token است. decode کردن Base64 احراز هویت نیست. signature، issuer، زمان اعتبار و audience مورد انتظار را بررسی کن؛ refresh token کار resource server نیست.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 13",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های JWT and OAuth2/OIDC",
-      "filesToModify": [
-        "src/main/java/com/academy/order/jwtandoauth2oidc/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-076",
@@ -549,7 +327,7 @@ export const WEEK_13_LESSONS: Lesson[] = [
     "description": "پیاده‌سازی فیلتر اختصاصی استخراج توکن کاربر، تزریق مشخصات خریدار به لایه سرویس و محافظت از متدها.",
     "category": "Security",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Capstone",
       "API Security",
@@ -557,167 +335,93 @@ export const WEEK_13_LESSONS: Lesson[] = [
       "User Context"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Security",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 12",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Securing the Order API در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای امن‌سازی کامل اندپوینت‌های سفارشات با JWT (پروژه محوری)",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "کاربر معتبر فاقد permission معمولاً چه پاسخی می‌گیرد",
+      "کاربر فقط‌خواندنی را با GET موفق و POST ممنوع تست کن؛ مالکیت سفارش را نیز جدا بسنج."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Securing the Order API تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث امن‌سازی کامل اندپوینت‌های سفارشات با JWT (پروژه محوری) (Securing the Order API) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "امنیت URL به تنهایی جلوی فراخوانی داخلی نامجاز service را نمی‌گیرد.",
+    "introduction": "پیاده‌سازی فیلتر اختصاصی استخراج توکن کاربر، تزریق مشخصات خریدار به لایه سرویس و محافظت از متدها.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Securing the Order API",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Securing the Order API استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Securing the Order API نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "امن‌سازی API باید policy قابل آزمون داشته باشد. روش credential را صریح انتخاب کن؛ HTTP Basic محلی برای آموزش ساده است و در انتقال واقعی TLS لازم دارد. JWT مسیر دیگری است، نه نام جدید Basic."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Securing the Order API از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Securing the Order API، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "کاربر فقط‌خواندنی را با GET موفق و POST ممنوع تست کن؛ مالکیت سفارش را نیز جدا بسنج.",
+      "solution": "امنیت URL به تنهایی جلوی فراخوانی داخلی نامجاز service را نمی‌گیرد."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Securing the Order API",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/securingtheorderapi/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Securing the Order API\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "http.authorizeHttpRequests(a -> a\n    .requestMatchers(HttpMethod.GET, \"/api/orders/**\").hasAuthority(\"orders:read\")\n    .requestMatchers(HttpMethod.POST, \"/api/orders\").hasAuthority(\"orders:write\")\n    .anyRequest().denyAll());",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Securing the Order API",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Securing the Order API",
+      "explanation": "Guard و Passport در Nest آشنا هستند؛ در Spring زنجیره filter و method security را جدا بشناس. احراز هویت معتبر در هیچ‌کدام جای کنترل مالکیت را نمی‌گیرد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Securing the Order API بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "امنیت URL به تنهایی جلوی فراخوانی داخلی نامجاز service را نمی‌گیرد.",
+        "whyBad": "امن‌سازی API باید policy قابل آزمون داشته باشد. روش credential را صریح انتخاب کن؛ HTTP Basic محلی برای آموزش ساده است و در انتقال واقعی TLS لازم دارد. JWT مسیر دیگری است، نه نام جدید Basic.",
+        "solution": "403"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Securing the Order API را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "امنیت URL به تنهایی جلوی فراخوانی داخلی نامجاز service را نمی‌گیرد.",
+      "کاربر فقط‌خواندنی را با GET موفق و POST ممنوع تست کن؛ مالکیت سفارش را نیز جدا بسنج."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست امن‌سازی کامل اندپوینت‌های سفارشات با JWT (پروژه محوری)",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Securing the Order API برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "کاربر فقط‌خواندنی را با GET موفق و POST ممنوع تست کن؛ مالکیت سفارش را نیز جدا بسنج.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "کاربر فقط‌خواندنی را با GET موفق و POST ممنوع تست کن؛ مالکیت سفارش را نیز جدا بسنج.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "امنیت URL به تنهایی جلوی فراخوانی داخلی نامجاز service را نمی‌گیرد."
       ],
       "solution": {
+        "code": "http.authorizeHttpRequests(a -> a\n    .requestMatchers(HttpMethod.GET, \"/api/orders/**\").hasAuthority(\"orders:read\")\n    .requestMatchers(HttpMethod.POST, \"/api/orders\").hasAuthority(\"orders:write\")\n    .anyRequest().denyAll());",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/securingtheorderapi/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. 403. امنیت URL به تنهایی جلوی فراخوانی داخلی نامجاز service را نمی‌گیرد."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-076-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Securing the Order API در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-076",
+        "question": "کاربر معتبر فاقد permission معمولاً چه پاسخی می‌گیرد؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "همیشه 401 مانند anonymous",
+          "403",
+          "201 همراه warning"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-076-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-076-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "403. امن‌سازی API باید policy قابل آزمون داشته باشد. روش credential را صریح انتخاب کن؛ HTTP Basic محلی برای آموزش ساده است و در انتقال واقعی TLS لازم دارد. JWT مسیر دیگری است، نه نام جدید Basic."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Securing the Order API را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: کاربر معتبر فاقد permission معمولاً چه پاسخی می‌گیرد؟",
+        "answer": "403. امنیت URL به تنهایی جلوی فراخوانی داخلی نامجاز service را نمی‌گیرد."
       }
     ],
-    "summary": "در این جلسه مبحث امن‌سازی کامل اندپوینت‌های سفارشات با JWT (پروژه محوری) را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "امن‌سازی API باید policy قابل آزمون داشته باشد. روش credential را صریح انتخاب کن؛ HTTP Basic محلی برای آموزش ساده است و در انتقال واقعی TLS لازم دارد. JWT مسیر دیگری است، نه نام جدید Basic.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 13",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Securing the Order API",
-      "filesToModify": [
-        "src/main/java/com/academy/order/securingtheorderapi/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-077",
@@ -729,7 +433,7 @@ export const WEEK_13_LESSONS: Lesson[] = [
     "description": "تعریف نقش‌های کاربر، ادمین و انباردار، فعال‌سازی @EnableMethodSecurity و به‌کارگیری عبارات شرطی SpEL.",
     "category": "Security",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "RBAC",
       "Method Security",
@@ -737,167 +441,93 @@ export const WEEK_13_LESSONS: Lesson[] = [
       "SpEL"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Security",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 12",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار RBAC and Method Security در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای کنترل دسترسی نقشی (RBAC) و امنیت لایه متد با @PreAuthorize",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "hasRole(\"ADMIN\") پیش‌فرض دنبال چه authority است",
+      "service را با principal فاقد permission مستقیماً در Spring test صدا بزن؛ دسترسی باید رد شود."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر RBAC and Method Security تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث کنترل دسترسی نقشی (RBAC) و امنیت لایه متد با @PreAuthorize (RBAC and Method Security) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "self-invocation یا ساخت service با new می‌تواند proxy method security را دور بزند.",
+    "introduction": "تعریف نقش‌های کاربر، ادمین و انباردار، فعال‌سازی @EnableMethodSecurity و به‌کارگیری عبارات شرطی SpEL.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی RBAC and Method Security",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از RBAC and Method Security استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از RBAC and Method Security نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "RBAC role را به مجموعه permissionها وصل می‌کند؛ method security برای محافظت مرز use case مفید است. hasRole پیشوند ROLE_ دارد، hasAuthority تطبیق مستقیم می‌خواهد. @EnableMethodSecurity را فعال کن."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، RBAC and Method Security از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش RBAC and Method Security، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "service را با principal فاقد permission مستقیماً در Spring test صدا بزن؛ دسترسی باید رد شود.",
+      "solution": "self-invocation یا ساخت service با new می‌تواند proxy method security را دور بزند."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن RBAC and Method Security",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/rbacandmethodsecurity/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"RBAC and Method Security\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "@EnableMethodSecurity\n@Configuration\nclass MethodSecurityConfig {}\n// On a Spring-managed service method:\n@PreAuthorize(\"hasAuthority('orders:write')\")\npublic UUID place(CreateOrder request) { return create(request); }",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای RBAC and Method Security",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "RBAC and Method Security",
+      "explanation": "Guard و Passport در Nest آشنا هستند؛ در Spring زنجیره filter و method security را جدا بشناس. احراز هویت معتبر در هیچ‌کدام جای کنترل مالکیت را نمی‌گیرد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی RBAC and Method Security بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "self-invocation یا ساخت service با new می‌تواند proxy method security را دور بزند.",
+        "whyBad": "RBAC role را به مجموعه permissionها وصل می‌کند؛ method security برای محافظت مرز use case مفید است. hasRole پیشوند ROLE_ دارد، hasAuthority تطبیق مستقیم می‌خواهد. @EnableMethodSecurity را فعال کن.",
+        "solution": "ROLE_ADMIN"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با RBAC and Method Security را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "self-invocation یا ساخت service با new می‌تواند proxy method security را دور بزند.",
+      "service را با principal فاقد permission مستقیماً در Spring test صدا بزن؛ دسترسی باید رد شود."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست کنترل دسترسی نقشی (RBAC) و امنیت لایه متد با @PreAuthorize",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق RBAC and Method Security برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "service را با principal فاقد permission مستقیماً در Spring test صدا بزن؛ دسترسی باید رد شود.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "service را با principal فاقد permission مستقیماً در Spring test صدا بزن؛ دسترسی باید رد شود.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "self-invocation یا ساخت service با new می‌تواند proxy method security را دور بزند."
       ],
       "solution": {
+        "code": "@EnableMethodSecurity\n@Configuration\nclass MethodSecurityConfig {}\n// On a Spring-managed service method:\n@PreAuthorize(\"hasAuthority('orders:write')\")\npublic UUID place(CreateOrder request) { return create(request); }",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/rbacandmethodsecurity/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. ROLE_ADMIN. self-invocation یا ساخت service با new می‌تواند proxy method security را دور بزند."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-077-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد RBAC and Method Security در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-077",
+        "question": "hasRole(\"ADMIN\") پیش‌فرض دنبال چه authority است؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "admin بدون توجه به حروف",
+          "هر authority شامل متن ADMIN",
+          "ROLE_ADMIN"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-077-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-077-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "ROLE_ADMIN. RBAC role را به مجموعه permissionها وصل می‌کند؛ method security برای محافظت مرز use case مفید است. hasRole پیشوند ROLE_ دارد، hasAuthority تطبیق مستقیم می‌خواهد. @EnableMethodSecurity را فعال کن."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از RBAC and Method Security را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: hasRole(\"ADMIN\") پیش‌فرض دنبال چه authority است؟",
+        "answer": "ROLE_ADMIN. self-invocation یا ساخت service با new می‌تواند proxy method security را دور بزند."
       }
     ],
-    "summary": "در این جلسه مبحث کنترل دسترسی نقشی (RBAC) و امنیت لایه متد با @PreAuthorize را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "RBAC role را به مجموعه permissionها وصل می‌کند؛ method security برای محافظت مرز use case مفید است. hasRole پیشوند ROLE_ دارد، hasAuthority تطبیق مستقیم می‌خواهد. @EnableMethodSecurity را فعال کن.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 13",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های RBAC and Method Security",
-      "filesToModify": [
-        "src/main/java/com/academy/order/rbacandmethodsecurity/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-078",
@@ -909,173 +539,99 @@ export const WEEK_13_LESSONS: Lesson[] = [
     "description": "پرهیز از ثبت کلیدها در گیت، تزریق امن پارامترها از طریق Environment Variables و ابزارهای مدیریت سکرت پروداکشن.",
     "category": "Security",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Secrets Management",
       "Security Best Practices",
       "DevSecOps"
     ],
     "prerequisites": [
-      "آشنایی با مبانی Security",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 12",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Secrets Management در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای مدیریت امن سکرت‌ها، کلیدها و متغیرهای حساس سازمانی",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "حذف رمز از آخرین commit برای رفع افشا کافی است",
+      "رمز را از محیط تزریق کن و با جستجوی repo/image/log نبودنش را بررسی کن؛ تعویض بدون commit انجام شود."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Secrets Management تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث مدیریت امن سکرت‌ها، کلیدها و متغیرهای حساس سازمانی (Secrets Management) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "مقدار پیش‌فرض production برای password نگذار که نبود secret را پنهان کند.",
+    "introduction": "پرهیز از ثبت کلیدها در گیت، تزریق امن پارامترها از طریق Environment Variables و ابزارهای مدیریت سکرت پروداکشن.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Secrets Management",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Secrets Management استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Secrets Management نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "Secret نباید وارد git، image layer یا log شود. environment و secret file روش تزریق‌اند، نه به‌خودی‌خود سیاست دسترسی یا rotation. دسترسی محدود، عمر کوتاه و قابلیت تعویض را طراحی کن."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Secrets Management از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Secrets Management، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "رمز را از محیط تزریق کن و با جستجوی repo/image/log نبودنش را بررسی کن؛ تعویض بدون commit انجام شود.",
+      "solution": "مقدار پیش‌فرض production برای password نگذار که نبود secret را پنهان کند."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Secrets Management",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/secretsmanagement/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Secrets Management\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "yaml",
+        "code": "spring:\n  datasource:\n    password: ${DB_PASSWORD}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Secrets Management",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Secrets Management",
+      "explanation": "Guard و Passport در Nest آشنا هستند؛ در Spring زنجیره filter و method security را جدا بشناس. احراز هویت معتبر در هیچ‌کدام جای کنترل مالکیت را نمی‌گیرد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Secrets Management بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "مقدار پیش‌فرض production برای password نگذار که نبود secret را پنهان کند.",
+        "whyBad": "Secret نباید وارد git، image layer یا log شود. environment و secret file روش تزریق‌اند، نه به‌خودی‌خود سیاست دسترسی یا rotation. دسترسی محدود، عمر کوتاه و قابلیت تعویض را طراحی کن.",
+        "solution": "خیر؛ باید رمز rotate و تاریخچه و دسترسی بررسی شود"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Secrets Management را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "مقدار پیش‌فرض production برای password نگذار که نبود secret را پنهان کند.",
+      "رمز را از محیط تزریق کن و با جستجوی repo/image/log نبودنش را بررسی کن؛ تعویض بدون commit انجام شود."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست مدیریت امن سکرت‌ها، کلیدها و متغیرهای حساس سازمانی",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Secrets Management برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "رمز را از محیط تزریق کن و با جستجوی repo/image/log نبودنش را بررسی کن؛ تعویض بدون commit انجام شود.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "رمز را از محیط تزریق کن و با جستجوی repo/image/log نبودنش را بررسی کن؛ تعویض بدون commit انجام شود.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "مقدار پیش‌فرض production برای password نگذار که نبود secret را پنهان کند."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/secretsmanagement/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "spring:\n  datasource:\n    password: ${DB_PASSWORD}",
+        "language": "yaml",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ باید رمز rotate و تاریخچه و دسترسی بررسی شود. مقدار پیش‌فرض production برای password نگذار که نبود secret را پنهان کند."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-078-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Secrets Management در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-078",
+        "question": "حذف رمز از آخرین commit برای رفع افشا کافی است؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "خیر؛ باید رمز rotate و تاریخچه و دسترسی بررسی شود",
+          "بله؛ git نسخه قبلی را خودکار پاک می‌کند",
+          "بله؛ اگر فایل به .gitignore اضافه شود"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-078-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-078-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "خیر؛ باید رمز rotate و تاریخچه و دسترسی بررسی شود. Secret نباید وارد git، image layer یا log شود. environment و secret file روش تزریق‌اند، نه به‌خودی‌خود سیاست دسترسی یا rotation. دسترسی محدود، عمر کوتاه و قابلیت تعویض را طراحی کن."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Secrets Management را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: حذف رمز از آخرین commit برای رفع افشا کافی است؟",
+        "answer": "خیر؛ باید رمز rotate و تاریخچه و دسترسی بررسی شود. مقدار پیش‌فرض production برای password نگذار که نبود secret را پنهان کند."
       }
     ],
-    "summary": "در این جلسه مبحث مدیریت امن سکرت‌ها، کلیدها و متغیرهای حساس سازمانی را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "Secret نباید وارد git، image layer یا log شود. environment و secret file روش تزریق‌اند، نه به‌خودی‌خود سیاست دسترسی یا rotation. دسترسی محدود، عمر کوتاه و قابلیت تعویض را طراحی کن.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 13",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Secrets Management",
-      "filesToModify": [
-        "src/main/java/com/academy/order/secretsmanagement/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   }
 ];

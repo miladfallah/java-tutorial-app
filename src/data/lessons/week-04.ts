@@ -11,7 +11,7 @@ export const WEEK_04_LESSONS: Lesson[] = [
     "description": "نحوه تخصیص حافظه اشیا و فریم متدها، بررسی رفتار نسل‌های حافظه (Young/Old Generation) و نحوه کار جمع‌آورنده‌های زباله مدرن مانند G1 و ZGC.",
     "category": "JVM & Concurrency",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "JVM Internals",
       "Heap & Stack",
@@ -21,167 +21,93 @@ export const WEEK_04_LESSONS: Lesson[] = [
       "Memory Leak"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JVM & Concurrency",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 3",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار JVM Heap, Stack and Garbage Collection در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای کالبدشکافی حافظه JVM: تفاوت Heap و Stack و الگوریتم‌های GC",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "آیا GC شیء قابل دسترس ولی بی‌مصرف را الزاماً حذف می‌کند",
+      "با یک cache بدون سقف مصرف heap را مشاهده کن؛ سپس eviction اضافه کن و روند مصرف را مقایسه کن."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر JVM Heap, Stack and Garbage Collection تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث کالبدشکافی حافظه JVM: تفاوت Heap و Stack و الگوریتم‌های GC (JVM Heap, Stack and Garbage Collection) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "افزایش Xmx علت نگه‌داشتن referenceها را درمان نمی‌کند.",
+    "introduction": "نحوه تخصیص حافظه اشیا و فریم متدها، بررسی رفتار نسل‌های حافظه (Young/Old Generation) و نحوه کار جمع‌آورنده‌های زباله مدرن مانند G1 و ZGC.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی JVM Heap, Stack and Garbage Collection",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از JVM Heap, Stack and Garbage Collection استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از JVM Heap, Stack and Garbage Collection نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "هر thread stack اجرای خود را دارد و اشیای معمول در heap مشترک قرار می‌گیرند. GC اشیای غیرقابل‌دسترسی را جمع می‌کند، نه اشیایی که صرفاً دیگر لازمشان نداری. cache یا listener دارای reference می‌تواند نشت منطقی بسازد."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، JVM Heap, Stack and Garbage Collection از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش JVM Heap, Stack and Garbage Collection، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "با یک cache بدون سقف مصرف heap را مشاهده کن؛ سپس eviction اضافه کن و روند مصرف را مقایسه کن.",
+      "solution": "افزایش Xmx علت نگه‌داشتن referenceها را درمان نمی‌کند."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن JVM Heap, Stack and Garbage Collection",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/jvmheapstackgarbagecollection/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"JVM Heap, Stack and Garbage Collection\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "bash",
+        "code": "java -Xms128m -Xmx512m -Xlog:gc* -jar app.jar\njcmd <PID> GC.heap_info",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای JVM Heap, Stack and Garbage Collection",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "JVM Heap, Stack and Garbage Collection",
+      "explanation": "Event Loop اجرای callbackهای JavaScript را زمان‌بندی می‌کند؛ libuv و Worker Threads نیز وجود دارند. در Java state یک singleton می‌تواند همزمان از چند thread لمس شود."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی JVM Heap, Stack and Garbage Collection بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "افزایش Xmx علت نگه‌داشتن referenceها را درمان نمی‌کند.",
+        "whyBad": "هر thread stack اجرای خود را دارد و اشیای معمول در heap مشترک قرار می‌گیرند. GC اشیای غیرقابل‌دسترسی را جمع می‌کند، نه اشیایی که صرفاً دیگر لازمشان نداری. cache یا listener دارای reference می‌تواند نشت منطقی بسازد.",
+        "solution": "خیر؛ reachable بودن مانع جمع‌آوری است"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با JVM Heap, Stack and Garbage Collection را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "افزایش Xmx علت نگه‌داشتن referenceها را درمان نمی‌کند.",
+      "با یک cache بدون سقف مصرف heap را مشاهده کن؛ سپس eviction اضافه کن و روند مصرف را مقایسه کن."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست کالبدشکافی حافظه JVM: تفاوت Heap و Stack و الگوریتم‌های GC",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق JVM Heap, Stack and Garbage Collection برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "با یک cache بدون سقف مصرف heap را مشاهده کن؛ سپس eviction اضافه کن و روند مصرف را مقایسه کن.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "با یک cache بدون سقف مصرف heap را مشاهده کن؛ سپس eviction اضافه کن و روند مصرف را مقایسه کن.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "افزایش Xmx علت نگه‌داشتن referenceها را درمان نمی‌کند."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/jvmheapstackgarbagecollection/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "java -Xms128m -Xmx512m -Xlog:gc* -jar app.jar\njcmd <PID> GC.heap_info",
+        "language": "bash",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ reachable بودن مانع جمع‌آوری است. افزایش Xmx علت نگه‌داشتن referenceها را درمان نمی‌کند."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-019-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد JVM Heap, Stack and Garbage Collection در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-019",
+        "question": "آیا GC شیء قابل دسترس ولی بی‌مصرف را الزاماً حذف می‌کند؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "بله؛ JVM نیاز تجاری را تشخیص می‌دهد",
+          "خیر؛ reachable بودن مانع جمع‌آوری است",
+          "بله؛ به محض پایان هر HTTP request"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-019-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-019-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "خیر؛ reachable بودن مانع جمع‌آوری است. هر thread stack اجرای خود را دارد و اشیای معمول در heap مشترک قرار می‌گیرند. GC اشیای غیرقابل‌دسترسی را جمع می‌کند، نه اشیایی که صرفاً دیگر لازمشان نداری. cache یا listener دارای reference می‌تواند نشت منطقی بسازد."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از JVM Heap, Stack and Garbage Collection را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: آیا GC شیء قابل دسترس ولی بی‌مصرف را الزاماً حذف می‌کند؟",
+        "answer": "خیر؛ reachable بودن مانع جمع‌آوری است. افزایش Xmx علت نگه‌داشتن referenceها را درمان نمی‌کند."
       }
     ],
-    "summary": "در این جلسه مبحث کالبدشکافی حافظه JVM: تفاوت Heap و Stack و الگوریتم‌های GC را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "هر thread stack اجرای خود را دارد و اشیای معمول در heap مشترک قرار می‌گیرند. GC اشیای غیرقابل‌دسترسی را جمع می‌کند، نه اشیایی که صرفاً دیگر لازمشان نداری. cache یا listener دارای reference می‌تواند نشت منطقی بسازد.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.oracle.com/en/java/javase/25/core/concurrency.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 4",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های JVM Heap, Stack and Garbage Collection",
-      "filesToModify": [
-        "src/main/java/com/academy/order/jvmheapstackgarbagecollection/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-020",
@@ -193,7 +119,7 @@ export const WEEK_04_LESSONS: Lesson[] = [
     "description": "تفاوت مدل تک‌رشته‌ای Node.js Event Loop با رشته‌های سیستم‌عامل در جاوا، چرخه حیات رشته‌ها، استخر رشته‌ها و متدهای submit/invokeAll.",
     "category": "JVM & Concurrency",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Threads",
       "ExecutorService",
@@ -202,167 +128,93 @@ export const WEEK_04_LESSONS: Lesson[] = [
       "Node vs Java Concurrency"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JVM & Concurrency",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 3",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Threads and ExecutorService در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای مدیریت ریسمان‌ها در جاوا با ExecutorService و Thread Pools",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "submit شکست task را کجا در اختیار مصرف‌کننده می‌گذارد",
+      "سه task با یک شکست اجرا کن؛ خطای ExecutionException را با حفظ cause بررسی کن و executor را ببند."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Threads and ExecutorService تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث مدیریت ریسمان‌ها در جاوا با ExecutorService و Thread Pools (Threads and ExecutorService) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "صف newFixedThreadPool بدون سقف است؛ برای بار کنترل‌نشده executor با صف محدود لازم است.",
+    "introduction": "تفاوت مدل تک‌رشته‌ای Node.js Event Loop با رشته‌های سیستم‌عامل در جاوا، چرخه حیات رشته‌ها، استخر رشته‌ها و متدهای submit/invokeAll.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Threads and ExecutorService",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Threads and ExecutorService استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Threads and ExecutorService نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "ExecutorService اجرای task را از ساخت thread جدا می‌کند. Future.get نتیجه یا خطا را آشکار می‌کند؛ اگر نتیجه را رها کنی ممکن است شکست task را نبینی. در Java 25 executor را با try-with-resources ببند."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Threads and ExecutorService از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Threads and ExecutorService، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "سه task با یک شکست اجرا کن؛ خطای ExecutionException را با حفظ cause بررسی کن و executor را ببند.",
+      "solution": "صف newFixedThreadPool بدون سقف است؛ برای بار کنترل‌نشده executor با صف محدود لازم است."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Threads and ExecutorService",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/threadsandexecutorservice/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Threads and ExecutorService\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "try (var pool = Executors.newFixedThreadPool(2)) {\n    Future<Integer> result = pool.submit(() -> 21 * 2);\n    System.out.println(result.get());\n}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Threads and ExecutorService",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Threads and ExecutorService",
+      "explanation": "Event Loop اجرای callbackهای JavaScript را زمان‌بندی می‌کند؛ libuv و Worker Threads نیز وجود دارند. در Java state یک singleton می‌تواند همزمان از چند thread لمس شود."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Threads and ExecutorService بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "صف newFixedThreadPool بدون سقف است؛ برای بار کنترل‌نشده executor با صف محدود لازم است.",
+        "whyBad": "ExecutorService اجرای task را از ساخت thread جدا می‌کند. Future.get نتیجه یا خطا را آشکار می‌کند؛ اگر نتیجه را رها کنی ممکن است شکست task را نبینی. در Java 25 executor را با try-with-resources ببند.",
+        "solution": "در Future و فراخوانی get"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Threads and ExecutorService را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "صف newFixedThreadPool بدون سقف است؛ برای بار کنترل‌نشده executor با صف محدود لازم است.",
+      "سه task با یک شکست اجرا کن؛ خطای ExecutionException را با حفظ cause بررسی کن و executor را ببند."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست مدیریت ریسمان‌ها در جاوا با ExecutorService و Thread Pools",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Threads and ExecutorService برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "سه task با یک شکست اجرا کن؛ خطای ExecutionException را با حفظ cause بررسی کن و executor را ببند.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "سه task با یک شکست اجرا کن؛ خطای ExecutionException را با حفظ cause بررسی کن و executor را ببند.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "صف newFixedThreadPool بدون سقف است؛ برای بار کنترل‌نشده executor با صف محدود لازم است."
       ],
       "solution": {
+        "code": "try (var pool = Executors.newFixedThreadPool(2)) {\n    Future<Integer> result = pool.submit(() -> 21 * 2);\n    System.out.println(result.get());\n}",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/threadsandexecutorservice/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. در Future و فراخوانی get. صف newFixedThreadPool بدون سقف است؛ برای بار کنترل‌نشده executor با صف محدود لازم است."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-020-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Threads and ExecutorService در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-020",
+        "question": "submit شکست task را کجا در اختیار مصرف‌کننده می‌گذارد؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "همیشه مستقیماً در thread فراخواننده submit",
+          "آن را خودکار retry می‌کند",
+          "در Future و فراخوانی get"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-020-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-020-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "در Future و فراخوانی get. ExecutorService اجرای task را از ساخت thread جدا می‌کند. Future.get نتیجه یا خطا را آشکار می‌کند؛ اگر نتیجه را رها کنی ممکن است شکست task را نبینی. در Java 25 executor را با try-with-resources ببند."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Threads and ExecutorService را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: submit شکست task را کجا در اختیار مصرف‌کننده می‌گذارد؟",
+        "answer": "در Future و فراخوانی get. صف newFixedThreadPool بدون سقف است؛ برای بار کنترل‌نشده executor با صف محدود لازم است."
       }
     ],
-    "summary": "در این جلسه مبحث مدیریت ریسمان‌ها در جاوا با ExecutorService و Thread Pools را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "ExecutorService اجرای task را از ساخت thread جدا می‌کند. Future.get نتیجه یا خطا را آشکار می‌کند؛ اگر نتیجه را رها کنی ممکن است شکست task را نبینی. در Java 25 executor را با try-with-resources ببند.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.oracle.com/en/java/javase/25/core/concurrency.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 4",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Threads and ExecutorService",
-      "filesToModify": [
-        "src/main/java/com/academy/order/threadsandexecutorservice/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-021",
@@ -374,7 +226,7 @@ export const WEEK_04_LESSONS: Lesson[] = [
     "description": "تحلیل باگ‌های پنهان دسترسی موازی، کلمات کلیدی synchronized و volatile، و استفاده از متغیرهای اتمیک پکیج java.util.concurrent.atomic.",
     "category": "JVM & Concurrency",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Race Conditions",
       "Thread Safety",
@@ -383,167 +235,93 @@ export const WEEK_04_LESSONS: Lesson[] = [
       "Locks"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JVM & Concurrency",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 3",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Race Conditions and Thread Safety در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای شرایط رقابتی (Race Conditions) و مکانیزم‌های Thread Safety",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "آیا volatile int برای count++ کافی است",
+      "با چند thread شمارنده را افزایش بده؛ سپس volatile تنها را جایگزین کن و تفاوت تضمین را توضیح بده."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Race Conditions and Thread Safety تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث شرایط رقابتی (Race Conditions) و مکانیزم‌های Thread Safety (Race Conditions and Thread Safety) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "عبور تصادفی یک تست همزمانی اثبات thread safety نیست.",
+    "introduction": "تحلیل باگ‌های پنهان دسترسی موازی، کلمات کلیدی synchronized و volatile، و استفاده از متغیرهای اتمیک پکیج java.util.concurrent.atomic.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Race Conditions and Thread Safety",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Race Conditions and Thread Safety استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Race Conditions and Thread Safety نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "count++ یک عملیات اتمیک نیست. volatile visibility می‌دهد اما read-modify-write را اتمیک نمی‌کند. synchronized علاوه بر mutual exclusion رابطه happens-before می‌سازد؛ برای invariant چندفیلدی قفل مشترک یا طراحی immutable لازم است."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Race Conditions and Thread Safety از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Race Conditions and Thread Safety، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "با چند thread شمارنده را افزایش بده؛ سپس volatile تنها را جایگزین کن و تفاوت تضمین را توضیح بده.",
+      "solution": "عبور تصادفی یک تست همزمانی اثبات thread safety نیست."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Race Conditions and Thread Safety",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/raceconditionsandthreadsafety/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Race Conditions and Thread Safety\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "final class Counter {\n    private int value;\n    synchronized void increment() { value++; }\n    synchronized int value() { return value; }\n}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Race Conditions and Thread Safety",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Race Conditions and Thread Safety",
+      "explanation": "Event Loop اجرای callbackهای JavaScript را زمان‌بندی می‌کند؛ libuv و Worker Threads نیز وجود دارند. در Java state یک singleton می‌تواند همزمان از چند thread لمس شود."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Race Conditions and Thread Safety بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "عبور تصادفی یک تست همزمانی اثبات thread safety نیست.",
+        "whyBad": "count++ یک عملیات اتمیک نیست. volatile visibility می‌دهد اما read-modify-write را اتمیک نمی‌کند. synchronized علاوه بر mutual exclusion رابطه happens-before می‌سازد؛ برای invariant چندفیلدی قفل مشترک یا طراحی immutable لازم است.",
+        "solution": "خیر؛ افزایش چندمرحله‌ای است"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Race Conditions and Thread Safety را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "عبور تصادفی یک تست همزمانی اثبات thread safety نیست.",
+      "با چند thread شمارنده را افزایش بده؛ سپس volatile تنها را جایگزین کن و تفاوت تضمین را توضیح بده."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست شرایط رقابتی (Race Conditions) و مکانیزم‌های Thread Safety",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Race Conditions and Thread Safety برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "با چند thread شمارنده را افزایش بده؛ سپس volatile تنها را جایگزین کن و تفاوت تضمین را توضیح بده.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "با چند thread شمارنده را افزایش بده؛ سپس volatile تنها را جایگزین کن و تفاوت تضمین را توضیح بده.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "عبور تصادفی یک تست همزمانی اثبات thread safety نیست."
       ],
       "solution": {
+        "code": "final class Counter {\n    private int value;\n    synchronized void increment() { value++; }\n    synchronized int value() { return value; }\n}",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/raceconditionsandthreadsafety/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ افزایش چندمرحله‌ای است. عبور تصادفی یک تست همزمانی اثبات thread safety نیست."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-021-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Race Conditions and Thread Safety در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-021",
+        "question": "آیا volatile int برای count++ کافی است؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "خیر؛ افزایش چندمرحله‌ای است",
+          "بله؛ تمام عملیات روی آن قفل می‌شوند",
+          "فقط وقتی CPU بیشتر از یک هسته دارد"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-021-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-021-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "خیر؛ افزایش چندمرحله‌ای است. count++ یک عملیات اتمیک نیست. volatile visibility می‌دهد اما read-modify-write را اتمیک نمی‌کند. synchronized علاوه بر mutual exclusion رابطه happens-before می‌سازد؛ برای invariant چندفیلدی قفل مشترک یا طراحی immutable لازم است."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Race Conditions and Thread Safety را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: آیا volatile int برای count++ کافی است؟",
+        "answer": "خیر؛ افزایش چندمرحله‌ای است. عبور تصادفی یک تست همزمانی اثبات thread safety نیست."
       }
     ],
-    "summary": "در این جلسه مبحث شرایط رقابتی (Race Conditions) و مکانیزم‌های Thread Safety را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "count++ یک عملیات اتمیک نیست. volatile visibility می‌دهد اما read-modify-write را اتمیک نمی‌کند. synchronized علاوه بر mutual exclusion رابطه happens-before می‌سازد؛ برای invariant چندفیلدی قفل مشترک یا طراحی immutable لازم است.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.oracle.com/en/java/javase/25/core/concurrency.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 4",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Race Conditions and Thread Safety",
-      "filesToModify": [
-        "src/main/java/com/academy/order/raceconditionsandthreadsafety/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-022",
@@ -555,7 +333,7 @@ export const WEEK_04_LESSONS: Lesson[] = [
     "description": "ساخت سرویس پردازش همزمان سبدهای خرید با مدیریت موجودی انبار بدون ایجاد ناهماهنگی در تعداد کالا، شبیه‌سازی ترافیک سنگین و تست استرس.",
     "category": "JVM & Concurrency",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Capstone",
       "Concurrency",
@@ -564,167 +342,93 @@ export const WEEK_04_LESSONS: Lesson[] = [
       "Order Processing"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JVM & Concurrency",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 3",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Concurrent Order Processing در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای پیاده‌سازی پردازش همزمان سفارشات و مدیریت انبار (پروژه محوری)",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "قفل synchronized از موجودی در دو JVM محافظت می‌کند",
+      "موجودی یک را با دو درخواست همزمان امتحان کن؛ دقیقاً یک رزرو موفق باشد. محدودیت چند instance را بنویس."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Concurrent Order Processing تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث پیاده‌سازی پردازش همزمان سفارشات و مدیریت انبار (پروژه محوری) (Concurrent Order Processing) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "check خارج از قفل و decrement داخل قفل هنوز race condition دارد.",
+    "introduction": "ساخت سرویس پردازش همزمان سبدهای خرید با مدیریت موجودی انبار بدون ایجاد ناهماهنگی در تعداد کالا، شبیه‌سازی ترافیک سنگین و تست استرس.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Concurrent Order Processing",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Concurrent Order Processing استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Concurrent Order Processing نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "در یک process می‌توان check و decrement را زیر یک قفل واحد انجام داد؛ این قفل میان چند instance مشترک نیست. برای سفارش واقعی، invariant موجودی باید در دیتابیس و تراکنش محافظت شود."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Concurrent Order Processing از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Concurrent Order Processing، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "موجودی یک را با دو درخواست همزمان امتحان کن؛ دقیقاً یک رزرو موفق باشد. محدودیت چند instance را بنویس.",
+      "solution": "check خارج از قفل و decrement داخل قفل هنوز race condition دارد."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Concurrent Order Processing",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/concurrentorderprocessing/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Concurrent Order Processing\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "synchronized boolean reserve(int quantity) {\n    if (quantity < 1 || stock < quantity) return false;\n    stock -= quantity;\n    return true;\n}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Concurrent Order Processing",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Concurrent Order Processing",
+      "explanation": "Event Loop اجرای callbackهای JavaScript را زمان‌بندی می‌کند؛ libuv و Worker Threads نیز وجود دارند. در Java state یک singleton می‌تواند همزمان از چند thread لمس شود."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Concurrent Order Processing بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "check خارج از قفل و decrement داخل قفل هنوز race condition دارد.",
+        "whyBad": "در یک process می‌توان check و decrement را زیر یک قفل واحد انجام داد؛ این قفل میان چند instance مشترک نیست. برای سفارش واقعی، invariant موجودی باید در دیتابیس و تراکنش محافظت شود.",
+        "solution": "خیر؛ قفل حافظه محلی process است"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Concurrent Order Processing را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "check خارج از قفل و decrement داخل قفل هنوز race condition دارد.",
+      "موجودی یک را با دو درخواست همزمان امتحان کن؛ دقیقاً یک رزرو موفق باشد. محدودیت چند instance را بنویس."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست پیاده‌سازی پردازش همزمان سفارشات و مدیریت انبار (پروژه محوری)",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Concurrent Order Processing برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "موجودی یک را با دو درخواست همزمان امتحان کن؛ دقیقاً یک رزرو موفق باشد. محدودیت چند instance را بنویس.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "موجودی یک را با دو درخواست همزمان امتحان کن؛ دقیقاً یک رزرو موفق باشد. محدودیت چند instance را بنویس.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "check خارج از قفل و decrement داخل قفل هنوز race condition دارد."
       ],
       "solution": {
+        "code": "synchronized boolean reserve(int quantity) {\n    if (quantity < 1 || stock < quantity) return false;\n    stock -= quantity;\n    return true;\n}",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/concurrentorderprocessing/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ قفل حافظه محلی process است. check خارج از قفل و decrement داخل قفل هنوز race condition دارد."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-022-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Concurrent Order Processing در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-022",
+        "question": "قفل synchronized از موجودی در دو JVM محافظت می‌کند؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "بله؛ اگر کلاس‌ها نام یکسان داشته باشند",
+          "خیر؛ قفل حافظه محلی process است",
+          "بله؛ با static شدن هر فیلد"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-022-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-022-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "خیر؛ قفل حافظه محلی process است. در یک process می‌توان check و decrement را زیر یک قفل واحد انجام داد؛ این قفل میان چند instance مشترک نیست. برای سفارش واقعی، invariant موجودی باید در دیتابیس و تراکنش محافظت شود."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Concurrent Order Processing را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: قفل synchronized از موجودی در دو JVM محافظت می‌کند؟",
+        "answer": "خیر؛ قفل حافظه محلی process است. check خارج از قفل و decrement داخل قفل هنوز race condition دارد."
       }
     ],
-    "summary": "در این جلسه مبحث پیاده‌سازی پردازش همزمان سفارشات و مدیریت انبار (پروژه محوری) را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "در یک process می‌توان check و decrement را زیر یک قفل واحد انجام داد؛ این قفل میان چند instance مشترک نیست. برای سفارش واقعی، invariant موجودی باید در دیتابیس و تراکنش محافظت شود.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.oracle.com/en/java/javase/25/core/concurrency.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 4",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Concurrent Order Processing",
-      "filesToModify": [
-        "src/main/java/com/academy/order/concurrentorderprocessing/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-023",
@@ -736,7 +440,7 @@ export const WEEK_04_LESSONS: Lesson[] = [
     "description": "کار با ابزارهای JDK مانند jcmd, jstack, jmap و ابزارهای مانیتورینگ تصویری (JConsole, VisualVM) برای استخراج گلوگاه‌های پرفورمنس و Thread Dump.",
     "category": "JVM & Concurrency",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Profiling",
       "Thread Dump",
@@ -746,167 +450,93 @@ export const WEEK_04_LESSONS: Lesson[] = [
       "Performance"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JVM & Concurrency",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 3",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار JVM Profiling Fundamentals در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای مبانی پروفایلینگ و پایش رفتار JVM در محیط زنده",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "برای تصمیم تیونینگ اولین گام چیست",
+      "یک endpoint کند را زیر بار محدود اجرا کن؛ با JFR مشخص کن وقت روی CPU صرف می‌شود یا انتظار اتصال DB."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر JVM Profiling Fundamentals تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث مبانی پروفایلینگ و پایش رفتار JVM در محیط زنده (JVM Profiling Fundamentals) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "یک snapshot بدون workload و baseline قابل تفسیر مطمئن نیست.",
+    "introduction": "کار با ابزارهای JDK مانند jcmd, jstack, jmap و ابزارهای مانیتورینگ تصویری (JConsole, VisualVM) برای استخراج گلوگاه‌های پرفورمنس و Thread Dump.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی JVM Profiling Fundamentals",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از JVM Profiling Fundamentals استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از JVM Profiling Fundamentals نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "پیش از تغییر GC یا thread pool، داده جمع کن. JFR نمونه‌های CPU، allocation، قفل و I/O را کنار هم نشان می‌دهد. thread dump برای دیدن محل انتظار است؛ تعداد زیاد WAITING الزاماً مشکل نیست."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، JVM Profiling Fundamentals از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش JVM Profiling Fundamentals، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "یک endpoint کند را زیر بار محدود اجرا کن؛ با JFR مشخص کن وقت روی CPU صرف می‌شود یا انتظار اتصال DB.",
+      "solution": "یک snapshot بدون workload و baseline قابل تفسیر مطمئن نیست."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن JVM Profiling Fundamentals",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/jvmprofilingfundamentals/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"JVM Profiling Fundamentals\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "bash",
+        "code": "jcmd <PID> JFR.start name=orders settings=profile duration=60s filename=/tmp/orders.jfr\njcmd <PID> Thread.print",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای JVM Profiling Fundamentals",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "JVM Profiling Fundamentals",
+      "explanation": "Event Loop اجرای callbackهای JavaScript را زمان‌بندی می‌کند؛ libuv و Worker Threads نیز وجود دارند. در Java state یک singleton می‌تواند همزمان از چند thread لمس شود."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی JVM Profiling Fundamentals بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "یک snapshot بدون workload و baseline قابل تفسیر مطمئن نیست.",
+        "whyBad": "پیش از تغییر GC یا thread pool، داده جمع کن. JFR نمونه‌های CPU، allocation، قفل و I/O را کنار هم نشان می‌دهد. thread dump برای دیدن محل انتظار است؛ تعداد زیاد WAITING الزاماً مشکل نیست.",
+        "solution": "اندازه‌گیری زیر بار نماینده"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با JVM Profiling Fundamentals را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "یک snapshot بدون workload و baseline قابل تفسیر مطمئن نیست.",
+      "یک endpoint کند را زیر بار محدود اجرا کن؛ با JFR مشخص کن وقت روی CPU صرف می‌شود یا انتظار اتصال DB."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست مبانی پروفایلینگ و پایش رفتار JVM در محیط زنده",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق JVM Profiling Fundamentals برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "یک endpoint کند را زیر بار محدود اجرا کن؛ با JFR مشخص کن وقت روی CPU صرف می‌شود یا انتظار اتصال DB.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "یک endpoint کند را زیر بار محدود اجرا کن؛ با JFR مشخص کن وقت روی CPU صرف می‌شود یا انتظار اتصال DB.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "یک snapshot بدون workload و baseline قابل تفسیر مطمئن نیست."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/jvmprofilingfundamentals/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "jcmd <PID> JFR.start name=orders settings=profile duration=60s filename=/tmp/orders.jfr\njcmd <PID> Thread.print",
+        "language": "bash",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. اندازه‌گیری زیر بار نماینده. یک snapshot بدون workload و baseline قابل تفسیر مطمئن نیست."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-023-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد JVM Profiling Fundamentals در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-023",
+        "question": "برای تصمیم تیونینگ اولین گام چیست؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "افزایش همه poolها به ۱۰۰۰",
+          "خاموش‌کردن log و فرض حل مشکل",
+          "اندازه‌گیری زیر بار نماینده"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-023-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-023-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "اندازه‌گیری زیر بار نماینده. پیش از تغییر GC یا thread pool، داده جمع کن. JFR نمونه‌های CPU، allocation، قفل و I/O را کنار هم نشان می‌دهد. thread dump برای دیدن محل انتظار است؛ تعداد زیاد WAITING الزاماً مشکل نیست."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از JVM Profiling Fundamentals را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: برای تصمیم تیونینگ اولین گام چیست؟",
+        "answer": "اندازه‌گیری زیر بار نماینده. یک snapshot بدون workload و baseline قابل تفسیر مطمئن نیست."
       }
     ],
-    "summary": "در این جلسه مبحث مبانی پروفایلینگ و پایش رفتار JVM در محیط زنده را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "پیش از تغییر GC یا thread pool، داده جمع کن. JFR نمونه‌های CPU، allocation، قفل و I/O را کنار هم نشان می‌دهد. thread dump برای دیدن محل انتظار است؛ تعداد زیاد WAITING الزاماً مشکل نیست.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.oracle.com/en/java/javase/25/core/concurrency.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 4",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های JVM Profiling Fundamentals",
-      "filesToModify": [
-        "src/main/java/com/academy/order/jvmprofilingfundamentals/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-024",
@@ -918,7 +548,7 @@ export const WEEK_04_LESSONS: Lesson[] = [
     "description": "تنظیم فلگ‌های حیاتی -Xms, -Xmx، شناسایی محدودیت‌های حافظه در محیط داکر و cgroups با استفاده از -XX:+UseContainerSupport و جلوگیری از OOMKilled.",
     "category": "JVM & Concurrency",
     "difficulty": "Advanced",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "JVM Flags",
       "Container Memory",
@@ -927,166 +557,92 @@ export const WEEK_04_LESSONS: Lesson[] = [
       "Production Tuning"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JVM & Concurrency",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 3",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار JVM Flags and Memory Limits در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای تنظیم پروداکشن JVM Flags و مدیریت محدودیت حافظه در کانتینرها",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "حد ۵۱۲MB کانتینر یعنی می‌توان Xmx=512m گذاشت",
+      "با limit مشخص Docker، heap و RSS را مقایسه کن؛ توضیح بده چرا Xmx برابر کل limit خطرناک است."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر JVM Flags and Memory Limits تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث تنظیم پروداکشن JVM Flags و مدیریت محدودیت حافظه در کانتینرها (JVM Flags and Memory Limits) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "OOMKilled ممکن است بدون Java OutOfMemoryError رخ دهد؛ exit code و رخداد container را نیز ببین.",
+    "introduction": "تنظیم فلگ‌های حیاتی -Xms, -Xmx، شناسایی محدودیت‌های حافظه در محیط داکر و cgroups با استفاده از -XX:+UseContainerSupport و جلوگیری از OOMKilled.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی JVM Flags and Memory Limits",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از JVM Flags and Memory Limits استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از JVM Flags and Memory Limits نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "حد حافظه کانتینر فقط heap نیست؛ metaspace، stack، direct buffer و native memory هم مصرف دارند. MaxRAMPercentage سهم heap را تعیین می‌کند، نه سقف کل process. فاصله امن تا حد container را با اندازه‌گیری انتخاب کن."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، JVM Flags and Memory Limits از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش JVM Flags and Memory Limits، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "با limit مشخص Docker، heap و RSS را مقایسه کن؛ توضیح بده چرا Xmx برابر کل limit خطرناک است.",
+      "solution": "OOMKilled ممکن است بدون Java OutOfMemoryError رخ دهد؛ exit code و رخداد container را نیز ببین."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن JVM Flags and Memory Limits",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/jvmflagsandmemorylimits/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"JVM Flags and Memory Limits\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "bash",
+        "code": "java -XX:MaxRAMPercentage=60 -XX:+ExitOnOutOfMemoryError -jar app.jar\ndocker stats",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای JVM Flags and Memory Limits",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "JVM Flags and Memory Limits",
+      "explanation": "Event Loop اجرای callbackهای JavaScript را زمان‌بندی می‌کند؛ libuv و Worker Threads نیز وجود دارند. در Java state یک singleton می‌تواند همزمان از چند thread لمس شود."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی JVM Flags and Memory Limits بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "OOMKilled ممکن است بدون Java OutOfMemoryError رخ دهد؛ exit code و رخداد container را نیز ببین.",
+        "whyBad": "حد حافظه کانتینر فقط heap نیست؛ metaspace، stack، direct buffer و native memory هم مصرف دارند. MaxRAMPercentage سهم heap را تعیین می‌کند، نه سقف کل process. فاصله امن تا حد container را با اندازه‌گیری انتخاب کن.",
+        "solution": "معمولاً خیر؛ حافظه غیر heap هم نیاز است"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با JVM Flags and Memory Limits را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "OOMKilled ممکن است بدون Java OutOfMemoryError رخ دهد؛ exit code و رخداد container را نیز ببین.",
+      "با limit مشخص Docker، heap و RSS را مقایسه کن؛ توضیح بده چرا Xmx برابر کل limit خطرناک است."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست تنظیم پروداکشن JVM Flags و مدیریت محدودیت حافظه در کانتینرها",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق JVM Flags and Memory Limits برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "با limit مشخص Docker، heap و RSS را مقایسه کن؛ توضیح بده چرا Xmx برابر کل limit خطرناک است.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "با limit مشخص Docker، heap و RSS را مقایسه کن؛ توضیح بده چرا Xmx برابر کل limit خطرناک است.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "OOMKilled ممکن است بدون Java OutOfMemoryError رخ دهد؛ exit code و رخداد container را نیز ببین."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/jvmflagsandmemorylimits/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "java -XX:MaxRAMPercentage=60 -XX:+ExitOnOutOfMemoryError -jar app.jar\ndocker stats",
+        "language": "bash",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. معمولاً خیر؛ حافظه غیر heap هم نیاز است. OOMKilled ممکن است بدون Java OutOfMemoryError رخ دهد؛ exit code و رخداد container را نیز ببین."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-024-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد JVM Flags and Memory Limits در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-024",
+        "question": "حد ۵۱۲MB کانتینر یعنی می‌توان Xmx=512m گذاشت؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "معمولاً خیر؛ حافظه غیر heap هم نیاز است",
+          "بله؛ stack داخل همان heap است",
+          "بله؛ Docker متاسپیس را حساب نمی‌کند"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-024-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-024-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "معمولاً خیر؛ حافظه غیر heap هم نیاز است. حد حافظه کانتینر فقط heap نیست؛ metaspace، stack، direct buffer و native memory هم مصرف دارند. MaxRAMPercentage سهم heap را تعیین می‌کند، نه سقف کل process. فاصله امن تا حد container را با اندازه‌گیری انتخاب کن."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از JVM Flags and Memory Limits را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: حد ۵۱۲MB کانتینر یعنی می‌توان Xmx=512m گذاشت؟",
+        "answer": "معمولاً خیر؛ حافظه غیر heap هم نیاز است. OOMKilled ممکن است بدون Java OutOfMemoryError رخ دهد؛ exit code و رخداد container را نیز ببین."
       }
     ],
-    "summary": "در این جلسه مبحث تنظیم پروداکشن JVM Flags و مدیریت محدودیت حافظه در کانتینرها را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "حد حافظه کانتینر فقط heap نیست؛ metaspace، stack، direct buffer و native memory هم مصرف دارند. MaxRAMPercentage سهم heap را تعیین می‌کند، نه سقف کل process. فاصله امن تا حد container را با اندازه‌گیری انتخاب کن.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.oracle.com/en/java/javase/25/core/concurrency.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 4",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های JVM Flags and Memory Limits",
-      "filesToModify": [
-        "src/main/java/com/academy/order/jvmflagsandmemorylimits/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   }
 ];

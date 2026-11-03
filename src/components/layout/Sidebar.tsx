@@ -31,6 +31,14 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const pathname = usePathname();
   const { progress, isLoaded } = useAcademyStore();
   const [filterQuery, setFilterQuery] = useState("");
@@ -136,6 +144,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       )}
 
       <aside
+        inert={!isDesktop && !isOpen}
+        aria-hidden={!isDesktop && !isOpen}
         className={cn(
           "fixed top-14 right-0 z-40 h-[calc(100dvh-3.5rem)] w-72 max-w-[calc(100vw-1rem)] bg-card border-l border-border transition-transform duration-200 ease-in-out overflow-hidden flex flex-col select-none",
           isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
@@ -215,7 +225,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       className={cn(
                         "w-5 h-5 rounded flex items-center justify-center font-mono text-[10px] font-bold shrink-0",
                         isWeekDone
-                          ? "bg-emerald-500/15 text-emerald-400"
+                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
                           : "bg-secondary text-muted-foreground"
                       )}
                     >
@@ -267,11 +277,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-[11px] font-mono leading-tight truncate">
-                              {toPersianDigits(lesson.day)}. {lesson.titleEn}
+                            <div className="text-xs leading-relaxed line-clamp-2">
+                              {toPersianDigits(lesson.day)}. {lesson.title}
                             </div>
-                            <div className="text-[10px] text-muted-foreground truncate mt-0.5">
-                              {lesson.title}
+                            <div dir="ltr" className="text-[10px] font-mono text-muted-foreground truncate mt-1 text-left">
+                              {lesson.titleEn}
                             </div>
                           </div>
                         </Link>

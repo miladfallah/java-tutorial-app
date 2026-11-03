@@ -29,6 +29,7 @@ import { NotesEditor } from "./NotesEditor";
 import { LessonNavigation } from "./LessonNavigation";
 import { TableOfContents, TOCItem } from "./TableOfContents";
 import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
+import { FocusedLessonView } from "./FocusedLessonView";
 
 interface LessonViewProps {
   lesson: Lesson;
@@ -157,6 +158,8 @@ export function LessonView({ lesson }: LessonViewProps) {
     return items;
   }, [lesson]);
 
+  if (lesson.contentVersion === 2) return <FocusedLessonView lesson={lesson} />;
+
   return (
     <div className={cn("lesson-layout flex items-start gap-6 2xl:gap-8 justify-between", isReaderMode && "justify-center")}>
       {/* Main Prose Reading Column */}
@@ -190,8 +193,8 @@ export function LessonView({ lesson }: LessonViewProps) {
               <span>{toPersianDigits(lesson.estimatedMinutes)} دقیقه</span>
             </span>
             {isCompleted && (
-              <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                 خوانده شد ✓
               </span>
             )}
@@ -431,7 +434,7 @@ export function LessonView({ lesson }: LessonViewProps) {
                   key={idx}
                   className="p-5 rounded-xl border border-rose-500/20 bg-rose-500/5 space-y-3"
                 >
-                  <div className="flex items-start gap-2 text-rose-400 font-bold text-base">
+                  <div className="flex items-start gap-2 text-rose-700 dark:text-rose-400 font-bold text-base">
                     <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
                     <span>{mistake.mistake}</span>
                   </div>
@@ -454,7 +457,7 @@ export function LessonView({ lesson }: LessonViewProps) {
 
                   {mistake.codeBad && (
                     <div className="pt-2">
-                      <span className="text-xs font-mono text-rose-400 block mb-1">
+                      <span className="text-xs font-mono text-rose-700 dark:text-rose-400 block mb-1">
                         ✗ رویکرد نادرست (Anti-pattern):
                       </span>
                       <CodeBlock
@@ -467,7 +470,7 @@ export function LessonView({ lesson }: LessonViewProps) {
 
                   {mistake.codeGood && (
                     <div className="pt-2">
-                      <span className="text-xs font-mono text-emerald-400 block mb-1">
+                      <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 block mb-1">
                         ✓ رویکرد استاندارد (Best Practice):
                       </span>
                       <CodeBlock

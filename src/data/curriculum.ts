@@ -1745,3 +1745,11 @@ REMAINING_WEEKS_TITLES.forEach((w) => {
     });
   });
 });
+
+// Keep time estimates consistent across the roadmap, search and lesson pages.
+ALL_LESSON_SUMMARIES.forEach(lesson => { lesson.estimatedMinutes = lesson.week === 1 ? 30 : 25; });
+WEEKS_META.forEach(week => {
+  const lessons = ALL_LESSON_SUMMARIES.filter(lesson => lesson.week === week.weekNumber);
+  week.lessonsCount = lessons.length;
+  week.estimatedHours = lessons.reduce((minutes, lesson) => minutes + lesson.estimatedMinutes, 0) / 60;
+});

@@ -56,13 +56,13 @@ export function NotesEditor({ lessonId }: NotesEditorProps) {
             </span>
           )}
           {status === "saved" && (
-            <span className="text-emerald-400 flex items-center gap-1 font-sans font-medium">
+            <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1 font-sans font-medium">
               <Check className="w-3 h-3" />
               ذخیره شد ✓
             </span>
           )}
           {status === "error" && (
-            <span className="text-rose-400 flex items-center gap-1 font-sans font-medium">
+            <span className="text-rose-700 dark:text-rose-400 flex items-center gap-1 font-sans font-medium">
               <AlertCircle className="w-3 h-3" />
               خطا در ذخیره
             </span>

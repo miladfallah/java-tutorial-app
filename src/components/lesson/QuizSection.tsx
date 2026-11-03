@@ -12,6 +12,8 @@ import {
 import { QuizQuestion } from "@/data/types";
 import { useAcademyStore } from "@/lib/store";
 import { toPersianDigits, cn } from "@/lib/utils";
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
+import { formatTechnicalText } from "@/lib/format-technical-text";
 
 interface QuizSectionProps {
   lessonId: string;
@@ -20,7 +22,8 @@ interface QuizSectionProps {
 
 export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
   const { progress, recordQuizResult } = useAcademyStore();
-  const existingResult = progress.quizResults[lessonId];
+  const candidate = progress.quizResults[lessonId];
+  const existingResult = candidate && quizzes.every(q => Number.isInteger(candidate.answers?.[q.id])) ? candidate : undefined;
 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>(
     existingResult?.answers || {}
@@ -30,14 +33,14 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
   // Synchronize state when lesson changes or when progress finishes loading
   useEffect(() => {
     const res = progress.quizResults[lessonId];
-    if (res) {
+    if (res && quizzes.every(q => Number.isInteger(res.answers?.[q.id]))) {
       setSelectedAnswers(res.answers || {});
       setSubmitted(true);
     } else {
       setSelectedAnswers({});
       setSubmitted(false);
     }
-  }, [lessonId, progress.quizResults]);
+  }, [lessonId, progress.quizResults, quizzes]);
 
   const handleSelectOption = (quizId: string, optionIndex: number) => {
     if (submitted) return;
@@ -101,8 +104,8 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
               className={cn(
                 "px-3 py-1.5 rounded-lg text-xs font-medium border",
                 isPassed
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-semibold"
-                  : "bg-rose-500/10 text-rose-400 border-rose-500/30 font-semibold"
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-semibold"
+                  : "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30 font-semibold"
               )}
             >
               نمره: {toPersianDigits(currentScore)} از {toPersianDigits(quizzes.length)} ({isPassed ? "قبول ✓" : "نیازمند مرور"})
@@ -154,12 +157,12 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
                   if (submitted) {
                     if (isThisCorrect) {
                       optionStyle =
-                        "border-emerald-500/60 bg-emerald-500/10 text-emerald-400 font-semibold ring-1 ring-emerald-500/30";
+                        "border-emerald-500/60 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold ring-1 ring-emerald-500/30";
                     } else if (isThisSelected && !isThisCorrect) {
                       optionStyle =
-                        "border-rose-500/60 bg-rose-500/10 text-rose-400 font-semibold ring-1 ring-rose-500/30";
+                        "border-rose-500/60 bg-rose-500/10 text-rose-700 dark:text-rose-400 font-semibold ring-1 ring-rose-500/30";
                     } else {
-                      optionStyle = "border-border/40 bg-card/40 text-muted-foreground opacity-60";
+                      optionStyle = "border-border/40 bg-card/40 text-muted-foreground";
                     }
                   } else if (isThisSelected) {
                     optionStyle =
@@ -181,7 +184,7 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
                         <span className="w-5 h-5 rounded text-xs font-mono border border-border bg-secondary text-muted-foreground flex items-center justify-center shrink-0">
                           {String.fromCharCode(65 + optIdx)}
                         </span>
-                        <span>{option}</span>
+                        <div className="min-w-0"><MarkdownRenderer content={formatTechnicalText(option)} /></div>
                       </div>
 
                       {submitted && (
@@ -212,7 +215,7 @@ export function QuizSection({ lessonId, quizzes }: QuizSectionProps) {
                   <span className="font-bold text-foreground block mb-1">
                     تحلیل و بررسی پاسخ:
                   </span>
-                  <p className="text-muted-foreground leading-relaxed">{quiz.explanation}</p>
+                  <MarkdownRenderer className="text-muted-foreground leading-relaxed" content={formatTechnicalText(quiz.explanation)} />
                 </div>
               )}
             </div>

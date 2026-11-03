@@ -27,9 +27,20 @@ export function ReaderSettingsModal({ isOpen, onClose }: ReaderSettingsModalProp
 
   // Close on Escape key
   useEffect(() => {
+    if (!isOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    const focusables = () => Array.from(modalRef.current?.querySelectorAll<HTMLElement>('button, input, select, textarea, a[href], [tabindex="0"]') || []);
+    focusables()[0]?.focus();
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
         onClose();
+      }
+      if (e.key === "Tab") {
+        const items = focusables();
+        const first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
       }
     };
     if (isOpen) {
@@ -38,7 +49,8 @@ export function ReaderSettingsModal({ isOpen, onClose }: ReaderSettingsModalProp
     }
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
     };
   }, [isOpen, onClose]);
 

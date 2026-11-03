@@ -25,8 +25,7 @@ export function Footer() {
               <span className="font-bold">Java-first Backend Engineer Academy</span>
             </div>
             <p className="text-muted-foreground leading-relaxed max-w-md text-xs sm:text-sm">
-              سامانه آموزشی مهندسی، طراحی‌شده برای توسعه‌دهندگان ارشد Node.js/NestJS. 
-              آموزش عمیق و کاربردی Java 21 LTS، Spring Boot 3.3، معماری‌های توزیع‌شده و آزمون‌های خودکار در قالب ۲۶ هفته و ۱۵۶ جلسه.
+              مسیر فارسی انتقال از Node.js/NestJS به Java 25 و Spring؛ با جلسه‌های متمرکز، تمرین عملی و منابع اختیاری.
             </p>
             <div className="text-xs text-muted-foreground font-mono">
               Self-hosted • Local Storage (IndexedDB) • Zero Cloud Dependencies
@@ -96,7 +95,7 @@ export function Footer() {
             توسعه‌یافته بر اساس استانداردهای باز و سازگار با Docker Compose.
           </div>
           <div className="font-mono">
-            Next.js 14 • Java 21 LTS • Spring Boot 3.3
+            Next.js 16 • Java 25 LTS • Spring Boot 3.5
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ export const WEEK_09_LESSONS: Lesson[] = [
     "description": "نقش EntityManager در هماهنگی بین اشیای جاوا و جداول پایگاه داده و بررسی پشت‌صحنه عملیات persist و find.",
     "category": "JPA & Hibernate",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "JPA",
       "EntityManager",
@@ -19,167 +19,93 @@ export const WEEK_09_LESSONS: Lesson[] = [
       "Persistence"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JPA & Hibernate",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 8",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار JPA Entity and EntityManager در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای آشنایی عمیق با موجودیت‌های JPA و عملکرد EntityManager",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "آیا flush یعنی تراکنش commit شده است",
+      "تفاوت persist، flush و commit را با rollback پس از flush مشاهده کن."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر JPA Entity and EntityManager تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث آشنایی عمیق با موجودیت‌های JPA و عملکرد EntityManager (JPA Entity and EntityManager) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "شناسه تولیدشده در حافظه اثبات ذخیره پایدار پس از commit نیست.",
+    "introduction": "نقش EntityManager در هماهنگی بین اشیای جاوا و جداول پایگاه داده و بررسی پشت‌صحنه عملیات persist و find.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی JPA Entity and EntityManager",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از JPA Entity and EntityManager استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از JPA Entity and EntityManager نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "Entity با هویت پایدار و lifecycle در persistence context مدیریت می‌شود. persist شیء جدید را managed می‌کند؛ تغییر شیء managed با dirty checking ذخیره می‌شود. EntityManager برای اشتراک همزمان مستقیم میان threadها نیست."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، JPA Entity and EntityManager از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش JPA Entity and EntityManager، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "تفاوت persist، flush و commit را با rollback پس از flush مشاهده کن.",
+      "solution": "شناسه تولیدشده در حافظه اثبات ذخیره پایدار پس از commit نیست."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن JPA Entity and EntityManager",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/jpaentityandentitymanager/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"JPA Entity and EntityManager\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "Order order = new Order(customerId, key);\nentityManager.persist(order);\nentityManager.flush();\n// flush sends SQL; commit still determines transaction success.",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای JPA Entity and EntityManager",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "JPA Entity and EntityManager",
+      "explanation": "Entityهای JPA مانند objectهای معمول یا DTOهای TypeScript نیستند؛ managed/detached بودن و session روی رفتار query و write اثر دارد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی JPA Entity and EntityManager بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "شناسه تولیدشده در حافظه اثبات ذخیره پایدار پس از commit نیست.",
+        "whyBad": "Entity با هویت پایدار و lifecycle در persistence context مدیریت می‌شود. persist شیء جدید را managed می‌کند؛ تغییر شیء managed با dirty checking ذخیره می‌شود. EntityManager برای اشتراک همزمان مستقیم میان threadها نیست.",
+        "solution": "خیر؛ SQL ارسال شده ولی rollback ممکن است"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با JPA Entity and EntityManager را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "شناسه تولیدشده در حافظه اثبات ذخیره پایدار پس از commit نیست.",
+      "تفاوت persist، flush و commit را با rollback پس از flush مشاهده کن."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست آشنایی عمیق با موجودیت‌های JPA و عملکرد EntityManager",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق JPA Entity and EntityManager برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "تفاوت persist، flush و commit را با rollback پس از flush مشاهده کن.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "تفاوت persist، flush و commit را با rollback پس از flush مشاهده کن.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "شناسه تولیدشده در حافظه اثبات ذخیره پایدار پس از commit نیست."
       ],
       "solution": {
+        "code": "Order order = new Order(customerId, key);\nentityManager.persist(order);\nentityManager.flush();\n// flush sends SQL; commit still determines transaction success.",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/jpaentityandentitymanager/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ SQL ارسال شده ولی rollback ممکن است. شناسه تولیدشده در حافظه اثبات ذخیره پایدار پس از commit نیست."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-049-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد JPA Entity and EntityManager در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-049",
+        "question": "آیا flush یعنی تراکنش commit شده است؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "بله؛ تمام lockها آزاد شده‌اند",
+          "خیر؛ SQL ارسال شده ولی rollback ممکن است",
+          "بله؛ flush همان commit با نام دیگر است"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-049-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-049-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "خیر؛ SQL ارسال شده ولی rollback ممکن است. Entity با هویت پایدار و lifecycle در persistence context مدیریت می‌شود. persist شیء جدید را managed می‌کند؛ تغییر شیء managed با dirty checking ذخیره می‌شود. EntityManager برای اشتراک همزمان مستقیم میان threadها نیست."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از JPA Entity and EntityManager را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: آیا flush یعنی تراکنش commit شده است؟",
+        "answer": "خیر؛ SQL ارسال شده ولی rollback ممکن است. شناسه تولیدشده در حافظه اثبات ذخیره پایدار پس از commit نیست."
       }
     ],
-    "summary": "در این جلسه مبحث آشنایی عمیق با موجودیت‌های JPA و عملکرد EntityManager را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "Entity با هویت پایدار و lifecycle در persistence context مدیریت می‌شود. persist شیء جدید را managed می‌کند؛ تغییر شیء managed با dirty checking ذخیره می‌شود. EntityManager برای اشتراک همزمان مستقیم میان threadها نیست.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 9",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های JPA Entity and EntityManager",
-      "filesToModify": [
-        "src/main/java/com/academy/order/jpaentityandentitymanager/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-050",
@@ -191,7 +117,7 @@ export const WEEK_09_LESSONS: Lesson[] = [
     "description": "نحوه کار JpaRepository، ایجاد خودکار کوئری‌ها بر اساس متدهای نام‌گذاری‌شده و مقایسه با TypeORM و Prisma.",
     "category": "JPA & Hibernate",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Spring Data JPA",
       "Repositories",
@@ -199,167 +125,93 @@ export const WEEK_09_LESSONS: Lesson[] = [
       "Nest Comparison"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JPA & Hibernate",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 8",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Spring Data JPA در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای ساده‌سازی دسترسی به داده‌ها با Spring Data JPA",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "پس از merge کدام نمونه را باید مبنا گرفت",
+      "برای صفحه خالی و پر query را با دیتابیس واقعی تست کن؛ حد page size اعمال کن."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Spring Data JPA تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث ساده‌سازی دسترسی به داده‌ها با Spring Data JPA (Spring Data JPA) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "save را برای هر تغییر ساده entity managed بی‌دلیل فراخوانی نکن.",
+    "introduction": "نحوه کار JpaRepository، ایجاد خودکار کوئری‌ها بر اساس متدهای نام‌گذاری‌شده و مقایسه با TypeORM و Prisma.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Spring Data JPA",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Spring Data JPA استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Spring Data JPA نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "Spring Data پیاده‌سازی repository را تولید می‌کند؛ query derivation از نام متد قرارداد مشخص می‌سازد. save بسته به وضعیت entity ممکن است persist یا merge کند؛ merge نمونه managed برمی‌گرداند."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Spring Data JPA از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Spring Data JPA، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "برای صفحه خالی و پر query را با دیتابیس واقعی تست کن؛ حد page size اعمال کن.",
+      "solution": "save را برای هر تغییر ساده entity managed بی‌دلیل فراخوانی نکن."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Spring Data JPA",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/springdatajpa/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Spring Data JPA\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "interface OrderRepository extends JpaRepository<Order, UUID> {\n    Page<Order> findByCustomerId(String customerId, Pageable page);\n}",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Spring Data JPA",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Spring Data JPA",
+      "explanation": "Entityهای JPA مانند objectهای معمول یا DTOهای TypeScript نیستند؛ managed/detached بودن و session روی رفتار query و write اثر دارد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Spring Data JPA بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "save را برای هر تغییر ساده entity managed بی‌دلیل فراخوانی نکن.",
+        "whyBad": "Spring Data پیاده‌سازی repository را تولید می‌کند؛ query derivation از نام متد قرارداد مشخص می‌سازد. save بسته به وضعیت entity ممکن است persist یا merge کند؛ merge نمونه managed برمی‌گرداند.",
+        "solution": "نمونه managed بازگشتی"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Spring Data JPA را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "save را برای هر تغییر ساده entity managed بی‌دلیل فراخوانی نکن.",
+      "برای صفحه خالی و پر query را با دیتابیس واقعی تست کن؛ حد page size اعمال کن."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست ساده‌سازی دسترسی به داده‌ها با Spring Data JPA",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Spring Data JPA برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "برای صفحه خالی و پر query را با دیتابیس واقعی تست کن؛ حد page size اعمال کن.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "برای صفحه خالی و پر query را با دیتابیس واقعی تست کن؛ حد page size اعمال کن.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "save را برای هر تغییر ساده entity managed بی‌دلیل فراخوانی نکن."
       ],
       "solution": {
+        "code": "interface OrderRepository extends JpaRepository<Order, UUID> {\n    Page<Order> findByCustomerId(String customerId, Pageable page);\n}",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/springdatajpa/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. نمونه managed بازگشتی. save را برای هر تغییر ساده entity managed بی‌دلیل فراخوانی نکن."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-050-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Spring Data JPA در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-050",
+        "question": "پس از merge کدام نمونه را باید مبنا گرفت؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "همیشه شیء detached ورودی",
+          "هر دو بدون توجه به context یکسان‌اند",
+          "نمونه managed بازگشتی"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-050-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-050-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "نمونه managed بازگشتی. Spring Data پیاده‌سازی repository را تولید می‌کند؛ query derivation از نام متد قرارداد مشخص می‌سازد. save بسته به وضعیت entity ممکن است persist یا merge کند؛ merge نمونه managed برمی‌گرداند."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Spring Data JPA را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: پس از merge کدام نمونه را باید مبنا گرفت؟",
+        "answer": "نمونه managed بازگشتی. save را برای هر تغییر ساده entity managed بی‌دلیل فراخوانی نکن."
       }
     ],
-    "summary": "در این جلسه مبحث ساده‌سازی دسترسی به داده‌ها با Spring Data JPA را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "Spring Data پیاده‌سازی repository را تولید می‌کند؛ query derivation از نام متد قرارداد مشخص می‌سازد. save بسته به وضعیت entity ممکن است persist یا merge کند؛ merge نمونه managed برمی‌گرداند.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 9",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Spring Data JPA",
-      "filesToModify": [
-        "src/main/java/com/academy/order/springdatajpa/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-051",
@@ -371,174 +223,100 @@ export const WEEK_09_LESSONS: Lesson[] = [
     "description": "طراحی کلیدهای اصلی (UUID در برابر Sequence)، جداول نرمال‌شده و قیود یکپارچگی ارجاعی (Foreign Keys).",
     "category": "JPA & Hibernate",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Data Modeling",
       "UUID vs Sequence",
       "Database Design"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JPA & Hibernate",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 8",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Relational Data Modeling در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای مدل‌سازی اصولی داده‌های رابطه‌ای برای سرویس‌های مالی و فروشگاهی",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "چرا CHECK علاوه بر validation اپ مفید است",
+      "درج quantity صفر و order_id ناموجود را مستقیم در SQL امتحان کن؛ DB باید رد کند."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Relational Data Modeling تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث مدل‌سازی اصولی داده‌های رابطه‌ای برای سرویس‌های مالی و فروشگاهی (Relational Data Modeling) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "قواعد cross-row مانند کل موجودی با CHECK ساده یک ردیف حل نمی‌شوند.",
+    "introduction": "طراحی کلیدهای اصلی (UUID در برابر Sequence)، جداول نرمال‌شده و قیود یکپارچگی ارجاعی (Foreign Keys).",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Relational Data Modeling",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Relational Data Modeling استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Relational Data Modeling نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "مدل رابطه‌ای باید invariant را با constraint هم محافظت کند. مقدار پول numeric، تعداد integer مثبت و رابطه با foreign key مشخص شود. soft delete یا cascade باید با سیاست حذف دامنه هماهنگ باشد."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Relational Data Modeling از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Relational Data Modeling، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "درج quantity صفر و order_id ناموجود را مستقیم در SQL امتحان کن؛ DB باید رد کند.",
+      "solution": "قواعد cross-row مانند کل موجودی با CHECK ساده یک ردیف حل نمی‌شوند."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Relational Data Modeling",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/relationaldatamodeling/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Relational Data Modeling\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "sql",
+        "code": "CREATE TABLE order_items (\n id uuid PRIMARY KEY, order_id uuid NOT NULL REFERENCES orders(id),\n quantity integer NOT NULL CHECK (quantity > 0),\n unit_price numeric(19,2) NOT NULL CHECK (unit_price >= 0)\n);",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Relational Data Modeling",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Relational Data Modeling",
+      "explanation": "Entityهای JPA مانند objectهای معمول یا DTOهای TypeScript نیستند؛ managed/detached بودن و session روی رفتار query و write اثر دارد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Relational Data Modeling بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "قواعد cross-row مانند کل موجودی با CHECK ساده یک ردیف حل نمی‌شوند.",
+        "whyBad": "مدل رابطه‌ای باید invariant را با constraint هم محافظت کند. مقدار پول numeric، تعداد integer مثبت و رابطه با foreign key مشخص شود. soft delete یا cascade باید با سیاست حذف دامنه هماهنگ باشد.",
+        "solution": "تمام نویسنده‌های دیتابیس را زیر یک invariant می‌آورد"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Relational Data Modeling را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "قواعد cross-row مانند کل موجودی با CHECK ساده یک ردیف حل نمی‌شوند.",
+      "درج quantity صفر و order_id ناموجود را مستقیم در SQL امتحان کن؛ DB باید رد کند."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست مدل‌سازی اصولی داده‌های رابطه‌ای برای سرویس‌های مالی و فروشگاهی",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Relational Data Modeling برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "درج quantity صفر و order_id ناموجود را مستقیم در SQL امتحان کن؛ DB باید رد کند.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "درج quantity صفر و order_id ناموجود را مستقیم در SQL امتحان کن؛ DB باید رد کند.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "قواعد cross-row مانند کل موجودی با CHECK ساده یک ردیف حل نمی‌شوند."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/relationaldatamodeling/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "CREATE TABLE order_items (\n id uuid PRIMARY KEY, order_id uuid NOT NULL REFERENCES orders(id),\n quantity integer NOT NULL CHECK (quantity > 0),\n unit_price numeric(19,2) NOT NULL CHECK (unit_price >= 0)\n);",
+        "language": "sql",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. تمام نویسنده‌های دیتابیس را زیر یک invariant می‌آورد. قواعد cross-row مانند کل موجودی با CHECK ساده یک ردیف حل نمی‌شوند."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-051-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Relational Data Modeling در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-051",
+        "question": "چرا CHECK علاوه بر validation اپ مفید است؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "تمام نویسنده‌های دیتابیس را زیر یک invariant می‌آورد",
+          "جایگزین کامل authorization است",
+          "نیاز به تراکنش را حذف می‌کند"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-051-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-051-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "تمام نویسنده‌های دیتابیس را زیر یک invariant می‌آورد. مدل رابطه‌ای باید invariant را با constraint هم محافظت کند. مقدار پول numeric، تعداد integer مثبت و رابطه با foreign key مشخص شود. soft delete یا cascade باید با سیاست حذف دامنه هماهنگ باشد."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Relational Data Modeling را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: چرا CHECK علاوه بر validation اپ مفید است؟",
+        "answer": "تمام نویسنده‌های دیتابیس را زیر یک invariant می‌آورد. قواعد cross-row مانند کل موجودی با CHECK ساده یک ردیف حل نمی‌شوند."
       }
     ],
-    "summary": "در این جلسه مبحث مدل‌سازی اصولی داده‌های رابطه‌ای برای سرویس‌های مالی و فروشگاهی را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "مدل رابطه‌ای باید invariant را با constraint هم محافظت کند. مقدار پول numeric، تعداد integer مثبت و رابطه با foreign key مشخص شود. soft delete یا cascade باید با سیاست حذف دامنه هماهنگ باشد.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 9",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Relational Data Modeling",
-      "filesToModify": [
-        "src/main/java/com/academy/order/relationaldatamodeling/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-052",
@@ -550,7 +328,7 @@ export const WEEK_09_LESSONS: Lesson[] = [
     "description": "نگاشت جداول سفارشات و اقلام با رعایت انکپسولیشن دامنه و متدهای کمکی جهت اتصال پایدار داده‌ها.",
     "category": "JPA & Hibernate",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Capstone",
       "JPA Entities",
@@ -558,167 +336,93 @@ export const WEEK_09_LESSONS: Lesson[] = [
       "OrderItem"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JPA & Hibernate",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 8",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Implementing Order and OrderItem Entities در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای پیاده‌سازی موجودیت‌های Order و OrderItem با JPA (پروژه محوری)",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "mappedBy به چه چیزی اشاره می‌کند",
+      "یک Order با دو item ذخیره و در context تازه بخوان؛ foreign key و حذف item را بررسی کن."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Implementing Order and OrderItem Entities تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث پیاده‌سازی موجودیت‌های Order و OrderItem با JPA (پروژه محوری) (Implementing Order and OrderItem Entities) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "CascadeType.ALL را بی‌فکر روی رابطه به موجودیت مستقل مثل Product نگذار.",
+    "introduction": "نگاشت جداول سفارشات و اقلام با رعایت انکپسولیشن دامنه و متدهای کمکی جهت اتصال پایدار داده‌ها.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Implementing Order and OrderItem Entities",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Implementing Order and OrderItem Entities استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Implementing Order and OrderItem Entities نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "مالک رابطه JPA سمتی است که foreign key را کنترل می‌کند؛ mappedBy سمت معکوس است. متد دامنه باید دو سمت ارتباط حافظه‌ای را هماهنگ نگه دارد. cascade چرخه persistence را کنترل می‌کند، نه fetch."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Implementing Order and OrderItem Entities از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Implementing Order and OrderItem Entities، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "یک Order با دو item ذخیره و در context تازه بخوان؛ foreign key و حذف item را بررسی کن.",
+      "solution": "CascadeType.ALL را بی‌فکر روی رابطه به موجودیت مستقل مثل Product نگذار."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Implementing Order and OrderItem Entities",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/implementingorderandorderitementities/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Implementing Order and OrderItem Entities\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "void addItem(OrderItem item) {\n    items.add(item);\n    item.setOrder(this);\n}\n// @OneToMany(mappedBy=\"order\", cascade=CascadeType.ALL)",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Implementing Order and OrderItem Entities",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Implementing Order and OrderItem Entities",
+      "explanation": "Entityهای JPA مانند objectهای معمول یا DTOهای TypeScript نیستند؛ managed/detached بودن و session روی رفتار query و write اثر دارد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Implementing Order and OrderItem Entities بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "CascadeType.ALL را بی‌فکر روی رابطه به موجودیت مستقل مثل Product نگذار.",
+        "whyBad": "مالک رابطه JPA سمتی است که foreign key را کنترل می‌کند؛ mappedBy سمت معکوس است. متد دامنه باید دو سمت ارتباط حافظه‌ای را هماهنگ نگه دارد. cascade چرخه persistence را کنترل می‌کند، نه fetch.",
+        "solution": "نام فیلد رابطه در سمت مالک"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Implementing Order and OrderItem Entities را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "CascadeType.ALL را بی‌فکر روی رابطه به موجودیت مستقل مثل Product نگذار.",
+      "یک Order با دو item ذخیره و در context تازه بخوان؛ foreign key و حذف item را بررسی کن."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست پیاده‌سازی موجودیت‌های Order و OrderItem با JPA (پروژه محوری)",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Implementing Order and OrderItem Entities برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "یک Order با دو item ذخیره و در context تازه بخوان؛ foreign key و حذف item را بررسی کن.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "یک Order با دو item ذخیره و در context تازه بخوان؛ foreign key و حذف item را بررسی کن.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "CascadeType.ALL را بی‌فکر روی رابطه به موجودیت مستقل مثل Product نگذار."
       ],
       "solution": {
+        "code": "void addItem(OrderItem item) {\n    items.add(item);\n    item.setOrder(this);\n}\n// @OneToMany(mappedBy=\"order\", cascade=CascadeType.ALL)",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/implementingorderandorderitementities/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. نام فیلد رابطه در سمت مالک. CascadeType.ALL را بی‌فکر روی رابطه به موجودیت مستقل مثل Product نگذار."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-052-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Implementing Order and OrderItem Entities در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-052",
+        "question": "mappedBy به چه چیزی اشاره می‌کند؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "نام جدول دیتابیس",
+          "نام فیلد رابطه در سمت مالک",
+          "نام schema پیش‌فرض PostgreSQL"
         ],
         "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-052-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-052-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "explanation": "نام فیلد رابطه در سمت مالک. مالک رابطه JPA سمتی است که foreign key را کنترل می‌کند؛ mappedBy سمت معکوس است. متد دامنه باید دو سمت ارتباط حافظه‌ای را هماهنگ نگه دارد. cascade چرخه persistence را کنترل می‌کند، نه fetch."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Implementing Order and OrderItem Entities را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: mappedBy به چه چیزی اشاره می‌کند؟",
+        "answer": "نام فیلد رابطه در سمت مالک. CascadeType.ALL را بی‌فکر روی رابطه به موجودیت مستقل مثل Product نگذار."
       }
     ],
-    "summary": "در این جلسه مبحث پیاده‌سازی موجودیت‌های Order و OrderItem با JPA (پروژه محوری) را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "مالک رابطه JPA سمتی است که foreign key را کنترل می‌کند؛ mappedBy سمت معکوس است. متد دامنه باید دو سمت ارتباط حافظه‌ای را هماهنگ نگه دارد. cascade چرخه persistence را کنترل می‌کند، نه fetch.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 9",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Implementing Order and OrderItem Entities",
-      "filesToModify": [
-        "src/main/java/com/academy/order/implementingorderandorderitementities/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-053",
@@ -730,7 +434,7 @@ export const WEEK_09_LESSONS: Lesson[] = [
     "description": "تفاوت بنیادی LAZY و EAGER، قوانین پیشگیری از بارگذاری‌های ناخواسته و تنظیمات بازگشت دوطرفه روابط.",
     "category": "JPA & Hibernate",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "Relationships",
       "OneToMany",
@@ -738,167 +442,93 @@ export const WEEK_09_LESSONS: Lesson[] = [
       "Lazy Loading"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JPA & Hibernate",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 8",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار Entity Relationships and Fetch Types در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای روابط میان موجودیت‌ها (@OneToMany و @ManyToOne) و Fetch Types",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "LAZY به تنهایی N+1 را حل می‌کند",
+      "خروجی endpoint را به DTO تبدیل کن و تعداد queryها را بشمار؛ JSON نباید چرخه روابط بسازد."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر Entity Relationships and Fetch Types تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث روابط میان موجودیت‌ها (@OneToMany و @ManyToOne) و Fetch Types (Entity Relationships and Fetch Types) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "فعال‌کردن OSIV برای پنهان‌کردن LazyInitializationException می‌تواند query را تا لایه نمایش نشت دهد.",
+    "introduction": "تفاوت بنیادی LAZY و EAGER، قوانین پیشگیری از بارگذاری‌های ناخواسته و تنظیمات بازگشت دوطرفه روابط.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی Entity Relationships and Fetch Types",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از Entity Relationships and Fetch Types استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از Entity Relationships and Fetch Types نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "LAZY هدف را تا زمان نیاز بارگذاری می‌کند، اما تضمین حذف query اضافی نیست. در ManyToOne پیش‌فرض JPA برابر EAGER است؛ fetch plan هر use case را صریح طراحی کن. بیرون تراکنش DTO بساز، نه رابطه lazy فعال کن."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، Entity Relationships and Fetch Types از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش Entity Relationships and Fetch Types، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "خروجی endpoint را به DTO تبدیل کن و تعداد queryها را بشمار؛ JSON نباید چرخه روابط بسازد.",
+      "solution": "فعال‌کردن OSIV برای پنهان‌کردن LazyInitializationException می‌تواند query را تا لایه نمایش نشت دهد."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن Entity Relationships and Fetch Types",
+        "title": "نمونهٔ آموزشی متمرکز",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/entityrelationshipsandfetchtypes/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"Entity Relationships and Fetch Types\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "code": "@ManyToOne(fetch = FetchType.LAZY, optional = false)\n@JoinColumn(name = \"order_id\", nullable = false)\nprivate Order order;",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای Entity Relationships and Fetch Types",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "Entity Relationships and Fetch Types",
+      "explanation": "Entityهای JPA مانند objectهای معمول یا DTOهای TypeScript نیستند؛ managed/detached بودن و session روی رفتار query و write اثر دارد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی Entity Relationships and Fetch Types بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "فعال‌کردن OSIV برای پنهان‌کردن LazyInitializationException می‌تواند query را تا لایه نمایش نشت دهد.",
+        "whyBad": "LAZY هدف را تا زمان نیاز بارگذاری می‌کند، اما تضمین حذف query اضافی نیست. در ManyToOne پیش‌فرض JPA برابر EAGER است؛ fetch plan هر use case را صریح طراحی کن. بیرون تراکنش DTO بساز، نه رابطه lazy فعال کن.",
+        "solution": "خیر؛ دسترسی در حلقه همچنان query اضافی می‌سازد"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با Entity Relationships and Fetch Types را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "فعال‌کردن OSIV برای پنهان‌کردن LazyInitializationException می‌تواند query را تا لایه نمایش نشت دهد.",
+      "خروجی endpoint را به DTO تبدیل کن و تعداد queryها را بشمار؛ JSON نباید چرخه روابط بسازد."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست روابط میان موجودیت‌ها (@OneToMany و @ManyToOne) و Fetch Types",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق Entity Relationships and Fetch Types برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "خروجی endpoint را به DTO تبدیل کن و تعداد queryها را بشمار؛ JSON نباید چرخه روابط بسازد.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "خروجی endpoint را به DTO تبدیل کن و تعداد queryها را بشمار؛ JSON نباید چرخه روابط بسازد.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "فعال‌کردن OSIV برای پنهان‌کردن LazyInitializationException می‌تواند query را تا لایه نمایش نشت دهد."
       ],
       "solution": {
+        "code": "@ManyToOne(fetch = FetchType.LAZY, optional = false)\n@JoinColumn(name = \"order_id\", nullable = false)\nprivate Order order;",
         "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/entityrelationshipsandfetchtypes/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. خیر؛ دسترسی در حلقه همچنان query اضافی می‌سازد. فعال‌کردن OSIV برای پنهان‌کردن LazyInitializationException می‌تواند query را تا لایه نمایش نشت دهد."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-053-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد Entity Relationships and Fetch Types در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-053",
+        "question": "LAZY به تنهایی N+1 را حل می‌کند؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "بله؛ همه رابطه‌ها در یک query می‌آیند",
+          "بله؛ entity دیگر نیاز به transaction ندارد",
+          "خیر؛ دسترسی در حلقه همچنان query اضافی می‌سازد"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-053-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-053-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 2,
+        "explanation": "خیر؛ دسترسی در حلقه همچنان query اضافی می‌سازد. LAZY هدف را تا زمان نیاز بارگذاری می‌کند، اما تضمین حذف query اضافی نیست. در ManyToOne پیش‌فرض JPA برابر EAGER است؛ fetch plan هر use case را صریح طراحی کن. بیرون تراکنش DTO بساز، نه رابطه lazy فعال کن."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از Entity Relationships and Fetch Types را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: LAZY به تنهایی N+1 را حل می‌کند؟",
+        "answer": "خیر؛ دسترسی در حلقه همچنان query اضافی می‌سازد. فعال‌کردن OSIV برای پنهان‌کردن LazyInitializationException می‌تواند query را تا لایه نمایش نشت دهد."
       }
     ],
-    "summary": "در این جلسه مبحث روابط میان موجودیت‌ها (@OneToMany و @ManyToOne) و Fetch Types را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "LAZY هدف را تا زمان نیاز بارگذاری می‌کند، اما تضمین حذف query اضافی نیست. در ManyToOne پیش‌فرض JPA برابر EAGER است؛ fetch plan هر use case را صریح طراحی کن. بیرون تراکنش DTO بساز، نه رابطه lazy فعال کن.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 9",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های Entity Relationships and Fetch Types",
-      "filesToModify": [
-        "src/main/java/com/academy/order/entityrelationshipsandfetchtypes/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   },
   {
     "id": "lesson-054",
@@ -910,173 +540,99 @@ export const WEEK_09_LESSONS: Lesson[] = [
     "description": "راه‌اندازی سرور پایگاه داده PostgreSQL، پیکربندی والیوم‌های دائمی و ارتباط پایدار با اپلیکیشن اسپرینگ.",
     "category": "JPA & Hibernate",
     "difficulty": "Intermediate",
-    "estimatedMinutes": 30,
+    "estimatedMinutes": 25,
     "tags": [
       "PostgreSQL",
       "Docker Compose",
       "Database Setup"
     ],
     "prerequisites": [
-      "آشنایی با مبانی JPA & Hibernate",
-      "تجربه کار با سیستم‌های توزیع‌شده و میکروسرویس در Node.js/NestJS"
+      "مفاهیم و تمرین‌های هفته 8",
+      "توانایی خواندن کد TypeScript و نوشتن تست بک‌اند"
     ],
     "learningObjectives": [
-      "درک عمیق سازوکار PostgreSQL with Docker در اکوسیستم مدرن جاوا ۲۱",
-      "پیاده‌سازی استانداردهای صنعتی و سناریوهای پروداکشن برای اجرا و پیکربندی پروداکشن PostgreSQL با Docker Compose",
-      "شناخت و پیشگیری از گلوگاه‌های پرفورمنس، نشت حافظه و باگ‌های همزمانی",
-      "تطبیق تفاوت‌های معماری و پارادایم این مبحث با پیاده‌سازی‌های معادل در NestJS"
+      "hostname دیتابیس از container اپ در Compose چیست",
+      "از container اپ به db:5432 وصل شو؛ پس از restart داده بماند و رمز نمونه وارد production نشود."
     ],
-    "whyItMatters": "در پروژه‌های عظیم سازمانی با میلیون‌ها تراکنش، تسلط بر PostgreSQL with Docker تفاوت میان یک سرویس پایدار با تاخیر زیر ۱۰ میلی‌ثانیه و یک سیستم کرش‌کننده است. به عنوان مهندس بک‌اند باسابقه نودجی‌اس، شناخت این جزئیات امکان تصمیم‌گیری‌های هوشمندانه معماری را فراهم می‌سازد.",
-    "introduction": "مبحث اجرا و پیکربندی پروداکشن PostgreSQL با Docker Compose (PostgreSQL with Docker) یکی از پایه‌های حیاتی برای توسعه سرویس‌های پایدار سازمانی در جاوا است.\nدر اکوسیستم Node.js و NestJS، بسیاری از دغدغه‌های مربوط به این مفهوم یا توسط تک‌رشته‌ای بودن Event Loop ساده‌سازی می‌شد و یا نیازمند پکیج‌های شخص ثالث متعدد بود.\nاما در دنیای جاوا و اسپرینگ‌بوت، این سازوکار به شکل استاندارد، کپسوله‌شده و با نظارت دقیق ماشین مجازی مدیریت می‌گردد. در این درس ساختار داخلی، نمونه کدهای اجرایی پروداکشن، تله‌های متداول و سوالات مصاحبه ارشد آن را کالبدشکافی خواهیم کرد.",
+    "whyItMatters": "حذف volume داده را حذف می‌کند؛ قبل از عملیات پاک‌سازی backup را جدی بگیر.",
+    "introduction": "راه‌اندازی سرور پایگاه داده PostgreSQL، پیکربندی والیوم‌های دائمی و ارتباط پایدار با اپلیکیشن اسپرینگ.",
     "conceptualSections": [
       {
-        "title": "مبانی و معماری زیربنایی PostgreSQL with Docker",
-        "content": "برای تسلط بر این مبحث، ابتدا باید نقش آن را در جریان اجرای درخواست (Execution Pipeline) بشناسیم.\nدر جاوا، تمام تعاملات بر پایه قراردادهای صلب و تایپ‌سیف شکل می‌گیرند. وقتی از PostgreSQL with Docker استفاده می‌کنید، سیستم به جای حدس‌زدن ساختار داده‌ها، قواعد تجاری را در فاز کامپایل و زمان اجرا با بالاترین دقت اعتبارسنجی می‌کند.\n\nاین رویکرد تضمین می‌کند که سیستم در زمان جهش‌های ترافیکی ناگهانی (Traffic Spikes) رفتار پیش‌بینی‌پذیری از خود نشان دهد و منابع حافظه سرور دچار هدررفت نشوند.",
-        "keyPoints": [
-          "تطابق ۱۰۰ درصدی با استانداردهای مدرن Java 21 LTS",
-          "جداسازی لایه‌های مسئولیت و پیشگیری از نشت کدهای زیرساخت به لایه دامنه بیزینس",
-          "کاهش چشمگیر خطاهای زمان اجرا (Runtime Errors) با تکیه بر بررسی‌های ایستا"
-        ]
-      },
-      {
-        "title": "الگوهای کاربردی در محیط پروداکشن و سناریوهای تجاری",
-        "content": "در دنیای واقعی، استفاده از PostgreSQL with Docker نیازمند در نظر گرفتن مصالحه‌های مهندسی (Trade-offs) نظیر تاخیر شبکه، مصرف حافظه و سادگی نگهداری است.\nدر سیستم مدیریت سفارشات و انبار، هرگونه ناهماهنگی در این بخش می‌تواند منجر به محاسبات اشتباه مالی، رزروهای تکراری یا کندی در ثبت سفارشات خریداران شود. بنابراین باید از الگوهای اثبات‌شده و کتابخانه‌های استاندارد اکوسیستم استفاده کرد.",
-        "keyPoints": [
-          "پرهیز از پیچیدگی‌های زودرس (Premature Optimization)",
-          "استفاده از تنظیمات پیش‌فرض بهینه و بازنویسی تنها در صورت وجود متریک‌های مشخص پروفایلینگ"
-        ]
+        "title": "مدل ذهنی و رفتار واقعی",
+        "content": "برای توسعه DB را با volume پایدار و healthcheck اجرا کن. داخل شبکه Compose نام سرویس hostname است؛ localhost در container به خودش اشاره دارد. version دیتابیس را مشخص و تغییر major را با migration مدیریت کن."
       }
     ],
-    "internalsAndMechanisms": "از منظر کالبدشکافی داخلی، PostgreSQL with Docker از طریق مکانیزم‌های بایت‌کد، بازتاب (Reflection)، پروکسی‌های داینامیک یا ساختارهای داده بهینه در سطح هسته JVM هدایت می‌شود. این معماری تضمین می‌کند که سربار پردازشی به حداقل برسد و بهینه‌سازی‌های لحظه‌ای کامپایلر JIT به حداکثر کارایی دست یابند.",
     "realWorldScenario": {
-      "scenario": "در جریان جشنواره فروش، سرویس تحت بار سنگین ۵۰۰۰ درخواست بر ثانیه قرار می‌گیرد و به دلیل پیکربندی نامناسب در بخش PostgreSQL with Docker، صف‌های پردازشی دچار اشباع شده و زمان پاسخدهی به شدت بالا می‌رود.",
-      "solution": "با بازطراحی فرآیند بر اساس اصول مطرح شده در این درس، جداسازی ظرفیت پردازش و اعمال الگوهای غیرانسدادی و کشینگ هدفمند، تاخیر پاسخ از ۳ ثانیه به زیر ۴۵ میلی‌ثانیه کاهش یافته و گلوگاه برطرف می‌شود."
+      "scenario": "از container اپ به db:5432 وصل شو؛ پس از restart داده بماند و رمز نمونه وارد production نشود.",
+      "solution": "حذف volume داده را حذف می‌کند؛ قبل از عملیات پاک‌سازی backup را جدی بگیر."
     },
     "codeExamples": [
       {
-        "title": "پیاده‌سازی پروداکشن PostgreSQL with Docker",
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/postgresqlwithdocker/StandardImplementation.java",
-        "explanation": "نمونه کد کامل و استاندارد سازمانی متناسب با الگوهای مدرن جاوا و پروژه مدیریت سفارشات.",
-        "code": "package com.academy.order;\n\nimport java.util.Objects;\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class StandardImplementation {\n\n    private static final Logger log = LoggerFactory.getLogger(StandardImplementation.class);\n\n    private final String moduleName;\n\n    public StandardImplementation(String moduleName) {\n        this.moduleName = Objects.requireNonNull(moduleName, \"نام ماژول نمی‌تواند خالی باشد\");\n        log.info(\"ماژول {} بر پایه اصول {} مقداردهی اولیه شد.\", moduleName, \"PostgreSQL with Docker\");\n    }\n\n    public void executeOperation(String contextId) {\n        log.debug(\"آغاز پردازش برای شناسه: {}\", contextId);\n        // منطق پردازش سازمانی منطبق بر استانداردهای این درس\n        log.info(\"عملیات با موفقیت پایان یافت.\");\n    }\n}"
+        "title": "نمونهٔ آموزشی متمرکز",
+        "language": "yaml",
+        "code": "services:\n  db:\n    image: postgres:17\n    environment:\n      POSTGRES_DB: orders\n      POSTGRES_PASSWORD: local-only\n    volumes:\n      - db_data:/var/lib/postgresql/data\nvolumes:\n  db_data:",
+        "explanation": "این قطعه بخش مرتبط با موضوع را نشان می‌دهد؛ مگر کد مستقل CLI، در کلاس/پروژه و با importها و وابستگی‌های همان موضوع قرار می‌گیرد. نمونهٔ کامل production یا اثبات اجرای مستقل نیست."
       }
     ],
     "comparisonWithNestJS": {
-      "nestConcept": "الگوی معادل در NestJS / TypeScript برای PostgreSQL with Docker",
-      "javaConcept": "الگوی پیاده‌سازی رسمی در Java / Spring Boot",
-      "explanation": "در NestJS این وظیفه معمولاً با دکوراتورهای تایپ‌اسکریپت و میدل‌ورهای اکسپرس یا فستیفای مدیریت می‌شود که در رانتایم تک‌رشته‌ای نود اجرا می‌گردند. در جاوا، این مکانیزم با تکیه بر سیستم چندرشته‌ای واقعی، انوتیشن‌های بایت‌کد و پروکسی‌های رانتایم اسپرینگ پیاده‌سازی می‌شود.",
-      "nestCode": "// در NestJS\n@Injectable()\nexport class NestService {\n  process() {\n    // پیاده‌سازی مبتنی بر Promise و Event Loop\n  }\n}",
-      "javaCode": "// در Spring Boot / Java\n@Service\npublic class SpringService {\n    public void process() {\n        // پیاده‌سازی مبتنی بر Thread Pool و مدیریت تراکنش سازمانی\n    }\n}"
+      "nestConcept": "تجربهٔ Node.js / NestJS",
+      "javaConcept": "PostgreSQL with Docker",
+      "explanation": "Entityهای JPA مانند objectهای معمول یا DTOهای TypeScript نیستند؛ managed/detached بودن و session روی رفتار query و write اثر دارد."
     },
     "commonMistakes": [
       {
-        "mistake": "تلاش برای پیاده‌سازی PostgreSQL with Docker بدون در نظر گرفتن شرایط همزمانی (Concurrency) و مدیریت حافظه",
-        "whyBad": "در محیط چندرشته‌ای جاوا، دسترسی بدون قفل یا عدم استفاده از ساختارهای تغییرناپذیر منجر به خطاهای کشنده Race Condition و داده‌های فاسد می‌شود.",
-        "solution": "همیشه از اشیای تغییرناپذیر، کلاس‌های اتمیک یا انتزاع‌های استاندارد فریم‌ورک استفاده کنید.",
-        "codeBad": "// اشتراک وضعیت مشترک بدون محافظت در محیط چندرشته‌ای\npublic class UnsafeService {\n    private int counter = 0; // خطرناک!\n}",
-        "codeGood": "// استفاده از ساختارهای اتمیک و امن\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class SafeService {\n    private final AtomicInteger counter = new AtomicInteger(0);\n}"
+        "mistake": "حذف volume داده را حذف می‌کند؛ قبل از عملیات پاک‌سازی backup را جدی بگیر.",
+        "whyBad": "برای توسعه DB را با volume پایدار و healthcheck اجرا کن. داخل شبکه Compose نام سرویس hostname است؛ localhost در container به خودش اشاره دارد. version دیتابیس را مشخص و تغییر major را با migration مدیریت کن.",
+        "solution": "نام سرویس مانند db"
       }
     ],
     "bestPractices": [
-      "همواره کدهای مرتبط با PostgreSQL with Docker را با تست‌های واحد جامع پوشش دهید.",
-      "از انوتیشن‌ها و قابلیت‌های استاندارد فریم‌ورک به جای اختراع مجدد چرخ استفاده کنید.",
-      "لاگ‌های عملیاتی را با پارامترهای مشخص و کلیدهای رهگیری (Trace ID) ثبت کنید.",
-      "همواره متریک‌های کارایی و نرخ مصرف منابع را در داشبوردهای مانیتورینگ ارزیابی نمایید."
+      "حذف volume داده را حذف می‌کند؛ قبل از عملیات پاک‌سازی backup را جدی بگیر.",
+      "از container اپ به db:5432 وصل شو؛ پس از restart داده بماند و رمز نمونه وارد production نشود."
     ],
     "exercise": {
-      "title": "تمرین کارگاهی پیاده‌سازی و تست اجرا و پیکربندی پروداکشن PostgreSQL با Docker Compose",
-      "instructions": "۱. کلاسی جهت پیاده‌سازی منطق PostgreSQL with Docker برای ماژول سفارشات ایجاد کنید.\n۲. قوانین اعتبارسنجی ورودی و رفتارهای خطای استاندارد را در آن اعمال نمایید.\n۳. یک تست واحد بنویسید که هر دو سناریوی موفقیت و شرایط مرزی خطا را به صورت مستقل اعتبارسنجی کند.",
-      "expectedOutput": "تست واحد با موفقیت اجرا شده و گزارش قبولی ۱۰۰ درصدی ارزیابی صادر شود.",
+      "title": "تمرین اصلی · حدود ۱۵ دقیقه",
+      "instructions": "از container اپ به db:5432 وصل شو؛ پس از restart داده بماند و رمز نمونه وارد production نشود.",
       "acceptanceCriteria": [
-        "کد با جاوا ۲۱ سازگار بوده و بدون خطای کامپایل اجرا شود.",
-        "مدیریت خطاهای غیاب داده یا شرایط نامعتبر با پرتاب استثنای معنادار صورت گیرد.",
-        "تست‌های واحد تمامی مسیرهای انشعاب شرطی را پوشش دهند."
+        "از container اپ به db:5432 وصل شو؛ پس از restart داده بماند و رمز نمونه وارد production نشود.",
+        "نتیجهٔ مشاهده‌شده را با یک تست یا فرمان قابل تکرار ثبت کن؛ صرف اجرا یا نبود exception، قبولی نیست."
       ],
       "hints": [
-        "از قابلیت‌های تایپ‌سیف جاوا و پکیج java.util استفاده کنید.",
-        "برای تست از فریم‌ورک JUnit 5 بهره ببرید."
+        "حذف volume داده را حذف می‌کند؛ قبل از عملیات پاک‌سازی backup را جدی بگیر."
       ],
       "solution": {
-        "language": "java",
-        "filename": "src/main/java/com/academy/order/exercise/postgresqlwithdocker/Solution.java",
-        "explanation": "پیاده‌سازی مرجع تمرین با کپسوله‌سازی کامل و رعایت اصول مهندسی نرم‌افزار تمیز.",
-        "code": "package com.academy.order.exercise;\n\npublic class Solution {\n    public boolean validateAndExecute(String input) {\n        if (input == null || input.isBlank()) {\n            throw new IllegalArgumentException(\"ورودی نامعتبر است\");\n        }\n        return true;\n    }\n}"
+        "code": "services:\n  db:\n    image: postgres:17\n    environment:\n      POSTGRES_DB: orders\n      POSTGRES_PASSWORD: local-only\n    volumes:\n      - db_data:/var/lib/postgresql/data\nvolumes:\n  db_data:",
+        "language": "yaml",
+        "explanation": "این نمونه نقطه شروع است؛ شاهد تکمیل تمرین باید از تست خودت به دست بیاید. نام سرویس مانند db. حذف volume داده را حذف می‌کند؛ قبل از عملیات پاک‌سازی backup را جدی بگیر."
       }
     },
     "quizzes": [
       {
-        "id": "q-lesson-054-1",
-        "question": "مهم‌ترین مزیت استفاده از الگوی استاندارد PostgreSQL with Docker در پروژه‌های جاوا چیست؟",
+        "id": "focused-v2-lesson-054",
+        "question": "hostname دیتابیس از container اپ در Compose چیست؟",
         "options": [
-          "کاهش سورس‌کد به کمتر از ۵ خط.",
-          "تضمین پایداری معماری، تست‌پذیری حداکثری و پیشگیری از رفتارهای پیش‌بینی‌نشده در مقیاس بالا.",
-          "حذف نیاز به نصب پایگاه داده.",
-          "تبدیل خودکار کدهای جاوا به نودجی‌اس."
+          "نام سرویس مانند db",
+          "همیشه localhost",
+          "نام پوشه سورس Java"
         ],
-        "correctIndex": 1,
-        "explanation": "الگوهای استاندارد جاوا به گونه‌ای طراحی شده‌اند که قابلیت اطمینان، نگهداری آسان و مقیاس‌پذیری سیستم را در محیط‌های سازمانی تضمین کنند."
-      },
-      {
-        "id": "q-lesson-054-2",
-        "question": "در مقایسه با رویکردهای متداول در Node.js/NestJS، تفاوت کلیدی این مفهوم در جاوا چیست؟",
-        "options": [
-          "جاوا از Event Loop تک‌رشته‌ای استفاده می‌کند ولی نود چندرشته‌ای است.",
-          "در جاوا با سیستم نوع‌دهی اسمی، مدیریت نخ‌های واقعی سیستم‌عامل و انتزاع‌های فریم‌ورکی قوی‌تر روبرو هستیم.",
-          "هیچ تفاوتی از لحاظ معماری وجود ندارد.",
-          "جاوا کدهای جاوااسکریپت را درون داکر اجرا می‌کند."
-        ],
-        "correctIndex": 1,
-        "explanation": "جاوا با تکیه بر چندرشته‌ای بودن واقعی، بایت‌کد JVM و قراردادهای محکم فریم‌ورکی از مدل مبتنی بر Event Loop تک‌رشته‌ای نودجی‌اس متمایز می‌شود."
-      },
-      {
-        "id": "q-lesson-054-3",
-        "question": "کدام گزینه از مصادیق نقض Best Practice در این موضوع به شمار می‌رود؟",
-        "options": [
-          "پوشش کدهای حیاتی با تست‌های خودکار.",
-          "نادیده گرفتن شرایط مرزی، عدم اعتبارسنجی ورودی‌ها و دستکاری مستقیم وضعیت‌های داخلی بدون انکپسولیشن.",
-          "استفاده از لاگ‌های ساختاریافته به همراه شناسه رهگیری.",
-          "تعریف متغیرهای تغییرناپذیر با کلمه کلیدی final."
-        ],
-        "correctIndex": 1,
-        "explanation": "تخریب انکپسولیشن و رها کردن متغیرهای مشترک بدون محافظت در برابر تغییر، شایع‌ترین منشا باگ‌های پروداکشن در سیستم‌های جاوا است."
+        "correctIndex": 0,
+        "explanation": "نام سرویس مانند db. برای توسعه DB را با volume پایدار و healthcheck اجرا کن. داخل شبکه Compose نام سرویس hostname است؛ localhost در container به خودش اشاره دارد. version دیتابیس را مشخص و تغییر major را با migration مدیریت کن."
       }
     ],
     "interviewQuestions": [
       {
-        "question": "در یک مصاحبه فنی سطح مهندس ارشد بک‌اند، چگونه فلسفه و چرایی استفاده از PostgreSQL with Docker را برای مصاحبه‌کننده تشریح می‌کنید؟",
-        "answer": "در پاسخ باید ابتدا به مشکل پایه‌ای که این مفهوم حل می‌کند اشاره کرد (مانند حل گلوگاه‌های مقیاس، پایداری یا تفکیک دغدغه‌ها). سپس معماری زیرین و نحوه رفتار آن در زمان اجرای JVM را شرح داده و در نهایت مصالحه‌های آن با راهکارهای جایگزین را با تکیه بر تجربه عملی پروداکشن تحلیل نمود.",
-        "keyTakeaways": [
-          "تمرکز بر چرایی مهندسی و ارزش تجاری به جای حفظ کردن دستورات",
-          "اشاره به رفتار سیستم در زمان بار سنگین و سناریوهای شکست"
-        ]
-      },
-      {
-        "question": "چه مصالحه‌هایی (Trade-offs) در به‌کارگیری این الگو وجود دارد و چه زمان نباید از آن استفاده کرد؟",
-        "answer": "هیچ الگویی گلوله نقره‌ای نیست. این الگو سادگی اولیه کد را فدای انعطاف‌پذیری و مقیاس‌پذیری در آینده می‌کند. برای پروژه‌های بسیار کوچک یا اسکریپت‌های موقت، اضافه کردن این سطح از انتزاع ممکن است پیچیدگی بی‌مورد ایجاد نماید؛ اما در سیستم‌های سازمانی بزرگ، کاملاً توجیه‌پذیر است.",
-        "keyTakeaways": [
-          "آگاهی از مفهوم Over-engineering",
-          "سنجش تناسب الگو با نیازمندی‌های واقعی سیستم"
-        ]
+        "question": "بدون نگاه‌کردن به متن پاسخ بده: hostname دیتابیس از container اپ در Compose چیست؟",
+        "answer": "نام سرویس مانند db. حذف volume داده را حذف می‌کند؛ قبل از عملیات پاک‌سازی backup را جدی بگیر."
       }
     ],
-    "summary": "در این جلسه مبحث اجرا و پیکربندی پروداکشن PostgreSQL با Docker Compose را به شکل عمیق بررسی کردیم، تفاوت‌های آن با اکوسیستم نودجی‌اس را سنجیدیم و با تمرین عملی و کدهای سازمانی تسلط خود را محک زدیم.",
+    "summary": "برای توسعه DB را با volume پایدار و healthcheck اجرا کن. داخل شبکه Compose نام سرویس hostname است؛ localhost در container به خودش اشاره دارد. version دیتابیس را مشخص و تغییر major را با migration مدیریت کن.",
     "references": [
       {
-        "title": "Java Platform Standard Documentation",
-        "url": "https://dev.java/"
-      },
-      {
-        "title": "Spring Framework Reference Documentation",
-        "url": "https://docs.spring.io/spring-framework/reference/"
+        "title": "مستندات رسمی برای ادامهٔ اختیاری",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/jpa/entity-persistence.html"
       }
     ],
-    "capstoneConnection": {
-      "phase": "فاز مربوط به هفته 9",
-      "task": "تجهیز ماژول سفارشات و انبار به قابلیت‌های PostgreSQL with Docker",
-      "filesToModify": [
-        "src/main/java/com/academy/order/postgresqlwithdocker/ModuleConfig.java"
-      ]
-    },
-    "lastReviewedAt": "2026-11-01"
+    "lastReviewedAt": "2026-11-03",
+    "contentVersion": 2
   }
 ];

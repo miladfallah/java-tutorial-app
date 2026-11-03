@@ -202,9 +202,9 @@ export function CodeBlock({
           className={cn(
             "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer border border-transparent font-sans",
             copied
-              ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
               : copyError
-              ? "bg-rose-500/15 text-rose-400 border-rose-500/30"
+              ? "bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30"
               : "hover:bg-[var(--code-border)]/50 text-muted-foreground hover:text-foreground hover:border-[var(--code-border)]"
           )}
           title="کپی کردن کد"
