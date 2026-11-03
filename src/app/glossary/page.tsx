@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { BookMarked, Search, ArrowLeftRight, Code, X } from "lucide-react";
+import { BookMarked, Search, ArrowLeftRight, X } from "lucide-react";
 import { GLOSSARY_TERMS } from "@/data/glossary";
 import { normalizeText, cn, toPersianDigits } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
+import { CodeBlock } from "@/components/lesson/CodeBlock";
 
 export default function GlossaryPage() {
   const [search, setSearch] = useState("");
@@ -47,10 +48,10 @@ export default function GlossaryPage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">
             واژه‌نامه تخصصی مفاهیم و الگوهای مهندسی جاوا
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+          <p className="text-base text-muted-foreground leading-[1.85] max-w-3xl">
             تعاریف دقیق اصطلاحات معماری جاوا و اسپرینگ‌بوت همراه با تطبیق مستقیم با معادل‌های NestJS و اکوسیستم TypeScript برای درک سریع‌تر و دقیق‌تر معادل‌ها.
           </p>
         </div>
@@ -64,13 +65,14 @@ export default function GlossaryPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="جستجو در اصطلاحات انگلیسی یا فارسی (مثال: IoC, Hibernate, Transactional, Virtual Thread)..."
-              className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-border bg-card text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary shadow-xs transition-colors"
+              className="w-full pl-10 pr-10 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary shadow-xs transition-colors"
             />
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className="absolute left-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 aria-label="پاک کردن جستجو"
+                type="button"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -83,11 +85,12 @@ export default function GlossaryPage() {
                 key={c.id}
                 onClick={() => setSelectedCat(c.id)}
                 className={cn(
-                  "px-2.5 py-1 rounded-md text-xs font-medium border transition-colors",
+                  "px-3 py-1.5 min-h-[38px] rounded-lg text-xs sm:text-sm font-medium border transition-colors cursor-pointer",
                   selectedCat === c.id
                     ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                     : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
                 )}
+                type="button"
               >
                 {c.label}
               </button>
@@ -104,13 +107,13 @@ export default function GlossaryPage() {
       </div>
 
       {/* Terms Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.length === 0 ? (
           <div className="col-span-full p-12 rounded-xl border border-dashed border-border text-center space-y-2">
-            <p className="text-sm font-semibold text-foreground">
+            <p className="text-base font-semibold text-foreground">
               واژه‌ای مطابق با جستجوی شما یافت نشد
             </p>
-            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
               لطفاً املای انگلیسی یا معادل فارسی اصطلاح را بررسی فرمایید.
             </p>
           </div>
@@ -118,33 +121,37 @@ export default function GlossaryPage() {
           filtered.map((term) => (
             <div
               key={term.id}
-              className="p-5 rounded-xl border border-border bg-card space-y-3 flex flex-col justify-between hover:border-border/80 transition-colors"
+              className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4 flex flex-col justify-between hover:border-border/80 transition-colors shadow-xs"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-foreground ltr-dir font-mono">
+                  <span
+                    dir="ltr"
+                    style={{ direction: "ltr", textAlign: "left" }}
+                    className="text-base font-bold text-foreground ltr-dir font-mono"
+                  >
                     {term.termEn}
                   </span>
-                  <Badge variant="neutral" className="text-[10px]">
+                  <Badge variant="neutral" className="text-xs">
                     {term.category}
                   </Badge>
                 </div>
 
-                <div className="text-xs font-bold text-primary">
+                <div className="text-sm font-bold text-primary">
                   {term.termFa}
                 </div>
 
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="text-[15px] text-foreground/90 leading-[1.85]">
                   {term.definition}
                 </p>
 
                 {/* NestJS comparison callout */}
-                <div className="p-3 rounded-lg border border-border bg-secondary/50 text-xs space-y-1">
-                  <div className="flex items-center gap-1.5 text-foreground font-semibold text-[11px]">
-                    <ArrowLeftRight className="w-3.5 h-3.5 text-primary" />
+                <div className="p-3.5 rounded-lg border border-border bg-secondary/50 text-[14px] sm:text-[15px] space-y-1.5 leading-[1.85]">
+                  <div className="flex items-center gap-1.5 text-foreground font-bold text-xs">
+                    <ArrowLeftRight className="w-3.5 h-3.5 text-primary shrink-0" />
                     <span>تطبیق با اکوسیستم NestJS / Node.js:</span>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed pr-5">
+                  <p className="text-muted-foreground pr-5">
                     {term.nestComparison}
                   </p>
                 </div>
@@ -152,9 +159,12 @@ export default function GlossaryPage() {
 
               {term.example && (
                 <div className="pt-2 border-t border-border/60">
-                  <pre className="font-mono text-[11px] text-zinc-300 ltr-dir bg-[#0c0e12] p-2.5 rounded-lg overflow-x-auto border border-border/80">
-                    <code>{term.example}</code>
-                  </pre>
+                  <CodeBlock
+                    code={term.example}
+                    language="java"
+                    title={term.termEn}
+                    showLineNumbers={false}
+                  />
                 </div>
               )}
             </div>

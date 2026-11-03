@@ -1,4 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+@font-face {
+  font-family: 'Estedad';
+  src: url('/fonts/estedad/Estedad-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Estedad';
+  src: url('/fonts/estedad/Estedad-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Estedad';
+  src: url('/fonts/estedad/Estedad-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Estedad';
+  src: url('/fonts/estedad/Estedad-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono/JetBrainsMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono/JetBrainsMono-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
@@ -36,6 +98,20 @@
     --ring: 28 92% 54%;
 
     --radius: 0.625rem;
+
+    /* Code Block Theme Tokens - Dark */
+    --code-bg: #0d1117;
+    --code-header-bg: #161b22;
+    --code-border: #30363d;
+    --code-text: #e6edf3;
+    --code-line-number: #484f58;
+    --token-keyword: #ff7b72;
+    --token-type: #79c0ff;
+    --token-string: #7ee787;
+    --token-comment: #8b949e;
+    --token-annotation: #ffa657;
+    --token-number: #79c0ff;
+    --token-punctuation: #8b949e;
   }
 
   .light {
@@ -66,6 +142,20 @@
     --border: 220 13% 89%;
     --input: 220 13% 89%;
     --ring: 24 94% 48%;
+
+    /* Code Block Theme Tokens - Light */
+    --code-bg: #f6f8fa;
+    --code-header-bg: #eaeef2;
+    --code-border: #d0d7de;
+    --code-text: #1f2328;
+    --code-line-number: #8c959f;
+    --token-keyword: #cf222e;
+    --token-type: #0550ae;
+    --token-string: #116329;
+    --token-comment: #6e7781;
+    --token-annotation: #953800;
+    --token-number: #0550ae;
+    --token-punctuation: #57606a;
   }
 
   * {
@@ -79,21 +169,20 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    line-height: 1.75;
+    font-family: 'Estedad', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.9;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
   }
 
-  /* Focus ring utility for accessibility */
+  /* Accessible visible focus ring */
   :focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
   }
 }
 
-/* Strict LTR isolation for code, symbols, paths, and commands */
+/* Strict LTR isolation for pre, code, kbd, samp, and LTR content */
 pre, code, kbd, samp, .ltr-dir {
   direction: ltr !important;
   text-align: left !important;
@@ -101,20 +190,55 @@ pre, code, kbd, samp, .ltr-dir {
   font-feature-settings: "liga" 1, "calt" 1;
 }
 
-/* Inline code in Persian prose */
-p code, li code, td code, span code {
-  unicode-bidi: isolate;
+/* Inline code in Persian prose with strict bidirectional isolation */
+p code, li code, td code, span code, h1 code, h2 code, h3 code, h4 code, button code {
+  unicode-bidi: isolate !important;
+  direction: ltr !important;
+  text-align: left !important;
   display: inline-block;
-  direction: ltr;
-  padding: 0.125rem 0.375rem;
-  font-size: 0.8125rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.875em;
   border-radius: 0.375rem;
   background-color: hsl(var(--secondary));
   border: 1px solid hsl(var(--border));
   color: hsl(var(--foreground));
+  font-family: 'JetBrains Mono', monospace;
+  vertical-align: baseline;
+  margin: 0 0.15rem;
 }
 
-/* Minimalist scrollbar */
+/* Syntax highlighting token classes */
+.token-keyword {
+  color: var(--token-keyword);
+  font-weight: 600;
+}
+
+.token-type {
+  color: var(--token-type);
+}
+
+.token-string {
+  color: var(--token-string);
+}
+
+.token-comment {
+  color: var(--token-comment);
+  font-style: italic;
+}
+
+.token-annotation {
+  color: var(--token-annotation);
+}
+
+.token-number {
+  color: var(--token-number);
+}
+
+.token-punctuation {
+  color: var(--token-punctuation);
+}
+
+/* Minimalist custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

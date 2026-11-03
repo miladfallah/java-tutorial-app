@@ -13,7 +13,7 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const base =
-    "inline-flex items-center font-medium rounded-md tracking-tight transition-colors";
+    "inline-flex items-center font-medium rounded-md transition-colors";
 
   const variants = {
     neutral:

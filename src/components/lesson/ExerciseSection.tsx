@@ -32,7 +32,7 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
   return (
     <section
       id="exercise"
-      className="my-8 rounded-xl border border-border bg-card p-5 sm:p-6"
+      className="my-8 rounded-xl border border-border bg-card p-5 sm:p-6 scroll-mt-24"
     >
       {/* Exercise Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border/60">
@@ -41,67 +41,71 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
             <Code2 className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
-              Hands-on Workshop
+            <div className="text-xs font-mono text-muted-foreground">
+              WORKSHOP_EXERCISE
             </div>
-            <h3 className="text-base font-semibold text-foreground mt-0.5">
+            <h3 className="text-base sm:text-lg font-bold text-foreground mt-0.5">
               {exercise.title}
             </h3>
           </div>
         </div>
 
-        {/* Completion toggle */}
+        {/* Completion toggle (Accessible touch target >= 44px) */}
         <button
           onClick={() => toggleExerciseCompleted(lessonId)}
           className={cn(
-            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors self-start sm:self-auto",
+            "inline-flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-lg text-xs sm:text-sm font-medium border transition-colors self-start sm:self-auto cursor-pointer",
             isCompleted
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/15"
-              : "bg-secondary text-muted-foreground border-border hover:text-foreground hover:bg-secondary/80"
+              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/15"
+              : "bg-secondary text-foreground border-border hover:bg-secondary/80"
           )}
+          type="button"
         >
           <CheckCircle2
             className={cn(
-              "w-3.5 h-3.5",
+              "w-4 h-4 shrink-0",
               isCompleted ? "text-emerald-400" : "text-muted-foreground"
             )}
           />
-          <span>{isCompleted ? "تمرین تکمیل شد ✓" : "ثبت به عنوان انجام شده"}</span>
+          <span>{isCompleted ? "تمرین تکمیل شد ✓" : "علامت‌گذاری به عنوان انجام شده"}</span>
         </button>
       </div>
 
-      {/* Instructions */}
-      <div className="mt-4 space-y-4 text-xs sm:text-sm">
-        <div className="text-foreground/90 leading-relaxed whitespace-pre-line">
+      {/* Instructions: readable body text */}
+      <div className="mt-5 space-y-5">
+        <div className="text-[15px] sm:text-base text-foreground/90 leading-[1.95] whitespace-pre-line">
           {exercise.instructions}
         </div>
 
-        {/* Expected output */}
+        {/* Expected output with CodeBlock */}
         {exercise.expectedOutput && (
-          <div className="rounded-lg border border-border bg-background p-3 text-xs space-y-1">
-            <div className="flex items-center gap-1.5 text-muted-foreground font-mono text-[11px]">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
               <Terminal className="w-3.5 h-3.5 text-primary" />
-              <span>خروجی یا نتیجه مورد انتظار:</span>
+              <span>خروجی یا کنسول مورد انتظار:</span>
             </div>
-            <pre className="font-mono text-slate-300 ltr-dir text-[11px] overflow-x-auto bg-[#0c0e12] p-2.5 rounded">
-              <code>{exercise.expectedOutput}</code>
-            </pre>
+            <CodeBlock
+              code={exercise.expectedOutput}
+              language="bash"
+              title="Expected Output"
+              showLineNumbers={false}
+            />
           </div>
         )}
 
         {/* Acceptance Criteria */}
-        <div className="rounded-lg border border-border bg-secondary/30 p-3.5">
-          <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5 mb-2">
-            <CheckSquare className="w-3.5 h-3.5 text-primary" />
+        <div className="rounded-xl border border-border bg-secondary/30 p-4">
+          <h4 className="text-sm font-bold text-foreground flex items-center gap-2 mb-3">
+            <CheckSquare className="w-4 h-4 text-primary shrink-0" />
             <span>معیارهای پذیرش تمرین (Acceptance Criteria):</span>
           </h4>
-          <ul className="space-y-1.5 text-xs text-muted-foreground">
+          <ul className="space-y-2 text-[15px] leading-[1.85] text-foreground/90">
             {exercise.acceptanceCriteria.map((criterion, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="w-4 h-4 rounded bg-secondary text-foreground text-[10px] font-mono flex items-center justify-center shrink-0 mt-0.5">
+              <li key={idx} className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded bg-secondary text-primary text-xs font-mono font-bold flex items-center justify-center shrink-0 mt-0.5 border border-border">
                   {idx + 1}
                 </span>
-                <span className="text-foreground/90">{criterion}</span>
+                <span>{criterion}</span>
               </li>
             ))}
           </ul>
@@ -109,23 +113,24 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
 
         {/* Hints */}
         {exercise.hints && exercise.hints.length > 0 && (
-          <div className="rounded-lg border border-border overflow-hidden">
+          <div className="rounded-xl border border-border overflow-hidden">
             <button
               onClick={() => setShowHints(!showHints)}
-              className="w-full px-3.5 py-2 flex items-center justify-between text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
+              className="w-full px-4 py-3 min-h-[44px] flex items-center justify-between text-xs sm:text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors cursor-pointer"
+              type="button"
             >
-              <span className="flex items-center gap-1.5 font-medium">
-                <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-                <span>راهنمایی‌های حل ({toPersianDigits(exercise.hints.length)} نکته)</span>
+              <span className="flex items-center gap-2 font-medium">
+                <Lightbulb className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>راهنمایی‌های حل مرحله‌به‌مرحله ({toPersianDigits(exercise.hints.length)} نکته)</span>
               </span>
-              {showHints ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {showHints ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
 
             {showHints && (
-              <div className="p-3.5 border-t border-border bg-background text-xs space-y-1.5 text-muted-foreground">
+              <div className="p-4 border-t border-border bg-background space-y-2.5 text-[15px] leading-[1.85]">
                 {exercise.hints.map((hint, idx) => (
-                  <div key={idx} className="flex items-start gap-2">
-                    <span className="text-amber-400 font-bold">•</span>
+                  <div key={idx} className="flex items-start gap-2.5">
+                    <span className="text-amber-400 font-bold shrink-0">•</span>
                     <p className="text-foreground/90">{hint}</p>
                   </div>
                 ))}
@@ -135,37 +140,39 @@ export function ExerciseSection({ lessonId, exercise }: ExerciseSectionProps) {
         )}
 
         {/* Reference Solution */}
-        <div className="rounded-lg border border-border overflow-hidden">
+        <div className="rounded-xl border border-border overflow-hidden">
           <button
             onClick={() => setShowSolution(!showSolution)}
-            className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
+            className="w-full px-4 py-3 min-h-[44px] flex items-center justify-between text-xs sm:text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors cursor-pointer"
+            type="button"
           >
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-2 font-medium">
               {showSolution ? (
-                <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />
+                <EyeOff className="w-4 h-4 text-muted-foreground shrink-0" />
               ) : (
-                <Eye className="w-3.5 h-3.5 text-primary" />
+                <Eye className="w-4 h-4 text-primary shrink-0" />
               )}
-              <span>{showSolution ? "مخفی کردن کد مرجع" : "مشاهده راهکار و کد مرجع"}</span>
+              <span>{showSolution ? "مخفی کردن کد راهکار مرجع" : "مشاهده کد راهکار مرجع مهندسی"}</span>
             </span>
-            {showSolution ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            {showSolution ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
 
           {showSolution && (
-            <div className="p-3.5 border-t border-border bg-background space-y-3">
-              <div className="text-xs text-foreground/90 leading-relaxed border-r-2 border-primary/60 pr-2.5">
-                <span className="font-semibold text-foreground block mb-1">
-                  تحلیل راهکار:
-                </span>
-                <p>{exercise.solution.explanation}</p>
+            <div className="p-4 border-t border-border bg-background space-y-3">
+              <div className="text-xs text-muted-foreground leading-relaxed">
+                راهکار استاندارد و بهینه جاوا ۲۱ برای این تمرین:
               </div>
-
               <CodeBlock
                 code={exercise.solution.code}
                 language={exercise.solution.language || "java"}
                 filename={exercise.solution.filename}
                 title="Reference Solution"
               />
+              {exercise.solution.explanation && (
+                <div className="text-[15px] text-muted-foreground leading-[1.85] pt-2">
+                  {exercise.solution.explanation}
+                </div>
+              )}
             </div>
           )}
         </div>

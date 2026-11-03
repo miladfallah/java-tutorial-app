@@ -14,7 +14,6 @@ import {
   Eye, 
   EyeOff, 
   CheckCircle2, 
-  AlertCircle,
   Sparkles,
   Shuffle,
   Clock,
@@ -146,82 +145,87 @@ export default function RevisionPage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">
             مرور، فلش‌کارت‌های مفهومی و مدیریت پشتیبان
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+          <p className="text-base text-muted-foreground leading-[1.85] max-w-3xl">
             روزهای جمعه یا ساعات مرور را به بررسی فلش‌کارت‌های معماری، رفع اشکال کوییزهای آزموده شده و جلسات نشان‌شده اختصاص دهید تا مفاهیم عمیقاً در حافظه کاری شما تثبیت شوند.
           </p>
         </div>
 
-        {/* Tab switch */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-2">
+        {/* Tab switch with touch targets >= 42px */}
+        <div className="flex flex-wrap items-center gap-2 pt-2">
           <button
             onClick={() => setActiveTab("flashcards")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border flex items-center gap-2 cursor-pointer",
               activeTab === "flashcards"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-4 h-4" />
             <span>فلش‌کارت‌ها</span>
-            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(FLASHCARDS.length)})</span>
+            <span className="font-mono text-xs opacity-80">({toPersianDigits(FLASHCARDS.length)})</span>
           </button>
 
           <button
             onClick={() => setActiveTab("bookmarks")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border flex items-center gap-2 cursor-pointer",
               activeTab === "bookmarks"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
-            <Bookmark className="w-3.5 h-3.5" />
+            <Bookmark className="w-4 h-4" />
             <span>نشان‌شده‌ها</span>
-            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(bookmarkedLessons.length)})</span>
+            <span className="font-mono text-xs opacity-80">({toPersianDigits(bookmarkedLessons.length)})</span>
           </button>
 
           <button
             onClick={() => setActiveTab("review")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border flex items-center gap-2 cursor-pointer",
               activeTab === "review"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
-            <Flag className="w-3.5 h-3.5" />
+            <Flag className="w-4 h-4" />
             <span>نیازمند مرور</span>
-            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(reviewNeededLessons.length)})</span>
+            <span className="font-mono text-xs opacity-80">({toPersianDigits(reviewNeededLessons.length)})</span>
           </button>
 
           <button
             onClick={() => setActiveTab("quizzes")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border flex items-center gap-2 cursor-pointer",
               activeTab === "quizzes"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
-            <HelpCircle className="w-3.5 h-3.5" />
+            <HelpCircle className="w-4 h-4" />
             <span>کوییزهای ناموفق</span>
-            <span className="font-mono text-[10px] opacity-80">({toPersianDigits(failedQuizzesLessons.length)})</span>
+            <span className="font-mono text-xs opacity-80">({toPersianDigits(failedQuizzesLessons.length)})</span>
           </button>
 
           <button
             onClick={() => setActiveTab("backup")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border flex items-center gap-1.5",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border flex items-center gap-2 cursor-pointer",
               activeTab === "backup"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-4 h-4" />
             <span>پشتیبان‌گیری و بازیابی</span>
           </button>
         </div>
@@ -232,17 +236,17 @@ export default function RevisionPage() {
         <div className="space-y-4 max-w-2xl mx-auto">
           {/* Controls Bar */}
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="font-mono">
+            <span className="font-mono font-medium">
               کارت {toPersianDigits(currentCardIndex + 1)} از {toPersianDigits(FLASHCARDS.length)}
             </span>
-            <Badge variant="neutral" className="font-mono text-[11px]">
+            <Badge variant="neutral" className="font-mono text-xs">
               {currentCard.category}
             </Badge>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleShuffle}
-              className="text-xs h-7 px-2 text-muted-foreground hover:text-foreground gap-1"
+              className="text-xs h-8 px-2.5 text-muted-foreground hover:text-foreground gap-1.5 cursor-pointer font-sans"
             >
               <Shuffle className="w-3.5 h-3.5" />
               <span>کارت تصادفی</span>
@@ -252,7 +256,7 @@ export default function RevisionPage() {
           {/* Flashcard Box */}
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="cursor-pointer min-h-[320px] p-6 sm:p-8 rounded-xl border border-border bg-card shadow-xs hover:border-primary/40 flex flex-col justify-between transition-all select-none"
+            className="cursor-pointer min-h-[340px] p-6 sm:p-8 rounded-xl border border-border bg-card shadow-xs hover:border-primary/50 flex flex-col justify-between transition-all select-none"
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
@@ -264,37 +268,37 @@ export default function RevisionPage() {
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-[11px] font-mono font-bold text-primary uppercase tracking-wider">
-                  {isFlipped ? "ANSWER & ARCHITECTURE ANALYSIS" : "QUESTION"}
+                <span className="text-xs font-mono font-bold text-primary uppercase">
+                  {isFlipped ? "ANSWER & ARCHITECTURE ANALYSIS" : "CONCEPT_QUESTION"}
                 </span>
-                <span className="text-[11px] text-muted-foreground/60 font-mono">
+                <span className="text-xs text-muted-foreground font-mono">
                   {isFlipped ? "رویه پاسخ" : "رویه سوال"}
                 </span>
               </div>
 
               {!isFlipped ? (
-                <div className="py-6">
-                  <h3 className="text-lg sm:text-xl font-bold text-foreground leading-relaxed">
+                <div className="py-8">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-[1.85]">
                     {currentCard.question}
                   </h3>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-sm sm:text-base font-bold text-foreground leading-relaxed">
+                  <p className="text-base sm:text-lg font-bold text-foreground leading-[1.85]">
                     {currentCard.answer}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed border-r-2 border-primary pr-3">
+                  <p className="text-[15px] sm:text-base text-muted-foreground leading-[1.95] border-r-3 border-primary pr-3.5">
                     {currentCard.explanation}
                   </p>
                   <div className="pt-2">
-                    <span className="text-[11px] font-bold text-foreground block mb-1.5">
+                    <span className="text-xs font-bold text-foreground block mb-2">
                       نکات کلیدی مهندسی:
                     </span>
-                    <ul className="space-y-1.5 text-xs text-muted-foreground">
+                    <ul className="space-y-1.5 text-[15px] text-muted-foreground">
                       {currentCard.keyPoints.map((kp, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5">
-                          <span className="text-primary font-bold mt-0.5">•</span>
-                          <span className="leading-relaxed">{kp}</span>
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-primary font-bold shrink-0 mt-0.5">•</span>
+                          <span className="leading-[1.8]">{kp}</span>
                         </li>
                       ))}
                     </ul>
@@ -304,39 +308,39 @@ export default function RevisionPage() {
             </div>
 
             <div className="pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 font-medium">
                 {isFlipped ? (
-                  <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />
+                  <EyeOff className="w-4 h-4 text-muted-foreground" />
                 ) : (
-                  <Eye className="w-3.5 h-3.5 text-primary" />
+                  <Eye className="w-4 h-4 text-primary" />
                 )}
                 <span>{isFlipped ? "برای بازگشت به سوال کلیک کنید" : "برای مشاهده پاسخ کلیک کنید"}</span>
               </span>
-              <kbd className="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded bg-secondary border border-border text-muted-foreground">
+              <kbd className="hidden sm:inline-block font-mono text-xs px-2 py-0.5 rounded bg-secondary border border-border text-muted-foreground">
                 Space / Click
               </kbd>
             </div>
           </div>
 
-          {/* Nav arrows */}
+          {/* Nav arrows (Accessible touch targets >= 44px) */}
           <div className="flex items-center justify-between pt-1">
             <Button
               variant="outline"
               size="sm"
               onClick={handlePrevCard}
-              className="text-xs h-8 gap-1.5"
+              className="text-xs sm:text-sm h-10 px-3.5 gap-2 cursor-pointer font-sans"
             >
               <ChevronRight className="w-4 h-4" />
               <span>کارت قبلی</span>
             </Button>
-            <span className="text-[11px] text-muted-foreground font-mono hidden sm:inline-block">
-              کلیدهای جهت‌نما ← / → برای جابجایی
+            <span className="text-xs text-muted-foreground font-mono hidden sm:inline-block">
+              کلیدهای جهت‌نما ← / → برای ورق زدن
             </span>
             <Button
               variant="outline"
               size="sm"
               onClick={handleNextCard}
-              className="text-xs h-8 gap-1.5"
+              className="text-xs sm:text-sm h-10 px-3.5 gap-2 cursor-pointer font-sans"
             >
               <span>کارت بعدی</span>
               <ChevronLeft className="w-4 h-4" />
@@ -349,12 +353,12 @@ export default function RevisionPage() {
       {activeTab === "bookmarks" && (
         <div className="space-y-3">
           {bookmarkedLessons.length === 0 ? (
-            <div className="p-10 rounded-xl border border-dashed border-border text-center space-y-2">
+            <div className="p-12 rounded-xl border border-dashed border-border text-center space-y-2">
               <Bookmark className="w-8 h-8 mx-auto text-muted-foreground/40" />
-              <p className="text-sm font-semibold text-foreground">
+              <p className="text-base font-semibold text-foreground">
                 هنوز درسی را نشان نکرده‌اید
               </p>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                 در صفحه هر درس، با کلیک روی آیکون نشان می‌توانید مباحث مهم را برای مراجعه بعدی در این قسمت ذخیره کنید.
               </p>
             </div>
@@ -363,21 +367,27 @@ export default function RevisionPage() {
               <Link
                 key={l.id}
                 href={`/lessons/${l.slug}`}
-                className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-colors flex items-center justify-between gap-4 group"
+                className="p-4 sm:p-5 min-h-[56px] rounded-xl border border-border bg-card hover:border-primary/50 transition-colors flex items-center justify-between gap-4 group shadow-xs cursor-pointer"
               >
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-mono">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                     <span className="text-primary font-bold">هفته {toPersianDigits(l.week)} • روز {toPersianDigits(l.day)}</span>
                     <span>•</span>
-                    <span className="ltr-dir">{l.titleEn}</span>
+                    <span
+                      dir="ltr"
+                      style={{ direction: "ltr", textAlign: "left" }}
+                      className="ltr-dir"
+                    >
+                      {l.titleEn}
+                    </span>
                   </div>
-                  <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                  <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
                     {l.title}
                   </h4>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground group-hover:text-primary">
                   <span className="hidden sm:inline">مشاهده درس</span>
-                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 </div>
               </Link>
             ))
@@ -389,12 +399,12 @@ export default function RevisionPage() {
       {activeTab === "review" && (
         <div className="space-y-3">
           {reviewNeededLessons.length === 0 ? (
-            <div className="p-10 rounded-xl border border-dashed border-border text-center space-y-2">
+            <div className="p-12 rounded-xl border border-dashed border-border text-center space-y-2">
               <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500/60" />
-              <p className="text-sm font-semibold text-foreground">
+              <p className="text-base font-semibold text-foreground">
                 هیچ درسی برای مرور علامت نخورده است
               </p>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                 جلساتی که مباحث چالش‌برانگیز دارند را می‌توانید در انتهای درس به عنوان «نیازمند مرور مجدد» علامت بزنید.
               </p>
             </div>
@@ -403,21 +413,27 @@ export default function RevisionPage() {
               <Link
                 key={l.id}
                 href={`/lessons/${l.slug}`}
-                className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-colors flex items-center justify-between gap-4 group"
+                className="p-4 sm:p-5 min-h-[56px] rounded-xl border border-border bg-card hover:border-primary/50 transition-colors flex items-center justify-between gap-4 group shadow-xs cursor-pointer"
               >
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-mono">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                     <span className="text-amber-500 font-bold">هفته {toPersianDigits(l.week)} • روز {toPersianDigits(l.day)}</span>
                     <span>•</span>
-                    <span className="ltr-dir">{l.titleEn}</span>
+                    <span
+                      dir="ltr"
+                      style={{ direction: "ltr", textAlign: "left" }}
+                      className="ltr-dir"
+                    >
+                      {l.titleEn}
+                    </span>
                   </div>
-                  <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                  <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
                     {l.title}
                   </h4>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground group-hover:text-primary">
                   <span className="hidden sm:inline">مرور مجدد</span>
-                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 </div>
               </Link>
             ))
@@ -429,12 +445,12 @@ export default function RevisionPage() {
       {activeTab === "quizzes" && (
         <div className="space-y-3">
           {failedQuizzesLessons.length === 0 ? (
-            <div className="p-10 rounded-xl border border-dashed border-border text-center space-y-2">
+            <div className="p-12 rounded-xl border border-dashed border-border text-center space-y-2">
               <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500" />
-              <p className="text-sm font-semibold text-foreground">
+              <p className="text-base font-semibold text-foreground">
                 وضعیت عالی است! کوییز ناموفقی وجود ندارد
               </p>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                 تمامی آزمون‌هایی که تا الان در آن‌ها شرکت کرده‌اید با نمره قبولی پشت سر گذاشته شده‌اند.
               </p>
             </div>
@@ -445,23 +461,29 @@ export default function RevisionPage() {
                 <Link
                   key={l.id}
                   href={`/lessons/${l.slug}`}
-                  className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-colors flex items-center justify-between gap-4 group"
+                  className="p-4 sm:p-5 min-h-[56px] rounded-xl border border-border bg-card hover:border-primary/50 transition-colors flex items-center justify-between gap-4 group shadow-xs cursor-pointer"
                 >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-mono">
-                      <Badge variant="warning" className="text-[10px] py-0">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                      <Badge variant="warning" className="text-xs py-0.5">
                         نمره: {toPersianDigits(res?.score || 0)} از {toPersianDigits(res?.total || 0)}
                       </Badge>
                       <span>•</span>
-                      <span className="ltr-dir">{l.titleEn}</span>
+                      <span
+                        dir="ltr"
+                        style={{ direction: "ltr", textAlign: "left" }}
+                        className="ltr-dir"
+                      >
+                        {l.titleEn}
+                      </span>
                     </div>
-                    <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                    <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
                       {l.title}
                     </h4>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-primary font-semibold">
+                  <div className="flex items-center gap-1.5 text-xs sm:text-sm text-primary font-bold">
                     <span>تلاش مجدد</span>
-                    <ArrowRight className="w-3.5 h-3.5 rotate-180" />
+                    <ArrowRight className="w-4 h-4 rotate-180" />
                   </div>
                 </Link>
               );
@@ -473,13 +495,13 @@ export default function RevisionPage() {
       {/* Tab: Backup & Restore */}
       {activeTab === "backup" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
-          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4 flex flex-col justify-between">
+          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4 flex flex-col justify-between shadow-xs">
             <div className="space-y-2">
-              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
                 <Download className="w-4 h-4 text-primary" />
                 دانلود فایل پشتیبان (JSON Export)
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-[1.85]">
                 ذخیره کامل وضعیت جلسات مطالعه‌شده، یادداشت‌های شخصی هر درس و سوابق کوییزها در قالب یک فایل متنی JSON استاندارد.
               </p>
             </div>
@@ -487,20 +509,20 @@ export default function RevisionPage() {
               variant="outline"
               size="sm"
               onClick={handleExport}
-              className="w-full text-xs h-9 gap-1.5"
+              className="w-full text-xs sm:text-sm h-10 gap-2 cursor-pointer font-sans"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-4 h-4" />
               <span>دانلود فایل JSON</span>
             </Button>
           </div>
 
-          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4 flex flex-col justify-between">
+          <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4 flex flex-col justify-between shadow-xs">
             <div className="space-y-2">
-              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
                 <Upload className="w-4 h-4 text-primary" />
                 بازیابی اطلاعات (JSON Import)
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-[1.85]">
                 فایل JSON تهیه‌شده از دستگاه قبلی را انتخاب نمایید تا دیتابیس محلی IndexedDB مرورگر به‌روزرسانی شود.
               </p>
             </div>
@@ -510,11 +532,11 @@ export default function RevisionPage() {
                   type="file"
                   accept=".json"
                   onChange={handleFileUpload}
-                  className="block w-full text-xs text-muted-foreground file:mr-0 file:ml-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-border file:text-xs file:font-semibold file:bg-secondary file:text-foreground hover:file:bg-secondary/80 file:cursor-pointer cursor-pointer"
+                  className="block w-full text-xs text-muted-foreground file:mr-0 file:ml-3 file:py-2 file:px-3 file:rounded-lg file:border file:border-border file:text-xs file:font-semibold file:bg-secondary file:text-foreground hover:file:bg-secondary/80 file:cursor-pointer cursor-pointer"
                 />
               </label>
               {importStatus && (
-                <div className="p-2.5 rounded-lg bg-secondary/80 border border-border text-xs text-foreground font-mono">
+                <div className="p-3 rounded-lg bg-secondary border border-border text-xs text-foreground font-mono">
                   {importStatus}
                 </div>
               )}

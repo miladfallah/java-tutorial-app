@@ -11,7 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Vazirmatn", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        sans: ["Estedad", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         mono: [
           "JetBrains Mono",
           "Fira Code",
@@ -53,15 +53,6 @@ const config: Config = {
           foreground: "hsl(var(--success-foreground))",
           muted: "hsl(var(--success-muted))",
         },
-        surface: {
-          50: "#f8fafc",
-          100: "#f1f5f9",
-          200: "#e2e8f0",
-          700: "#334155",
-          800: "#1e293b",
-          900: "#0f172a",
-          950: "#090d16",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -69,7 +60,7 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       lineHeight: {
-        relaxed: "1.85",
+        relaxed: "1.95",
         loose: "2.1",
       },
     },

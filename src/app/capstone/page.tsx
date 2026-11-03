@@ -10,15 +10,12 @@ import {
   Cpu, 
   Layers,
   ArrowRight,
-  ExternalLink,
-  CheckCircle2,
-  Copy,
-  Check
+  Check,
+  Copy
 } from "lucide-react";
 import { CodeBlock } from "@/components/lesson/CodeBlock";
 import { toPersianDigits, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
 export default function CapstonePage() {
@@ -100,46 +97,49 @@ export default function CapstonePage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">
             سامانه مدیریت سفارشات و انبار سازمانی (Order & Inventory System)
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+          <p className="text-base text-muted-foreground leading-[1.85] max-w-3xl">
             در این آکادمی پروژه‌های کوچک جزیره‌ای وجود ندارد؛ بلکه در طول ۲۶ هفته یک سیستم واقعی، توزیع‌پذیر و با کارایی بالا بر اساس معماری Modular Monolith با قابلیت گذار به Event-Driven Microservices در مخزن لوکال خود می‌سازید.
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-1.5 pt-2">
+        <div className="flex flex-wrap items-center gap-2 pt-2">
           <button
             onClick={() => setActiveTab("architecture")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border cursor-pointer",
               activeTab === "architecture"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
             معماری و جریان داده‌ها
           </button>
           <button
             onClick={() => setActiveTab("phases")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border cursor-pointer",
               activeTab === "phases"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
             فازهای توسعه ۶ گانه
           </button>
           <button
             onClick={() => setActiveTab("docker-local")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border",
+              "px-4 py-2 min-h-[42px] rounded-lg text-xs sm:text-sm font-medium transition-colors border cursor-pointer",
               activeTab === "docker-local"
-                ? "bg-primary text-primary-foreground border-primary font-semibold shadow-xs"
+                ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
                 : "bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
+            type="button"
           >
             داکر و زیرساخت لوکال
           </button>
@@ -150,19 +150,33 @@ export default function CapstonePage() {
       {activeTab === "architecture" && (
         <div className="space-y-6">
           <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4">
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <Layers className="w-4 h-4 text-primary" />
+            <div className="space-y-1.5">
+              <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
+                <Layers className="w-5 h-5 text-primary shrink-0" />
                 معماری سامانه: Modular Monolith رو به Event-Driven
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              <p className="text-[15px] text-muted-foreground leading-[1.85]">
                 برای جلوگیری از پیچیدگی نارس میکروسرویس‌ها، سیستم با مرزهای شفاف بیزینسی (Clean Boundaries) داخل یک پروژه ماژولار شکل می‌گیرد و سپس به کمک RabbitMQ، الگوی Transactional Outbox و پایگاه‌های داده توزیع‌شده بسط می‌یابد.
               </p>
             </div>
 
-            {/* ASCII Architecture Diagram */}
-            <div className="p-4 rounded-xl border border-border bg-[#0c0e12] font-mono text-xs text-zinc-300 ltr-dir leading-relaxed overflow-x-auto shadow-inner">
-              <pre>{`[ Client / React Frontend ]
+            {/* ASCII Architecture Diagram with explicit LTR and theme tokens */}
+            <div
+              dir="ltr"
+              style={{
+                direction: "ltr",
+                textAlign: "left",
+                backgroundColor: "var(--code-bg)",
+                borderColor: "var(--code-border)",
+                color: "var(--code-text)",
+              }}
+              className="p-4 sm:p-5 rounded-xl border font-mono text-[12px] sm:text-[13px] leading-6 ltr-dir overflow-x-auto shadow-inner"
+            >
+              <pre
+                dir="ltr"
+                style={{ direction: "ltr", textAlign: "left" }}
+                className="overflow-visible whitespace-pre"
+              >{`[ Client / React Frontend ]
            │  HTTP REST (OpenAPI 3 / JWT Bearer)
            ▼
 ┌────────────────────────────────────────────────────────┐
@@ -188,33 +202,33 @@ export default function CapstonePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
-                <Database className="w-4 h-4" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 rounded-xl border border-border bg-card space-y-2.5">
+              <div className="w-9 h-9 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
+                <Database className="w-5 h-5" />
               </div>
-              <h4 className="text-sm font-bold text-foreground">پایگاه داده رابطه‌ای سازمانی</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <h4 className="text-base font-bold text-foreground">پایگاه داده رابطه‌ای سازمانی</h4>
+              <p className="text-sm text-muted-foreground leading-[1.85]">
                 استفاده از PostgreSQL 16 به همراه مایگریشن‌های خودکار Flyway، تراکنش‌های ایزوله و قفل‌های Pessimistic جهت تضمین عدم موجودی منفی در انبار.
               </p>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
-                <Server className="w-4 h-4" />
+            <div className="p-5 rounded-xl border border-border bg-card space-y-2.5">
+              <div className="w-9 h-9 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
+                <Server className="w-5 h-5" />
               </div>
-              <h4 className="text-sm font-bold text-foreground">پیام‌رسانی با اطمینان ۱۰۰٪</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <h4 className="text-base font-bold text-foreground">پیام‌رسانی با اطمینان ۱۰۰٪</h4>
+              <p className="text-sm text-muted-foreground leading-[1.85]">
                 پیاده‌سازی RabbitMQ و الگوی حیاتی Transactional Outbox جهت جلوگیری از معضل 2PC و اطمینان از ارسال رویدادهای مالی پس از Commit قطعی دیتابیس.
               </p>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
-                <Cpu className="w-4 h-4" />
+            <div className="p-5 rounded-xl border border-border bg-card space-y-2.5">
+              <div className="w-9 h-9 rounded-lg bg-secondary border border-border text-primary flex items-center justify-center">
+                <Cpu className="w-5 h-5" />
               </div>
-              <h4 className="text-sm font-bold text-foreground">مقیاس‌پذیری با ترد مجازی</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <h4 className="text-base font-bold text-foreground">مقیاس‌پذیری با ترد مجازی</h4>
+              <p className="text-sm text-muted-foreground leading-[1.85]">
                 پیکربندی Virtual Threads در Java 21 برای مدیریت ده‌ها هزار درخواست همزمان I/O-bound بدون نیاز به پیچیدگی کدنویسی ری‌اکتیو (WebFlux).
               </p>
             </div>
@@ -224,11 +238,11 @@ export default function CapstonePage() {
 
       {/* Tab 2: Phases */}
       {activeTab === "phases" && (
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {phases.map((ph) => (
             <div
               key={ph.phaseNumber}
-              className="p-5 rounded-xl border border-border bg-card space-y-3 hover:border-border/80 transition-colors"
+              className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-3.5 hover:border-border/80 transition-colors shadow-xs"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
@@ -241,21 +255,25 @@ export default function CapstonePage() {
                 </div>
                 <Link
                   href={ph.link}
-                  className="text-xs text-primary hover:underline font-semibold flex items-center gap-1 group"
+                  className="text-xs sm:text-sm text-primary hover:underline font-semibold flex items-center gap-1 group py-1"
                 >
                   <span>ورود به درس شروع این فاز</span>
-                  <ArrowRight className="w-3 h-3 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
                 </Link>
               </div>
 
-              <div className="space-y-1">
-                <h3 className="text-base font-bold text-foreground flex flex-wrap items-baseline gap-2">
+              <div className="space-y-1.5">
+                <h3 className="text-base sm:text-lg font-bold text-foreground flex flex-wrap items-baseline gap-2">
                   <span>{ph.title}</span>
-                  <span className="text-xs text-muted-foreground font-mono ltr-dir">
+                  <span
+                    dir="ltr"
+                    style={{ direction: "ltr", textAlign: "left" }}
+                    className="text-xs text-muted-foreground font-mono ltr-dir"
+                  >
                     [{ph.titleEn}]
                   </span>
                 </h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                <p className="text-[15px] text-foreground/90 leading-[1.85]">
                   {ph.desc}
                 </p>
               </div>
@@ -264,7 +282,9 @@ export default function CapstonePage() {
                 {ph.techs.map((t, tIdx) => (
                   <span
                     key={tIdx}
-                    className="text-[11px] font-mono px-2 py-0.5 rounded bg-secondary/80 border border-border/80 text-muted-foreground ltr-dir"
+                    dir="ltr"
+                    style={{ direction: "ltr", textAlign: "left" }}
+                    className="text-xs font-mono px-2 py-0.5 rounded bg-secondary border border-border text-muted-foreground ltr-dir"
                   >
                     {t}
                   </span>
@@ -279,13 +299,13 @@ export default function CapstonePage() {
       {activeTab === "docker-local" && (
         <div className="space-y-5">
           <div className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-4">
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-primary" />
+            <div className="space-y-1.5">
+              <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
+                <Terminal className="w-5 h-5 text-primary shrink-0" />
                 داکر کامپوز زیرساخت لوکال پروژه
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                این فایل <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-secondary border border-border text-foreground">compose.yaml</code> را در ریشه پروژه جاوا در کامپیوتر خود قرار دهید تا تمامی سرویس‌های مورد نیاز (پایگاه‌داده، کش و صف پیام) با یک فرمان اجرا شوند:
+              <p className="text-[15px] text-muted-foreground leading-[1.85]">
+                این فایل <code dir="ltr" className="font-mono text-xs px-1.5 py-0.5 rounded bg-secondary border border-border text-foreground">compose.yaml</code> را در ریشه پروژه جاوا در کامپیوتر خود قرار دهید تا تمامی سرویس‌های مورد نیاز با یک فرمان اجرا شوند:
               </p>
             </div>
 
@@ -337,10 +357,14 @@ volumes:
   rabbitmqdata:`}
             />
 
-            <div className="p-3.5 rounded-xl border border-border bg-secondary/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="p-4 rounded-xl border border-border bg-secondary/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
               <div className="space-y-1">
-                <span className="font-semibold text-foreground block">دستور راه‌اندازی زیرساخت در ترمینال:</span>
-                <code className="font-mono text-primary ltr-dir block text-xs">
+                <span className="font-bold text-foreground block text-sm">دستور راه‌اندازی زیرساخت در ترمینال:</span>
+                <code
+                  dir="ltr"
+                  style={{ direction: "ltr", textAlign: "left" }}
+                  className="font-mono text-primary ltr-dir block text-xs sm:text-sm"
+                >
                   docker compose -f compose.yaml up -d
                 </code>
               </div>
@@ -348,10 +372,10 @@ volumes:
                 variant="outline"
                 size="sm"
                 onClick={copyCommand}
-                className="text-xs h-8 shrink-0 self-start sm:self-center gap-1.5"
+                className="text-xs h-10 px-3 shrink-0 self-start sm:self-center gap-1.5 cursor-pointer font-sans"
               >
-                {copiedCmd ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedCmd ? "کپی شد" : "کپی دستور"}</span>
+                {copiedCmd ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                <span>{copiedCmd ? "کپی شد ✓" : "کپی دستور"}</span>
               </Button>
             </div>
           </div>
