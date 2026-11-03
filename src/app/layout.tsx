@@ -73,24 +73,26 @@ export default function RootLayout({
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
         />
 
-        <div className="flex-1 flex w-full">
+        <div
+          className={cn(
+            "flex-1 flex flex-col min-w-0 transition-all duration-200",
+            isReaderMode ? "lg:mr-0" : "lg:mr-72"
+          )}
+        >
           {/* Main content container */}
           <main
-            className={cn(
-              "flex-1 min-w-0 p-4 sm:p-6 lg:p-8 transition-all duration-200",
-              isReaderMode ? "lg:mr-0" : "lg:mr-72"
-            )}
+            className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8"
           >
             <div className="max-w-6xl mx-auto">{children}</div>
           </main>
 
-          {/* RTL Sidebar on the right */}
-          {!isReaderMode && (
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          )}
+          <Footer />
         </div>
 
-        <Footer />
+        {/* RTL Sidebar on the right */}
+        {!isReaderMode && (
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        )}
       </body>
     </html>
   );
